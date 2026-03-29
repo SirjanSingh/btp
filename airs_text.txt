@@ -1,0 +1,1027 @@
+
+=== PAGE 1 ===
+ContentslistsavailableatScienceDirect
+ISPRSJournalofPhotogrammetryandRemoteSensing
+journal homepage: www.elsevier.com/locate/isprsjprs
+Aerialimageryforroofsegmentation:Alarge-scaledatasettowards
+automaticmappingofbuildings
+QiChena,c,LeiWangb,d,⁎
+,YifanWud,GuangmingWuc,ZhilingGuoc,StevenL.Waslanderb
+aFacultyofInformationEngineering,ChinaUniversityofGeosciences(Wuhan),Wuhan430074,China
+bMechanicalandMechatronicsEngineeringDepartment,UniversityofWaterloo,Waterloo,ONN2L3G1,Canada
+cCenterforSpatialInformationScience,UniversityofTokyo,Kashiwa277-8568,Japan
+dAtlasAIInc.,Waterloo,ONN2L3G1,Canada
+ARTICLEINFO
+Keywords:
+Roofsegmentation
+Buildingdetection
+Large-scaledataset
+Automaticmapping
+Deeplearning
+ABSTRACT
+Asanimportantbranchofdeeplearning,convolutionalneuralnetworkhaslargelyimprovedtheperformanceof
+buildingdetection.Forfurtheracceleratingthedevelopmentofbuildingdetectiontowardautomaticmapping,a
+benchmarkdatasetbearssignificanceinfaircomparisons.However,severalproblemsstillremaininthecurrent
+public datasets that address this task. First, although building detection is generally considered equivalent to
+extracting roof outlines, most datasets directly provide building footprints as ground truths for testing and
+evaluation; the challenges of these benchmarks are more complicated than roof segmentation, as relief dis-
+placementleadstovaryingdegreesofmisalignmentbetweenroofoutlinesandfootprints.Ontheotherhand,an
+imagedatasetshouldfeaturealargequantityandhighspatialresolutiontoeffectivelytrainahigh-performance
+deeplearningmodelforaccuratemappingofbuildings.Unfortunately,theremotesensingcommunitystilllacks
+properbenchmarkdatasetsthatcansimultaneouslysatisfytheserequirements.Inthispaper,wepresentanew
+large-scale benchmark dataset termed Aerial Imagery for Roof Segmentation (AIRS). This dataset provides a
+widecoverageofaerialimagerywith7.5cmresolutionandcontainsover220,000buildings.Thetaskposedfor
+AIRSisdefinedasroofsegmentation.Weimplementseveralstate-of-the-artdeeplearningmethodsofsemantic
+segmentation for performance evaluation and analysis of the proposed dataset. The results can serve as the
+baselineforfuturework.
+1. Introduction
+Buildings, which serve as the most significant place for human li-
+velihood,areakeyelementondigitalmappingofurbanareas.Withthe
+rapidurbandevelopment,tremendouseffortsarecontinuallyallocated
+to creating and updating locationinformation of buildings for various
+fields, such as urban planning, land investigation, change detection,
+and military reconnaissance. Aerial photogrammetry has been an ef-
+fective technology for accurate mapping of buildings due to its cap-
+ability for high-resolution imaging over large-scale areas.
+Unfortunately, automatic mapping of buildings is still limited by the
+insufficient detection/segmentation accuracy on aerial images. Most
+casesrequireconsiderableamountsofmanualintervention.
+Recent progress in computer vision (CV) field indicates that, with
+support from sufficient computing power and large training datasets
+(Cordts et al., 2016; Deng et al., 2009; Everingham et al., 2010; Lin
+et al., 2014), deep learning techniques such as convolutional neural
+network (CNN) (LeCun et al., 1989) can substantially improve the
+performanceofobjectdetectionandsemanticsegmentationfromfirst-
+person or ground-level imagery (Han et al., 2018; He et al., 2016;
+Krizhevsky et al., 2012). This condition strongly suggests that deep
+learningwillplayacriticalroleinpromotingtheaccuracyofbuilding
+detection toward practical applications of automatic mapping; thus, a
+publicly available dataset is significant for fair comparisons to accel-
+eratethedevelopmentofthisresearchfield.However,althoughseveral
+publicdatasetsaddressbuildingdetection,andnumerousexistingstu-
+dies use these datasets for experiments, critical problems remain be-
+causeofthefollowingreasons:
+(1) AsFig. 1shows, buildings designed for different purposes may
+present distinct patterns of roof surface and boundary, which re-
+quires a deep learning model to construct an extremely high-di-
+mensionalfeaturespacetodescribethelargeintra-classvariability.
+Accordingly, an image dataset also requires a wide coverage and
+https://doi.org/10.1016/j.isprsjprs.2018.11.011
+Received27July2018;Receivedinrevisedform10October2018;Accepted9November2018
+⁎ Corresponding author at: Mechanical and Mechatronics Engineering Department, University of Waterloo, Waterloo, ON N2L 3G1, Canada.
+E-mailaddress:lei.wang@uwaterloo.ca(L.Wang).
+ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+0924-2716/ © 2018 International Society for Photogrammetry and Remote Sensing, Inc. (ISPRS). Published by Elsevier B.V. All rights reserved.
+T
+
+=== PAGE 2 ===
+largequantityofdatatoincreasethefeaturediversityfortraining
+an effective deep learning model. In addition, to achieve accurate
+building mapping, the boundaries or edges of buildings should be
+clearly visible on the images, which further requires the image
+dataset to have high spatial resolution. However, the remote sen-
+sing(RS)communitystilllacksproperbenchmarkdatasetsthatcan
+simultaneouslysatisfytheaboverequirements.Therefore,aspecific
+dataset that focuses on advancing the development of automatic
+buildingmappingshouldbecreated.
+(2) Indigitalorthophotomaps(DOMs),thereliefdisplacementcaused
+by imperfect rectification leads to varying misalignment between
+theroofoutlinesandfootprintsof buildings. As a result, training a
+model to directly learn the pattern of building footprints will in-
+crease the difficulty for effective feature representation. For low
+buildings, detecting footprints is roughly equivalent to extracting
+roofoutlines,whereasformosthighbuildings,thetaskcanbemore
+complicated due to remarkable misalignment. Although adopting
+true DOMs (TDOMs) can theoretically eliminate the influence of
+relief displacement, other problems associated with TDOM gen-
+eration may create barriers for accurate roof segmentation.Fig. 5
+providesadditionaldetailsonthisissue.
+To address the above-mentioned issues, we present a new large-
+scalebenchmarkdatasetnamedAerialImageryforRoofSegmentation
+(AIRS). The proposed dataset provides a large quantity of aerial ima-
+gerywith7.5cmresolutionandcoversalmostallofChristchurchCity
+in New Zealand with about 457km
+2 of land and over 220,000 build-
+ings.ThetaskposedforAIRSisdefinedasroofsegmentation,anditis
+entirelyunaffectedbyreliefdisplacement.
+Our contributions can be summarized as follows: (1) After refine-
+ment of the open-source data released by Land Information of New
+Zealand (LINZ),1 we construct a large-scale aerial image dataset
+containing accurate roof outline annotations. Compared with other
+existingworks,thepresenteddatasetconcentratesmoreontestingthe
+capability of algorithms in precisely segmenting building roofs; such
+capabilityissignificantforpracticalapplicationofautomaticmapping
+in the future. (2) Several state-of-the-art semantic segmentation
+methodsbasedondeeplearningmodels,withperformanceevaluation
+and comparison, are implemented and applied on our dataset; these
+methodscanserveasthebaselineresultsforfuturework.Thedatasetis
+nowpubliclyavailable,andanonlineleaderboardisalsopresentedto
+evaluatetheresultssubmittedbyresearchers.
+2
+The remainder of the paper is organized as follows.Section 2re-
+viewstherelatedpreviousworks.Section3introducestheAIRSdataset.
+Section 4describes the baseline methods.Section 5presents and dis-
+cussestheevaluationandcomparisonresultsforthosemethods.Section
+6 drawsthestudyconclusions.
+2. Previous work
+2.1. Relateddatasets
+The ImageNet dataset(Deng et al., 2009), which provides over 14
+million labeled images containing 22,000 categories, has enabled an
+early breakthrough in applying deep learning algorithms for object
+recognition in the CV field. This dataset was originally designed for
+image classification, which requires the algorithms to determine the
+presence of particular objects in an image. Subsequently, other large-
+scale datasets, such as SUN (Xiao et al., 2010), PASCAL VOC
+(Everinghametal.,2010),KITTI(Geigeretal.,2012),MicrosoftCOCO
+(Lin et al., 2014), and Cityscapes (Cordts et al., 2016), have been in-
+troduced and successfully used for recognition tasks, such as object
+detectionandpixel-levelandinstance-levelsemanticsegmentation.On
+theotherhand,asmanystudiesfocusedondetectionofsinglecategory,
+(a) residential area (b) hospital (c) arc gallery 
+(d) shopping center (e) bus interchange (f) factory 
+Fig. 1.Theintra-classvariabilityofbuildings.
+1https://data.linz.govt.nz. 2https://www.airs-dataset.com/.
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+43
+
+=== PAGE 3 ===
+otherpublicdatasetshavebeencreatedforpopularchallenges,suchas
+face detection (Huang et al., 2007) or pedestrian detection (Dollár
+etal.,2012).
+The above CV datasets are mainly created for understanding first-
+person or ground-level images. In comparison, aerial or satellite ima-
+gery in the RS field offers a different perspective. Thus, the features
+learned from the ground-based imagery to RS data are difficult to
+generalizeandapply.Tocreatelarge-scaledatasetsspecificforRSap-
+plications, various attempts have been first made for RS scene/image
+classification with satellite data. UC-Merced dataset (Yang and
+Newsam,2010)isoneoftheearliestsatellitedatasets;itconsistsof21
+categories and 100 images per category. The images are organized as
+small patches of 256×256 pixels with roughly 30cm resolution and
+arethenusedforsceneclassification.Afterward,othersimilardatasets,
+such as WHU-RS(Huetal., 2015),RSSCN7(Zou etal.,2015),NWPU
+VHR-10 (Chengetal.,2016),AID(Xiaetal.,2017),NWPU-RESISC45
+(Cheng et al., 2017), and PatternNet (Zhou et al., 2018), which are
+mostly collected from Google Earth imagery, have been released in
+succession for this task. The Functional Map of the World is currently
+the largest public satellite dataset for RS scene classification (Christie
+et al., 2017); it not only offers over 1,000,000 images containing 63
+categories but also provides metadata and revisit images for temporal
+reasoningofareaslocatedaroundtheworld.
+Creating a large-scale dataset for semantic labeling, which is an-
+other major topic in photogrammetry and RS, is more difficult than
+scene classification, as pixel-level annotation is required for ground-
+truthproduction.Aprevioussignificantdatasetusedonthistaskisthe
+ISPRS urban classification and building reconstruction benchmark
+(Rottensteineretal.,2012),whichcontainsaerialimageryandairborne
+laser-scanningpointcloudsfordetectionofroads,buildingsandtrees.
+Lateron,thisbenchmarkhasbeenupdatedandextendedforpurposes
+wherea2DsemanticlabelingcontestisorganizedbyprovidingTDOMs
+and the corresponding digital surface models (DSMs) derived from
+dense matching techniques.
+3 On the other hand, considering the diffi-
+culty of making full annotation for large-scale imagery, many public
+datasets create benchmarks that only concern buildings or roads, in
+which the most similar work to ours includes the Massachusetts
+BuildingsDataset(Mnih,2013),theInriaAerialImageLabelingDataset
+(Maggiorietal.,2017c),andtheSpaceNetDatasetadoptedintherecent
+DeepGlobe challenge (Demir et al., 2018).Section 3.3provides a de-
+tailedcomparisonbetweenAIRSandthesecloselyrelateddatasets.
+2.2. CNNandbuildingdetection
+BuildingdetectionfromopticalRSimageryhasdrawnconsiderable
+attentionoverthedecades.Priortodeeplearning,muchoftheworkin
+thisfieldisconductedbyfirstextractingfeatures,suchasstrongedge,
+shape design, roof color, shadow evidence, local context, or their
+combination,basedonspecificknowledgeaboutbuildingrooftopsand
+then applying techniques, such as template matching (Sirmacek and
+Unsalan, 2009), mathematical morphology (Huang and Zhang, 2012;
+Zhang et al., 2016), active contours (Ahmadi et al., 2010; Liasis and
+Stavrou, 2016), graph-based methods (Li et al., 2017; Ok, 2013),
+randomforest(Duetal.,2015),andsupportvectormachine(Inglada,
+2007; Turker and Koc-San, 2015) for building detection. In spite of
+achievingimportantadvances,successfulapplicationofthesemethods
+is mostly at the cost of a careful manual design of the features and is
+largely based on prior knowledge and human experience. However,
+considering the complexity and variety of building shapes, roof sur-
+faces, imaging conditions, and the spatial context, the performance of
+thesemethodscaneasilybelimitedtocertainbuildingshapes,specific
+regions,andhigh-qualityinitialsegmentationresultsbyapplyinglow-
+levelhand-craftedfeatures.
+As an important branch of deep learning, CNNs have achieved re-
+markable improvement in image classification and object detection
+(Han et al., 2018). Recently, they have been increasingly applied in
+building detection or semantic segmentation from RS imagery due to
+their capability of extracting high-dimensional and highly dis-
+criminativefeatureswithoutmanualdesign.Theearlyapplicationsare
+usually performed under a patch-based CNN architecture (Alshehhi
+etal.,2017;Guoetal.,2017,2016;Vakalopoulouetal.,2015).Inthis
+strategy, the CNN model labels every pixel by classifying the image
+patch centered on that pixel with a sliding window, which leads to
+extensive overlapping computations for an image in the training and
+test phases. When dealing with large-scale datasets, the efficiency of
+these approaches can be significantly affected by the heavy computa-
+tion cost. Meanwhile, the patch-based CNN models are probably in-
+capable to generate accurate contours and may produce irregular
+building outlines; thus, post-processing for the segmentation maps re-
+mainsnecessaryincertaincases(Alshehhietal.,2017).
+Fully convolutional network (FCN) largely improves the efficiency
+by transforming the fully connected layers of classic CNN into con-
+volutional layers (Long et al., 2015). FCN provides an end-to-end
+learning framework for image semantic segmentation. In this frame-
+work,insteadofpredictingasinglelabelforaninputpatch,alabelmap
+is generated to achieve pixel-to-pixel classification. By far, FCNs have
+beensuccessfullyappliedinbuildingdetectionfromaerialandsatellite
+imagery (Maggiori et al., 2017a; Shrestha and Vanneschi, 2018). Pre-
+vious comparative results on semantic segmentation verify the ad-
+vantageofFCNoverthestandardpatch-basedstrategyintermsofac-
+curacyandefficiency(VolpiandTuia,2017).
+Following the fully convolutional fashion, several CNN models
+under the bottom-up/top-down architecture, such as U-Net
+(Ronneberger et al., 2015), DeconvNet (Noh et al., 2015), SharpMask
+(Pinheiroetal.,2016),SegNet(Badrinarayananetal.,2017),andfea-
+turepyramidnetwork(FPN)(Linetal.,2016),havebeenproposedto
+furtherimprovetheperformanceofimagesegmentationintheCVfield.
+In general, the development of these models is motivated by the re-
+duced spatial information of the input image after going through sev-
+eral convolution and pooling layers. This reduction can give rise to
+boundary blur or insufficient edge accuracy of segmentation results.
+Therefore, in the bottom-up/top-down architecture, the feature map
+with reduced spatial information is fed into a progressive upsampling
+processratherthandirectlyusedforprediction,andlateralconnections
+areappliedonfeaturemapsatdifferentscalestopreservethesemantic
+andspatialinformation.
+The above advances in CV inspire new attempts on building de-
+tection and image segmentation from RS imagery. The latest work in-
+cludes explicit multi-scale feature fusion (Maggiori et al., 2017b) and
+multi-constraintsonadditionalpredictions (Wuetal.,2018) basedon
+thebottom-up/top-downarchitectureforbuildingdetectionaswellas
+explicitencodingofequivarianceinclassicCNN(Marcosetal.,2018)or
+applying multi-task learning based on the hypercolumn architectures
+(Volpi and Tuia, 2018) for semantic segmentation. Under this back-
+ground, we implement three deep learning models that utilizes multi-
+scale feature fusion in different strategies as the baseline methods for
+theAIRSbenchmark.
+3. AIRS dataset
+3.1. Reasonforfocusingonroofsegmentation
+Inpracticalterms,buildingfootprintisthefinalproductthatcanbe
+usedforvariousapplications.However,forhumanvisualsystems,roof
+outlineisthekeypatternneededforbuildingrecognition.Asshownin
+Fig.2,buildingfootprintscanbeproducedfromaerialimagerythrough
+human editing via two common methods. The first method is stereo
+mapping from overlapping image pairs; this method can extract rela-
+tivelyaccuratefootprintswithelevationinformation.Theothermethod
+3 http://www2.isprs.org/commissions/comm3/wg4/semantic-labeling.html.
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+44
+
+=== PAGE 4 ===
+extracts 2D footprints from DOMs in an approximate manner: the an-
+notatorfirstdrawstheroofoutlineandthenmovestheoutlinetoalign
+withthevisibleedgesofthefootprint.Importantly,thesemethodsboth
+rely on accurate annotation of the roof shape.Directlyextracting the
+footprintwithoutdrawingtheroofoutlineinadvancewillcausediffi-
+cultiesforhumans.Therefore,webelievethatextractingroofoutlines
+can be a significant step for automatic mapping of buildings, as roof
+segmentationisnotonlyamorestraightforwardlearningtaskwithless
+difficulty but is also more consistent with human-like interpretation
+mechanism.
+3.2. Dataacquisitionandrefinement
+Fig. 3displays the study area of the AIRS dataset. The area of in-
+terest (AOI) covers about 457km2, including almost the full area of
+Christchurch,thelargestcityintheSouthIslandofNewZealand.The
+aerial imagery and the corresponding building map are open-source
+data provided by LINZ Data Service. The photographs were captured
+duringtheflyingseasonsof2015and2016,andtheopen-sourceimages
+wereortho-rectifiedDOMswithRGBchannelsand7.5cmresolutionin
+the projection of New Zealand Transverse Mercator. The building
+footprints, which are stored as 2D polygons in a shapefile, were pro-
+ducedinJune2016bymanualannotation.
+Several annotators are hired to scan and refine all the building
+outlines within the AOI to provide reliable ground truths for roof
+segmentationexperiment.Alargepartoftheworkinvolvesmovingthe
+footprints back to the roofs when significant misalignment can be ob-
+served, as shown inFig. 4. The original shapefile included numerous
+false annotations (probably generated from different data source).
+These samples are removed during refinement. We check the whole
+studyareaatleasttwice.WecooperatewiththeteamofWHUbuilding
+dataset(Jietal.,2018)tofinishtheannotationwork.Afterrefinement,
+we create a relatively pure ground-truth dataset, which contains
+226,342buildings,forroofsegmentation.
+3.3. ComparisonbetweenAIRSandthecurrentdatasets
+Table 1presents the comparison of the statistics between the pro-
+posed AIRS datasetand the fourclosely relateddatasets. Thecompar-
+ison shows that ISPRS Dataset features a relatively small coverage,
+which limits its applicability for training high-performance deep
+learningmodels.TheMassachusetts,Inria,andSpaceNetdatasetscover
+large areas.However, the images provided by these datasetsexhibit a
+relatively lower resolution than those of AIRS (
+30cm vs. 7.5cm).
+Although lower resolution will cause no significant influence on the
+object-level recognition of building targets, it will significantly affect
+the performance of high-precision mapping, especially for small
+buildings. In addition, the Massachusetts dataset directly adopts the
+OpenStreetMap (Haklay and Weber, 2008) labels as ground truths,
+which may bring considerable noises (i.e., incorrect or missing
+Fig. 2.Manualeditingmethodstoproducebuildingfootprintsfrom(a)originalstereo-imagepairsand(b)DOMs.
+Fig. 3.GeolocationoftheproposedAIRSdataset.ThewhitepolygonindicatestheAOI.Alltheannotatedbuildingsforbenchmarkingarehighlightedinred.
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+45
+
+=== PAGE 5 ===
+annotations)causedbycrowdsourcing.
+Another noteworthy problem is that the four related datasets pro-
+vide footprints rather than roof outlines as ground truths. InFig. 5,
+somerepresentativepatchesarecroppedfromthosedatasetstoindicate
+this problem. Although many building roofs appear consistent with
+their footprints in aerial imagery, for high buildings or small view-
+elevation angle, significant misalignment can occur (seeFig. 4a, b),
+presenting complicated patterns for learning by a model. Therefore,
+providing footprints will increase the difficulty and complexity of
+training effective models for accurate building mapping. The ISPRS
+dataset provides TDOMs rectified with dense-matching DSM. Thus,
+misalignment can be partially resolved. However, the errors of dense
+matching may cause notable texture distortion at building boundaries
+(seeFig.4c,d).Consideringthatedgeinformationisusefulforbuilding
+outlineextraction,thisdatasetmaybeunsuitablefordevelopingalgo-
+rithmstowardautomaticbuildingmapping.
+3.4. Splitsofdataset
+All the aerial images within the AOI are first merged into a single
+mosaicandthentiledintosmallerimagesforbetterhandling.Thetiled
+images feature a size of 10000×10000 pixels, with a 10% overlap
+betweenadjacenttiles.Asaresult,thewholeregionistiledinto1047
+images.Tofacilitateresearch,asshowninFig.6,wesplitthedatasetby
+randomlyassigningtheimagestothefollowingthreesubsets:
+•Trainingset.Thissetcontains857imagesandthecorrespondingroof
+labelsfortraining.
+•Validation set.This set contains 94 images and the corresponding
+rooflabelsforvalidation.
+•Test set.This set contains 96 images for benchmark testing.
+Currently,forfaircomparison,thecorrespondingrooflabelsarenot
+disclosed.Theywillbeusedforevaluatingtheresultssubmittedto
+thepublicchallengecenteredontheAIRSdataset.
+4. Baselines and methods
+Several state-of-the-art deep learning models are implemented as
+the baseline methods for benchmarking. ResNet is currently a com-
+monly-used architecture in object recognition, as it allows effective
+training of very deep neural networks. Moreover, the architecture of
+ResNet has been proven powerful in feature extraction for RS images
+(Kaiseretal.,2017;Kemkeretal.,2018;Linetal.,2017;Zhongetal.,
+2018); thus, in AIRS challenge, the ResNet-101 (He et al., 2016) is
+adoptedasthebasestructureforthethreebaselinemethodsappliedon
+roofsegmentation.
+4.1. FPN
+We first select FPN as a typical model of the bottom-up/top-down
+architecture and the first baseline method in our work. As shown in
+Fig. 7, FPN extends the classic ResNet architecture by progressively
+upsampling the feature map at different spatial scales, creating an in-
+network feature pyramid. Hence, the model can be considered the
+combinationofabottom-upstructure(theResNet-101)andatop-down
+structure,inwhichseverallateralconnectionsareappliedtomergethe
+featuremapsofthesamespatialsizefromthetwostructures.Thelat-
+eral connection aims to combine high-resolution, semantically weak
+featuresfromthebottom-upstructurewithlow-resolution,semantically
+strong features from the top-down structure to create semantically
+strongfeaturemapswithhighresolution.Whatfollowsthefinalfeature
+map is an inference structure, which is used to generate prediction
+resultsforeachpixeloftheinputimage.
+4.2. FPNwithmulti-scalefeaturefusion(MSFF)
+TheplainFPNarchitecturecreatesfeaturemapsatdifferentspatial
+scales.However,onlyasinglefeaturemapisusedforprediction.Other
+studies have demonstrated that explicitly fusing multi-scale features
+Fig. 4.Buildingoutlinesbeforeandafterrefinement,denotedbyredandcyancolors,respectively.Therefinementworkincludes:(a)movingthefootprintbackto
+roofoutlineand(b)removaloffalseannotations.
+Table 1
+ComparisonbetweenAIRSandcurrentstate-of-the-artbenchmarks.
+Dataset ISPRS Massachusetts Inria SpaceNet AIRS(ours)
+Location Vaihingen/Potsdam Massachusetts 10regionsinUSAandAustria 5citiesaroundtheworld Christchurch
+DataType CIR/IRRGB+DSM RGB RGB 8-bandimagery RGB
+TargetofSegmentation 6land-coverclasses Building Building Building,road Building
+Coverage(km2) 1.4/3.4 340 810 5555 457
+Resolution(cm) 9/5 100 30 30–50 7.5
+OpenStreetMapLabels – Yes – – –
+TDOM yes – – – –
+RefinedtoRoofOutline – – – – Yes
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+46
+
+=== PAGE 6 ===
+canimprovetheperformanceofimagesegmentation(Chenetal.,2016;
+Hariharan et al., 2015; Marmanis et al., 2018); thus, in the second
+baselinemethod,weextendtheplainFPNbyfusingthefeaturemapson
+differentscalesforprediction.ThisextendedversionisdenotedasFPN
+withMSFF(FPN+MSFF).AsshowninFig.8,thefeaturemapsonfour
+differentscalesfromthetop-downstructureofFPNarerescaledtothe
+samespatialdimensionandsummeduptogenerateanewfeaturemap
+forprediction.
+4.3. Pyramidsceneparsingnetwork(PSPNet)
+The third baseline method is PSPNet (Zhao et al., 2017), which is
+one of the state-of-the-art deep learning models for semantic image
+segmentation. In comparison with FPN, which mainly exploits local
+multi-scale information, PSPNet focuses more on exploring global in-
+formationindifferentscales.Toenhancetherepresentationofcontext
+information among different sub-regions, PSPNet applies a pyramid
+pooling module on the feature map generated by ResNet to create
+pooledfeaturemapsatdifferentlevels.Thesefeaturesarethenmerged
+andusedforprediction.
+AsshowninFig.9,thePSPNetappliedonAIRSchallengefollowsits
+originaldesign.Thepyramidpoolingmodulefeaturesfourlevelswith
+different bin sizes and appended to the feature map of ResNet-101. A
+1×1convolutionallayerisappliedoneachpyramidleveltoreduceits
+dimensiontoafixeddepth.Thesumofthechannelsofthefourlevelsis
+set equal to the dimension of the original feature map. Afterward, all
+thepooledfeaturemapsareupsampledtothesamesizeoftheoriginal
+feature map. The five feature maps are then concatenatedas the final
+pooling feature, which is followed by an inference structure for pre-
+diction.
+4.4. Implementationdetails
+Table 2shows the detailed architectures of the three baseline
+methods for AIRS challenge. The outputs of Conv1, Conv2, Conv3,
+Conv4, and Conv5are denotedas C
+1,C2, C3, C4, and C5,respectively.
+The feature maps in the feature pyramid corresponding to C2, C3, C4,
+andC5areP2,P3,P4,andP5,respectively.P2 isthefinalfeaturemapof
+FPNforprediction.ForFPN+MSFF,thefinalfeaturemapisthefusion
+result of P
+2, P3, P4, and P5. For PSPNet, the pooled feature maps PO1,
+PO2, PO3, and PO4 are first generated from C5 by pyramid pooling.
+Then,thefinalfeaturemapiscreatedbyconcatenatingC5andthefour
+pooled feature maps. The three models share the same inference
+structure that generates the probability map in a fully convolutional
+fashion.Thefinalroofsegmentationresultintheformofabinarymap
+is obtained from the probability map using a threshold of 0.5, which
+meansthateachpixelwillbeclassifiedtothelabel(roofornon-roof)of
+thehighestprobability.
+For each convolutional layer of the models, a batch normalization
+(BN) layer (Ioffe and Szegedy, 2015) is applied after the convolution
+operation;then,theBNoutputisfurtherhandledbythenonlinearac-
+tivationfunctionoftherectifiedlinearunit(NairandHinton,2010).All
+theupsamplingoperationsareperformedviabilinearinterpolation.
+Weimplementthethreebaselinemethodsusingthepublicplatform
+TensorFlow (Abadi et al., 2016) on a 64-bit Ubuntu system equipped
+with an NVIDIA GeForce GTX 1080 Ti GPU. We initialize the ResNet-
+101 structure with the publicly available pretrained model (He et al.,
+2016). The weights of additional parameters are initialized using the
+standardGaussiannormaldistributionwithameanof0andastandard
+deviationof0.01.Weuseaweightdecayof0.0001andamomentumof
+0.95(Krizhevskyetal.,2012).
+ThetiledimagesofAIRSarefurtherdividedintosmallcropstofeed
+into the models. A large batch size is helpful for efficient model
+training;however,sincetheimagespatialresolutioninAIRSishigh,it
+is important to have a relatively large crop size to provide sufficient
+contextinformation.DuetothelimitedGPUmemory,largercropsize
+means smaller batch size. With careful tuning, we set crop size to
+401×401pixelsandusebatchsize2inallourexperiments.Asliding
+Fig. 5.Samples of currentstate-of-the-artpublic datasetsfor building detection.(a) and (b) show themisalignment betweenroof outlines and footprints in Inria
+AerialImageLabelingandSpaceNetdatasets,respectively;(c)and(d)showthetexturedistortionofbuildingboundariesinVaihingenandPotsdaminISPRSdataset,
+respectively.
+Fig. 6.Geographicaldistributionofimagesin:(a)trainingset,(b)validationset,and(c)testsetofAIRSdataset.
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+47
+
+=== PAGE 7 ===
+windowwithastepsizeof134(onethirdof401)isusedtogeneratethe
+crops. Thus, every two consecutive crops have a 66.6% overlap hor-
+izontallyorvertically.
+We use several standard data augmentation methods to resist
+overfitting. We first apply random left-right flipping (with 50% prob-
+ability)foreachtrainingcrop.Besidesthat,randomscalingwithratio
+of0.8,0.9,1.0,1.1or1.2isapplied,thescaledcropsarethencropped
+or padded to the fixed size of 401×401 pixels. Afterward, random
+rotation of 0, 90, 180 or 270 degrees is performed with equal prob-
+ability. Furthermore, dropout with probability of 0.05 is used to ran-
+domly mask out pixel values. Meanwhile, with 50% probability, zero-
+meanGaussiannoisewithavarianceof5isaddedforeachchannelof
+theimageindependently.
+We use the union of training set and validation set of AIRS (951
+Fig. 7.ArchitectureofFPN.
+Fig. 8.ArchitectureoftheFPN+MSFF.
+Fig. 9.ArchitectureofPSPNet.
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+48
+
+=== PAGE 8 ===
+images,morethan5millioncropsintotal)totrainandreportresultson
+the96imagesofthetestset.Theaveragebuilding/non-buildingratioof
+allcropsis0.738,whichindicatesthatthereisnoobviousbiasbetween
+positive and negative training samples. Each model is trained end-to-
+end by mini-batch stochastic gradient descent and backpropagation
+algorithms (LeCun et al., 1989) for approximately 2weeks. The num-
+bersofiterationsforPSPNet,FPN,andFPN+MSFFare696K,532K,
+and 516K, respectively, which are inversely proportional to the com-
+plexityofthemodels.Duringtraining,theinitiallearningrateissetas
+0.001, which decreases by 10 times at 300K. To reduce random var-
+iations for each baseline method, the median error of the last five
+models with 10K iteration interval (e.g., PSPNet models at 656K,
+666K, 676K, 686K, and 696K) is reported for comparison (Goyal
+etal.,2017).Inpredictionphase,eachtestimageisdividedintocrops
+andfedintothemodels.Thegeneratedprobabilitymapsofallthecrops
+aremergedtooneprobabilitymapof10,000×10,000pixels.Forthe
+overlappingareasbetweencrops,theaverageprobabilityiscalculated
+asoutput.
+5. Results and discussion
+5.1. Overallevaluation
+The evaluation metrics of intersection over union (IoU) (Jaccard,
+1912)andF1-score(Powers,2011)areusedtoreflecttheoverallper-
+formance of the baseline methods. On the other hand, precision and
+recall, which indicate the correctness and completeness of the roof
+segmentation results, respectively, are also adopted for evaluation. As
+shown inTable 3, we first evaluate the segmentation results of all
+imagesinthetestsetasawholeforeachmethod.
+In general, the three baseline methods achieve good performance
+with IoU and F1-score higher than 0.88 and 0.93, respectively.
+Consideringthelargequantityandrandomdistributionofthetestdata
+(96 images, each with 10,000×10,000 pixels), the complexity and
+variety of the dataset can be well managed by very deep neural net-
+worksonroofsegmentation.
+Among the three methods, PSPNet yields the highest IoU and F1-
+score. Results show similar performances of the three models in sup-
+pressingfalsepositives.TheadvantageofPSPNetoverthetwoversions
+ofFPNmainlyliesinthecompletenessofsegmentationresults.Onthe
+other hand, FPN+MSFF slightly outperforms FPN by achieving high
+recall, which shows that multi-scale feature fusion can improve the
+performanceofmodelsincompletenessofthedetectedroofs.
+AlsonotethatthefinalfeaturemapofPSPNetforpredictionhasthe
+lowestspatialresolution(51×51pixels,one-eighthoftheinputsize),
+which indicates that the architecture design of the network plays a
+more important role in promoting segmentation performance rather
+thansimplyimprovingtheresolutionofthefeaturemapthroughlateral
+connectionandupsampling.
+Table 2
+ConfigurationsofthethreebaselinedeeplearningmodelsforAIRSchallenge.
+Layer/Module Outputname Outputsize FPN FPN+MSFF PSPNet
+Conv1 C1 201×201 7×7,64,stride2
+Conv2_x C2 101×101 3×3maxpool,stride2
+×
+×
+×
+×
+1 1, 64
+3 3, 64
+1 1, 256
+3
+Conv3_xa C3 51×51
+×
+×
+×
+×
+1 1, 128
+3 3, 128
+1 1, 512
+4
+Conv4_xa C4 26×26
+(51×51)
+×
+×
+×
+×
+1 1, 256
+3 3, 256
+1 1, 1024
+23
+Conv5_xa C5 13×13
+(51×51)
+×
+×
+×
+×
+1 1, 512
+3 3, 512
+1 1, 2048
+3
+Conv6 P5 13×13 1×1,256 –
+Lateral4 P4 26×26 C4∼(1×1,256);P 5∼upsample
+sum
+Lateral3 P3 51×51 C3 ∼(1×1,256);P 4∼upsample
+sum
+Lateral2 P2
+(FinalFeatureofFPN)
+101×101 C2∼(1×1,256);P 3 ∼upsample
+sum
+Fusion FinalFeatureofFPN+MSFF 201×201 – P2∼(3×3,256),upsample;
+P3 ∼(3×3,256),upsample;
+P4∼(3×3,256),upsample;
+P5∼(3×3,256),upsample
+–
+sum
+PyramidPool PO 1,PO2,PO3,PO4 1×1,2×2,3×3,6×6 – maxpool
+1×1,256
+Concat FinalfeatureofPSPNet 51×51 C
+5;(PO1∼PO 4)∼upsample
+concatenate
+Inference Probability 401×401 3×3,512
+dropout
+1×1,2;upsample;softmax
+a For FPN and FPN+MSFF, the feature map is downsampled with a stride of 2 by Conv3_1, Conv4_1, and Conv5_1; for PSPNet, following the original im-
+plementation,nodownsamplingisperformedintheselayers.
+Table 3
+Evaluation of the three baseline methods for all the test images in AIRS. For
+everymetric,thehighestvalueishighlightedinbold.
+Method IoU F1-score Precision Recall
+FPN 0.882 0.937 0.963 0.913
+FPN+MSFF 0.888 0.941 0.958 0.924
+PSPNet 0.899 0.947 0.961 0.933
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+49
+
+=== PAGE 9 ===
+t e N P S PF F S M + N P FN P Fa e r a t s e T
+Residential area I = 0.892; F = 0.943; P = 0.965; R = 0.922 I = 0.891; F = 0.943; P = 0.958; R = 0.927 I = 0.894; F = 0.944; P = 0.962; R = 0.927
+Central business area I = 0.683; F = 0.812; P = 0.920; R = 0.726 I = 0.681; F = 0.810; P = 0.933; R = 0.717 I = 0.713; F = 0.833; P = 0.908; R = 0.769
+(a) 
+(b) 
+Industrial area I = 0.869; F = 0.930; P = 0.975; R = 0.889 I = 0.884; F = 0.938; P = 0.979; R = 0.901 I = 0.909; F = 0.952; P = 0.976; R = 0.930
+Complex area I = 0.871; F = 0.931; P = 0.964; R = 0.900 I = 0.889; F = 0.941; P = 0.961; R = 0.922 I = 0.910; F = 0.953; P = 0.963; R = 0.943
+Village area I = 0.898; F = 0.946; P = 0.948; R = 0.945 I = 0.872; F = 0.932; P = 0.908; R = 0.956 I = 0.897; F = 0.945; P = 0.943; R = 0.948 
+(c) 
+(d) 
+(e) 
+Fig.10.Evaluationofthebaselinemethodsindifferentareas.Theyellow,red,blue,andwhitepixelsoftheevaluationmapsrepresentthepredictionresultsoftrue
+positives,falsepositives,falsenegatives,andtruenegatives,respectively.ThevaluesofI,F,P,andRrefertotheevaluationresultsofIoU,F1-score,precision,and
+recallmetricsforthewholeimage,respectively.(Forinterpretationofthereferencestocolourinthisfigurelegend,thereaderisreferredtothewebversionofthis
+article.)
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+50
+
+=== PAGE 10 ===
+5.2. Detailedanalysis
+AsshowninFig.10,representativeimagesareselectedfromthetest
+set to further analyze the performance of the baseline methods in dif-
+ferent types of regions. Specifically,(a) is a residential area with den-
+selydistributedhouses;(b)isthecentralbusinessareaofthecity,with
+many irregular buildings around a large square; (c) is a typical in-
+dustrial area, including many factory buildings at both sides of the
+railways; (d) is a complex area, which contains factories, government
+buildings,schools,andresidentialhouses;and(e)isavillageareawith
+largevegetationcoverageandfewhouses.
+The baseline methods perform differently in different areas. In re-
+sidentialandvillageareas(Fig.9a,e),buildingroofscanbemostlywell
+segmentedbythethreemethods,andmostofthevegetationareacanbe
+excludedcorrectly.Intheseareas,highaccuracycanbeachievedbythe
+three methods probably due to the consistency and regularity of roof
+size and shape. However, no improvement is reported by the MSFF
+strategy over the plain FPN. In the central business area (Fig. 10b),
+although PSPNet slightly outperforms the two FPNs, all the methods
+performpoorlymainlybecauseoflowrecall.Apossibleexplanationis
+that the roof surfaces in this area exhibit more complex patterns,
+especiallyforbuildingswithirregularshapesorsmallpartsstackingon
+the major structure. In the industrial area (Fig. 10c), most factory
+buildings are well detected, and few railroad cars are mistaken. The
+performance difference among the methods is mainly caused by their
+recall capability (0.889 vs. 0.901 vs. 0.930), which is evidently re-
+flectedinthesegmentationofthetwolargebuildingsintheimage.The
+results in the complex area (Fig. 10d) validate our findings in other
+areas:formostresidentialhouseswithregularshapesandsmoothroof
+surfaces, allthe methods canachieve highsegmentationaccuracy;for
+industrialareas,especiallylargefactorybuildings,PSPNetoutperforms
+theFPNsbydetectingmorecompletestructures,whereasFPN+MSFF
+presentsaslightlyimprovedperformancecomparedwiththeplainFPN.
+Fig.11showstypicalscenarioswhereremarkabledifferencesinthe
+three methodscanbeobserved.Specifically,for thebuildingcentered
+in(a),thetwoFPNsfailtosegmentthecompositestructureasasingle
+object, whereas PSPNet achieves better results by “linking” the three
+parts together. The building pointed by the arrow in (b) possesses a
+two-layer structure. The shadow cast by the high parts prevents FPN
+fromdetectingtheroofcompletely,whereastheothertwomethodsare
+not affected by the shadow. The facilities and shadow on top of the
+buildingin(c)providetheroofwithacomplicatedpattern,leadingto
+significant miss detection in the results of the two FPNs. By contrast,
+PSPNetcanstillroughlysegmentthewholeroof.Thebuildingcentered
+in (d) is a large factory (with a bounding box of about 1700×2500
+pixels); therefore, it must be divided into several crops (each with
+401×401pixels)andprocessedseparatelyforprediction.Inthiscase,
+the two FPNs suffer from serious miss detection of the central part of
+the roof in varying degrees, whereas PSPNet outperforms them with
+less false negatives. (e) shows several residential buildings with mul-
+tiplelayersorirregularshapes,whichcreatecertaindifficultiesforthe
+threemethods.However,anadvantageofPSPNetcanstillbeobserved:
+it shows better performance in suppressing false detection when the
+FPNsmixupthegroundorgrasswiththeroof(aspointedbytheblack
+arrows). PSPNet also shows better capability in correctly segmenting
+theunsmoothareaontheroofpointedbythegreenarrow.
+As stated above, although the three methods exhibit close perfor-
+mancesoverthewholetestarea,forspecificscenarios,PSPNetnotonly
+shows a certain advantage over the two FPNs in preserving the com-
+pleteness of the roofs but also achieves better robustness to the irre-
+gularity and roughness of the roof surfaces. A possible explanation is
+thatthepyramidpoolingmoduleinPSPNetaidsthemodelinlearning
+thecontextinformationoftheinputimage,whichreasonablyleadsto
+betterglobalrecognitionofthebuildingtargets.
+5.3. Areasforimprovement
+Thecurrentsegmentationperformanceofthebaselinemethodsstill
+requires considerable improvement.Fig. 12shows typical problems
+thathave notbeen resolved.Occlusionof treesand shadowsis oneof
+the most representative problems, as shown inFig. 12a. The baseline
+models cannot conduct human-likereasoning in these cases, thus pre-
+venting them from generating more practical segmentation results.
+Moreover, the models are easily confused by buildings under con-
+struction(Fig.12b),althoughthesurfacesofsuchobjectsusuallypre-
+sentdifferentpatterns.Inthecentralbusinessarea,whenencountering
+buildingswithcomplexroofsurfacesoruncommonfacilitiesonthetop,
+the models can almost ignore the whole target (Fig. 12c) or omit the
+unsmooth area (Fig. 12d). On the other hand, surfaces presenting si-
+milar patterns with roofs, such as the square inFig. 12d, can also be
+falsely detected. The last problem often occurs when processing large
+buildings.AsshowninFig.12e,difficultyarisesforextractionofglobal
+contextual information of the building due to the limited crop size.
+Hence,thesmoothsurfaceoftheroofcanbeeasilydetectedasroadsor
+other negative samples. Generally, although the baseline methods
+perform well on detecting regular or typical roofs, they are still chal-
+lengedbytheintra-classvariabilitiesofbuildingsandinter-classsimi-
+larities between buildings and other background objects in certain
+cases.
+The above problems provide at least two important directions for
+improvement. The first direction involves applying a generative ad-
+versarialnetwork(Goodfellowetal.,2014)onthesegmentationtaskto
+improve the reasoning capability of the models; thus, the complete
+structurecanpossiblybesegmentedeveniftheroofisnotcompletely
+visible. The second involves conducting instance-aware segmentation
+(Dai et al., 2015) in different spatial scales; thus, the deep learning
+modelscanextractandunderstandobject-levelcontextualinformation
+efficiently, which will aid in detecting large buildings. In addition,
+expandingtrainingsamplesforspecifictypesofareasorbuildingsalso
+bears significance in enhancing the generalization capability of the
+models.
+6. Conclusion
+In this work, we present a publicly available large-scale aerial da-
+taset for developing and evaluating methods to advance the develop-
+ment of automatic building mapping. We conduct refinement on the
+open-source data to accurately align the polygons with roof outlines
+andremovefalseannotationsandtoprovidereliablegroundtruthsfor
+roofsegmentationexperiment.Furthermore,threestate-of-the-artdeep
+learning methods, including two versions of FPNs and PSPNet, are
+implemented as the baseline methods for benchmarking. The evalua-
+tionverifiesthehighperformanceofthedeeplearningmodelsonroof
+segmentationandalsodemonstratesareasforfutureimprovement.
+Moreover,wewanttopointoutafewlimitationsofthiswork.First
+and foremost, the proposed dataset focuses on evaluating the roof
+segmentationperformanceonaerialimages,whichmeansthatthedeep
+learning model trained by this dataset may not work well on images
+capturedfromsatelliteorotherplatforms.Inthiscase,thedatasetcan
+be used to pre-train deep learning models for other types of images.
+Compared to training from scratch, fine-tuning the pre-trained model
+ontargetsatelliteimagesrequireslesssamples.Italsoshouldbenoted
+that when large relief displacement exists, roof segmentation results
+may not represent the actual building geolocations. To obtain more
+accurate geolocation results of buildings, providing more information
+(i.e.,footprintalongwithroofoutline)forthemodeltolearnisafuture
+directionworthexploring.Theseproblemswillbefurtherstudiedinour
+follow-upwork.Meanwhile,wewillcollectmorehigh-resolutionaerial
+imagery data from different regions around the world to enhance the
+varietyofthecurrentdataset.
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+51
+
+=== PAGE 11 ===
+t e N P S PF F S M + N P FN P Fa e r a t s e T
+(b)
+(c) 
+(d)
+(e) 
+Fig.11.Typicalscenariosthatdemonstratetheperformancedifferencesamongthebaselinemethods.Theyellow,red,blue,andwhitepixelsoftheevaluationmaps
+representthepredictionresultsoftruepositives,falsepositives,falsenegatives,andtruenegatives,respectively.(Forinterpretationofthereferencestocolourinthis
+figurelegend,thereaderisreferredtothewebversionofthisarticle.)
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+52
+
+=== PAGE 12 ===
+t e N P S PF F S M + N P FN P Fa e r a t s e T
+Fig. 12.Mainproblemsofthebaselinemethodsfor futureimprovement.The yellow,red, blue,andwhitepixels oftheevaluationmapsrepresenttheprediction
+resultsoftruepositives,falsepositives,falsenegatives,andtruenegatives,respectively.(Forinterpretationofthereferencestocolourinthisfigurelegend,thereader
+isreferredtothewebversionofthisarticle.)
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+53
+
+=== PAGE 13 ===
+Acknowledgements
+This work was partially supported by National Natural Science
+Foundation of China (No. 41601506); and China Postdoctoral Science
+Foundation(No.2016M590730);andJapanSocietyforthePromotion
+of Science (JSPS) Grant (No. 16K18162). We want to thank National
+Topographic Office of New Zealand for theirkind open-souringof the
+data, and also thank Prof. Shunping Ji from Wuhan University for
+helpingwiththeannotationoftheproposeddataset.
+References
+Abadi,M.,Barham,P.,Chen,J.,Chen,Z.,Davis,A.,Dean,J.,Devin,M.,Ghemawat,S.,
+Irving,G.,Isard,M.,Kudlur,M.,Levenberg,J.,Monga,R.,Moore,S.,Murray,D.G.,
+Steiner,B.,Tucker,P.,Vasudevan,V.,Warden,P.,Wicke,M.,Yu,Y.,Zheng,X.,2016.
+TensorFlow:asystemforlarge-scalemachinelearning.In:Proceedingsofthe12th
+USENIXConferenceonOperatingSystemsDesignandImplementation,OSDI’16.
+USENIXAssociation,Berkeley,CA,USA,pp.265–283.
+Ahmadi,S.,Zoej,M.J.V.,Ebadi,H.,Moghaddam,H.A.,Mohammadzadeh,A.,2010.
+Automaticurbanbuildingboundaryextractionfromhighresolutionaerialimages
+usinganinnovativemodelofactivecontours.Int.J.Appl.EarthObs.Geoinf.https://
+doi.org/10.1016/j.jag.2010.02.001.
+Alshehhi,R.,Marpu,P.R.,Woon,W.L.,Mura,M.D.,2017.Simultaneousextractionof
+roadsandbuildingsinremotesensingimagerywithconvolutionalneuralnetworks.
+ISPRSJ.Photogramm.RemoteSens.130,139–149.https://doi.org/10.1016/j.
+isprsjprs.2017.05.002.
+Badrinarayanan,V.,Kendall,A.,Cipolla,R.,2017.SegNet:adeepconvolutionalencoder-
+decoderarchitectureforimagesegmentation.IEEETrans.PatternAnal.Mach.Intell.
+39,2481–2495.https://doi.org/10.1109/TPAMI.2016.2644615.
+Chen,L.C.,Yang,Y.,Wang,J.,Xu,W.,Yuille,A.L.,2016.Attentiontoscale:scale-aware
+semanticimagesegmentation.In:2016IEEEConferenceonComputerVisionand
+PatternRecognition(CVPR),pp.3640–3649.https://doi.org/10.1109/CVPR.2016.
+396.
+Cheng,G.,Han,J.,Lu,X.,2017.Remotesensingimagesceneclassification:benchmark
+andstateoftheart.Proc.IEEE.https://doi.org/10.1109/JPROC.2017.2675998.
+Cheng,G.,Zhou,P.,Han,J.,2016.Learningrotation-invariantconvolutionalneural
+networksforobjectdetectioninVHRopticalremotesensingimages.IEEETrans.
+Geosci.RemoteSens.54,7405–7415.https://doi.org/10.1109/TGRS.2016.2601622.
+Christie,G.,Fendley,N.,Wilson,J.,Mukherjee,R.,2017.FunctionalMapoftheWorld2.
+Cordts,M.,Omran,M.,Ramos,S.,Rehfeld,T.,Enzweiler,M.,Benenson,R.,Franke,U.,
+Roth,S.,Schiele,B.,2016.Thecityscapesdatasetforsemanticurbansceneunder-
+standing.http://doi.org/10.1109/CVPR.2016.350.
+Dai,J.,He,K.,Sun,J.,2015.Instance-awaresemanticsegmentationviamulti-tasknet-
+workcascades,pp.3150–3158.http://doi.org/10.1109/CVPR.2016.343.
+Demir,I.,Koperski,K.,Lindenbaum,D.,Pang,G.,Huang,J.,Basu,S.,Hughes,F.,Tuia,D.,
+Raskar,R.,2018.DeepGlobe2018:achallengetoparsetheearththroughsatellite
+images,pp.172–181.http://doi.org/10.1109/CVPRW.2018.00031.
+Deng,J.,Dong,W.,Socher,R.,Li,L.-J.,Li,K.,Fei-Fei,L.,2009.ImageNet:alarge-scale
+hierarchicalimagedatabase.In:2009IEEEConf.Comput.Vis.PatternRecognit.pp.
+248–255.https://doi.org/10.1109/CVPRW.2009.5206848.
+Dollár,P.,Wojek,C.,Schiele,B.,Perona,P.,2012.Pedestriandetection:anevaluationof
+thestateoftheart.IEEETrans.PatternAnal.Mach.Intell.34,743–761.https://doi.
+org/10.1109/TPAMI.2011.155.
+Du,S.,Zhang,F.,Zhang,X.,2015.Semanticclassificationofurbanbuildingscombining
+VHRimageandGISdata:Animprovedrandomforestapproach.ISPRSJ.
+Photogramm.RemoteSens.https://doi.org/10.1016/j.isprsjprs.2015.03.011.
+Everingham,M.,VanGool,L.,Williams,C.K.I.,Winn,J.,Zisserman,A.,2010.Thepascal
+visualobjectclasses(VOC)challenge.Int.J.Comput.Vis.88,303–338.https://doi.
+org/10.1007/s11263-009-0275-4.
+Geiger,A.,Lenz,P.,Urtasun,R.,2012.Arewereadyforautonomousdriving?theKITTI
+visionbenchmarksuite.In:ProceedingsoftheIEEEComputerSocietyConferenceon
+ComputerVisionandPatternRecognition,pp.3354–3361.https://doi.org/10.1109/
+CVPR.2012.6248074.
+Goodfellow,I.,Pouget-Abadie,J.,Mirza,M.,Xu,B.,Warde-Farley,D.,Ozair,S.,Courville,
+A.,Bengio,Y.,2014.Generativeadversarialnets.Adv.NeuralInf.Process.Syst.27.
+https://doi.org/10.1017/CBO9781139058452.
+Goyal,P.,Dollár,P.,Girshick,R.,Noordhuis,P.,Wesolowski,L.,Kyrola,A.,Tulloch,A.,
+Jia,Y.,He,K.,2017.Accurate,LargeMinibatchSGD:TrainingImageNetin1Hour.
+http://doi.org/10.1561/2400000003.
+Guo,Z.,Chen,Q.,Wu,G.,Xu,Y.,Shibasaki,R.,Shao,X.,2017.Villagebuildingidenti-
+ficationbasedonEnsembleConvolutionalNeuralNetworks.Sensors(Switzerland).
+Guo,Z.,Shao,X.,Xu,Y.,Miyazaki,H.,Ohira,W.,Shibasaki,R.,2016.Identificationof
+villagebuildingviaGoogleEarthimagesandsupervisedmachinelearningmethods.
+RemoteSens.https://doi.org/10.3390/rs8040271.
+Haklay,M.,Weber,P.,2008.OpenStreetMap:user-generatedstreetmaps.IEEEPervasive
+Comput.7,12–18.https://doi.org/10.1109/MPRV.2008.80.
+Han,J.,Zhang,D.,Cheng,G.,Liu,N.,Xu,D.,2018.Advanceddeep-learningtechniques
+forsalientandcategory-specificobjectdetection:asurvey.IEEESignalProcess.Mag.
+https://doi.org/10.1109/MSP.2017.2749125.
+Hariharan,B.,Arbeláez,P.,Girshick,R.,Malik,J.,2015.Hypercolumnsforobjectseg-
+mentationandfine-grainedlocalization.In:Proc.IEEEComput.Soc.Conf.Comput
+Vis.PatternRecognit.07–12–June,pp.447–456.https://doi.org/10.1109/CVPR.
+2015.7298642.
+He,K.,Zhang,X.,Ren,S.,Sun,J.,2016.Deepresiduallearningforimagerecognition.In:
+2016IEEEConf.Comput.Vis.PatternRecognit.pp.770–778.https://doi.org/10.
+1109/CVPR.2016.90.
+Hu,J.,Jiang,T.,Tong,X.,Xia,G.-S.,Zhang,L.,2015.Abenchmarkforsceneclassifi-
+cationofhighspatialresolutionremotesensingimagery.In:Geosci.RemoteSens.
+Symp.(IGARSS),2015IEEEInt.pp.5003–5006.https://doi.org/10.1109/IGARSS.
+2015.7326956.
+Huang,G.B.,Ramesh,M.,Berg,T.,Learned-Miller,E.,2007.Labeledfacesinthewild:a
+databaseforstudyingfacerecognitioninunconstrainedenvironments,vol.1,07–49
+doi:10.1.1.122.8268.
+Huang,X.,Zhang,L.,2012.Morphologicalbuilding/shadowindexforbuildingextraction
+fromhigh-resolutionimageryoverurbanareas.IEEEJ.Sel.Top.Appl.EarthObs.
+RemoteSens.https://doi.org/10.1109/JSTARS.2011.2168195.
+Inglada,J.,2007.Automaticrecognitionofman-madeobjectsinhighresolutionoptical
+remotesensingimagesbySVMclassificationofgeometricimagefeatures.ISPRSJ.
+Photogramm.RemoteSens.https://doi.org/10.1016/j.isprsjprs.2007.05.011.
+Ioffe,S.,Szegedy,C.,2015.BatchNormalization:acceleratingdeepnetworktrainingby
+reducinginternalcovariateshift.In:Proceedingsofthe32NdInternational
+ConferenceonInternationalConferenceonMachineLearning–Volume37,ICML’15.
+JMLR.org,pp.448–456.
+Jaccard,P.,1912.Thedistributionoftheflorainthealphinezone.NewPhytol.https://
+doi.org/10.1111/j.1469-8137.1912.tb05611.x.
+Ji,S.,Wei,S.,Lu,M.,2018.Fullyconvolutionalnetworksformulti-sourcebuildingex-
+tractionfromanopenaerialandsatelliteimagerydataset.IEEETrans.Geosci.
+RemoteSens.https://doi.org/10.1109/TGRS.2018.2858817.
+Kaiser,P.,Wegner,J.D.,Lucchi,A.,Jaggi,M.,Hofmann,T.,Schindler,K.,2017.Learning
+aerialimagesegmentationfromonlinemaps.IEEETrans.Geosci.RemoteSens.55,
+6054–6068.https://doi.org/10.1109/TGRS.2017.2719738.
+Kemker,R.,Salvaggio,C.,Kanan,C.,2018.Algorithmsforsemanticsegmentationof
+multispectralremotesensingimageryusingdeeplearning.ISPRSJ.Photogramm.
+RemoteSens.0–1.https://doi.org/10.1016/j.isprsjprs.2018.04.014.
+Krizhevsky,A.,Sutskever,I.,Hinton,G.E.,2012.ImageNetclassificationwithdeep
+convolutionalneuralnetworks.Adv.NeuralInf.Process.Syst.https://doi.org/10.
+1016/j.protcy.2014.09.007.
+LeCun,Y.,Boser,B.,Denker,J.S.,Henderson,D.,Howard,R.E.,Hubbard,W.,Jackel,
+L.D.,1989.Backpropagationappliedtohandwrittenzipcoderecognition.Neural
+Comput.https://doi.org/10.1162/neco.1989.1.4.541.
+Li,E.,Xu,S.,Meng,W.,Zhang,X.,2017.Buildingextractionfromremotelysensedimages
+byintegratingsaliencycue.IEEEJSel.Top.Appl.EarthObs.RemoteSens.10,
+906–919.https://doi.org/10.1109/JSTARS.2016.2603184.
+Liasis,G.,Stavrou,S.,2016.Buildingextractioninsatelliteimagesusingactivecontours
+andcolourfeatures.Int.J.RemoteSens.https://doi.org/10.1080/01431161.2016.
+1148283.
+Lin,H.,Shi,Z.,Zou,Z.,2017.Fullyconvolutionalnetworkwithtaskpartitioningfor
+inshoreshipdetectioninopticalremotesensingimages.IEEEGeosci.RemoteSens.
+Lett.1–5.
+Lin,T.-Y.,Dollár,P.,Girshick,R.,He,K.,Hariharan,B.,Belongie,S.,2016.Feature
+PyramidNetworksforObjectDetection.http://doi.org/10.1109/CVPR.2017.106.
+Lin,T.Y.,Maire,M.,Belongie,S.,Hays,J.,Perona,P.,Ramanan,D.,Dollár,P.,Zitnick,C.
+L.,2014.MicrosoftCOCO:commonobjectsincontext.Lect.NotesComput.Sci.
+(includingSubser.Lect.NotesArtif.Intell.Lect.NotesBioinformatics)8693LNCS,
+pp.740–755.http://doi.org/10.1007/978-3-319-10602-1_48.
+Long,J.,Shelhamer,E.,Darrell,T.,2015.Fullyconvolutionalnetworksforsemantic
+segmentationppt.In:Proc.IEEEConf.Comput.Vis.PatternRecognit.https://doi.
+org/10.1109/CVPR.2015.7298965.
+Maggiori,E.,Tarabalka,Y.,Charpiat,G.,Alliez,P.,2017a.Convolutionalneuralnetworks
+forlarge-scaleremote-sensingimageclassification.IEEETrans.Geosci.RemoteSens.
+55,645–657.https://doi.org/10.1109/TGRS.2016.2612821.
+Maggiori,E.,Tarabalka,Y.,Charpiat,G.,Alliez,P.,2017b.High-resolutionaerialimage
+labelingwithconvolutionalneuralnetworks.IEEETrans.Geosci.RemoteSens.
+https://doi.org/10.1109/TGRS.2017.2740362.
+Maggiori,E.,Tarabalka,Y.,Charpiat,G.,Alliez,P.,Maggiori,E.,Tarabalka,Y.,Charpiat,
+G.,Alliez,P.,Semantic,C.,2017.CanSemanticLabelingMethodsGeneralizetoAny
+City?TheInriaAerialImageLabelingBenchmarktocitethisversion:HALId:hal-
+01468452.
+Marcos,D.,Volpi,M.,Kellenberger,B.,Tuia,D.,2018.Landcovermappingatveryhigh
+resolutionwithrotationequivariantCNNs:towardssmallyetaccuratemodels.ISPRS
+J.Photogramm.RemoteSens.1–12.https://doi.org/10.1016/j.isprsjprs.2018.01.
+021.
+Marmanis,D.,Schindler,K.,Wegner,J.D.,Galliani,S.,Datcu,M.,Stilla,U.,2018.
+Classificationwithanedge:Improvingsemanticimagesegmentationwithboundary
+detection.ISPRSJ.Photogramm.RemoteSens.135,158–172.https://doi.org/10.
+1016/j.isprsjprs.2017.11.009.
+Mnih,V.,2013.MachineLearningforAerialImageLabeling.(PhDThesis).
+Nair,V.,Hinton,G.E.,2010.RectifiedlinearunitsimproverestrictedBoltzmannma-
+chines.In:Proceedingsofthe27thInternationalConferenceonInternational
+ConferenceonMachineLearning,ICML’10.Omnipress,USA,pp.807–814.
+Noh,H.,Hong,S.,Han,B.,2015.Learningdeconvolutionnetworkforsemanticseg-
+mentation.In:ProceedingsoftheIEEEInternationalConferenceonComputerVision,
+https://doi.org/10.1109/ICCV.2015.178.
+Ok,A.O.,2013.ISPRSJournalofPhotogrammetryandRemoteSensingAutomatedde-
+tectionofbuildingsfromsingleVHRmultispectralimagesusingshadowinformation
+andgraphcuts.ISPRSJ.Photogramm.RemoteSens.86,21–40.https://doi.org/10.
+1016/j.isprsjprs.2013.09.004.
+Pinheiro,P.O.,Lin,T.-Y.,Collobert,R.,Dollár,P.,2016.Learningtorefineobject
+Q.Chenetal.
+ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+54
+
+=== PAGE 14 ===
+segments.In:Leibe,B.,Matas,J.,Sebe,N.,Welling,M.(Eds.),ComputerVision–
+ECCV2016.SpringerInternationalPublishing,Cham,pp.75–91.
+Powers,D.M.W.,2011.Evaluation:FromPrecision,RecallandF-MeasureToRoc,
+InformednessMarkedness&Correlation.J.Mach.Learn.Technoldoi:
+0.1.1.214.9232.
+Ronneberger,O.,Fischer,P.,Brox,T.,2015.U-Net:ConvolutionalNetworksfor
+BiomedicalImageSegmentation,pp.1–8.http://doi.org/10.1007/978-3-319-24574-
+4_28.
+Rottensteiner,F.,Sohn,G.,Jung,J.,Gerke,M.,Baillard,C.,Benitez,S.,Breitkopf,U.,
+2012.TheISPRSbenchmarkonurbanobjectclassificationand3Dbuildingre-
+construction.ISPRSAnn.Photogramm.RemoteSens.Spat.Inf.Sci.I-3293–298.
+https://doi.org/10.5194/isprsannals-I-3-293-2012.
+Shrestha,S.,Vanneschi,L.,2018.Improvedfullyconvolutionalnetworkwithconditional
+randomfieldsforbuildingextraction.RemoteSens.10.
+Sirmacek,B.,Unsalan,C.,2009.Urban-areaandbuildingdetectionusingSIFTkeypoints
+andgraphtheory.IEEETrans.Geosci.RemoteSens.47,1156–1167.https://doi.org/
+10.1109/TGRS.2008.2008440.
+Turker,M.,Koc-San,D.,2015.Buildingextractionfromhigh-resolutionopticalspace-
+borneimagesusingtheintegrationofsupportvectormachine(SVM)classification,
+Houghtransformationandperceptualgrouping.Int.J.Appl.EarthObs.Geoinf.
+https://doi.org/10.1016/j.jag.2014.06.016.
+Vakalopoulou,M.,Karantzalos,K.,Komodakis,N.,Paragios,N.,2015.Buildingdetection
+inveryhighresolutionmultispectraldatawithdeeplearningfeatures.In:2015IEEE
+InternationalGeoscienceandRemoteSensingSymposium(IGARSS),https://doi.org/
+10.1109/IGARSS.2015.7326158.
+Volpi,M.,Tuia,D.,2018.Deepmulti-tasklearningforageographically-regularizedse-
+manticsegmentationofaerialimages.ISPRSJ.Photogramm.RemoteSens.144,
+48–60.https://doi.org/10.1016/j.isprsjprs.2018.06.007.
+Volpi,M.,Tuia,D.,2017.Densesemanticlabelingofsubdecimeterresolutionimageswith
+convolutionalneuralnetworks.IEEETrans.Geosci.RemoteSens.https://doi.org/10.
+1109/TGRS.2016.2616585.
+Wu,G.,Shao,X.,Guo,Z.,Chen,Q.,Yuan,W.,Shi,X.,Xu,Y.,Shibasaki,R.,2018.
+Automaticbuildingsegmentationofaerialimageryusingmulti-constraintfully
+convolutionalnetworks.RemoteSens.https://doi.org/10.3390/rs10030407.
+Xia,G.S.,Hu,J.,Hu,F.,Shi,B.,Bai,X.,Zhong,Y.,Zhang,L.,Lu,X.,2017.AID:a
+benchmarkdatasetforperformanceevaluationofaerialsceneclassification.IEEE
+Trans.Geosci.RemoteSens.https://doi.org/10.1109/TGRS.2017.2685945.
+Xiao,J.,Hays,J.,Ehinger,K.A.,Oliva,A.,Torralba,A.,2010.SUNdatabase:large-scale
+scenerecognitionfromabbeytozoo.In:ProceedingsoftheIEEEComputerSociety
+ConferenceonComputerVisionandPatternRecognition,pp.3485–3492.https://
+doi.org/10.1109/CVPR.2010.5539970.
+Yang,Y.,Newsam,S.,2010.Bag-of-visual-wordsandspatialextensionsforland-use
+classification.In:Proceedingsofthe18thSIGSPATIALInternationalConferenceon
+AdvancesinGeographicInformationSystems–GIS’10,pp.270.https://doi.org/10.
+1145/1869790.1869829.
+Zhang,Q.,Huang,X.,Zhang,G.,2016.Amorphologicalbuildingdetectionframeworkfor
+high-resolutionopticalimageryoverurbanareas.IEEEGeosci.RemoteSens.Lett.13,
+1388–1392. https://doi.org/10.1109/LGRS.2016.2590481.
+Zhao,H.,Shi,J.,Qi,X.,Wang,X.,Jia,J.,2017.Pyramidsceneparsingnetwork.In:
+Proceedings–30thIEEEConferenceonComputerVisionandPatternRecognition,
+CVPR2017, https://doi.org/10.1109/CVPR.2017.660.
+Zhong,Y.,Han,X.,Zhang,L.,2018.Multi-classgeospatialobjectdetectionbasedona
+position-sensitivebalancingframeworkforhighspatialresolutionremotesensing
+imagery.ISPRSJ.Photogramm.RemoteSens.138,281–294.https://doi.org/10.
+1016/j.isprsjprs.2018.02.014.
+Zhou,W.,Newsam,S.,Li,C.,Shao,Z.,2018..PatternNet:abenchmarkdatasetfor
+performanceevaluationofremotesensingimageretrieval.ISPRSJ.Photogramm.
+RemoteSens.https://doi.org/10.1016/j.isprsjprs.2018.01.004.
+Zou,Q.,Ni,L.,Zhang,T.,Wang,Q.,2015.Deeplearningbasedfeatureselectionfor
+remotesensingsceneclassification.IEEEGeosci.RemoteSens.Lett.12,2321–2325.
+https://doi.org/10.1109/LGRS.2015.2475299.
+Q.Chenetal. ISPRS Journal of Photogrammetry and Remote Sensing 147 (2019) 42–55
+55
