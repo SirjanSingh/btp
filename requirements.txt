@@ -1,0 +1,36 @@
+# requirements.txt — DGX Ubuntu 22.04 Docker environment
+#
+# Base image already provides: torch==2.1.2, torchvision==0.16.2, CUDA 11.8
+# Install everything else with:
+#   pip install -r requirements.txt
+#
+# DO NOT pip-install torch/torchvision — use the versions from the Docker base image.
+
+# ── Segmentation ──────────────────────────────────────────────────────────────
+segmentation-models-pytorch==0.3.3
+timm==0.9.12                     # SMP encoder registry backend
+
+# ── Augmentation ─────────────────────────────────────────────────────────────
+albumentations==1.4.0
+
+# ── Numerical / Array ────────────────────────────────────────────────────────
+numpy==1.26.4                    # DO NOT upgrade to 2.x — breaks albumentations + SMP
+
+# ── Image I/O ────────────────────────────────────────────────────────────────
+opencv-python-headless==4.9.0.80 # headless = no libGL dependency (required on DGX)
+Pillow==10.2.0
+
+# ── Geospatial (raster I/O) ───────────────────────────────────────────────────
+rasterio==1.3.9                  # reads GeoTIFF + preserves GSD metadata
+shapely==2.0.3
+geopandas==0.14.3
+
+# ── Dataset download ─────────────────────────────────────────────────────────
+gdown==5.1.0
+
+# ── Training utilities ────────────────────────────────────────────────────────
+tqdm==4.66.1
+matplotlib==3.8.2
+pandas==2.1.4
+scikit-learn==1.4.0
+tensorboard==2.15.1
