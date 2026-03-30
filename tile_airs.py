@@ -1,16 +1,16 @@
 """
 tile_airs.py — Tile AIRS 10,000×10,000 images into 512×512 crops.
 
-Usage:
+Usage (AIRS default layout — image/ and label/ subdirs):
+    python tile_airs.py --src_dir /workspace/dataset/train \
+                        --out_dir /airs/btp/dataset_crops/train \
+                        --img_subdir image --mask_subdir label
+
+Usage (standard layout — images/ and masks/ subdirs):
     python tile_airs.py --src_dir /scratch/airs/train \
-                        --out_dir /scratch/airs_crops/train \
-                        --crop_size 512 --overlap 0.1
+                        --out_dir /scratch/airs_crops/train
 
-Folder structure expected under --src_dir:
-    images/  *.tif  (or *.png)
-    masks/   *.png  (binary 0/255)
-
-Output mirrors the same images/ masks/ structure under --out_dir.
+Output always writes to images/ and masks/ under --out_dir.
 """
 
 import argparse
@@ -55,8 +55,8 @@ def run(args):
     out = Path(args.out_dir)
     stride = int(args.crop_size * (1.0 - args.overlap))
 
-    img_src = src / "images"
-    msk_src = src / "masks"
+    img_src = src / args.img_subdir
+    msk_src = src / args.mask_subdir
     img_out = out / "images"
     msk_out = out / "masks"
     img_out.mkdir(parents=True, exist_ok=True)
@@ -111,8 +111,10 @@ def run(args):
 
 def parse_args():
     p = argparse.ArgumentParser(description="Tile AIRS images into overlapping crops")
-    p.add_argument("--src_dir",       required=True, help="Dir with images/ and masks/ subfolders")
+    p.add_argument("--src_dir",       required=True, help="Parent dir containing image + mask subdirs")
     p.add_argument("--out_dir",       required=True, help="Output dir for tiled crops")
+    p.add_argument("--img_subdir",    default="images", help="Image subdir name under src_dir (AIRS uses 'image')")
+    p.add_argument("--mask_subdir",   default="masks",  help="Mask subdir name under src_dir  (AIRS uses 'label')")
     p.add_argument("--crop_size",     type=int,   default=512)
     p.add_argument("--overlap",       type=float, default=0.1,   help="Fractional overlap [0,1)")
     p.add_argument("--min_mask_frac", type=float, default=0.005, help="Skip crops where mask coverage < this")
