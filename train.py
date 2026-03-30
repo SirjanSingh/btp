@@ -234,17 +234,37 @@ MEAN = (0.485, 0.456, 0.406)
 STD  = (0.229, 0.224, 0.225)
 
 
-def train_aug(crop_size: int = 512):
-    return A.Compose([
+def train_aug(crop_size: int = 512, simulate_low_res: bool = False):
+    """
+    Training augmentations.
+
+    simulate_low_res=True adds resolution simulation:
+      AIRS is 7.5 cm/px; Indian govt imagery is ~30 cm/px (4× lower).
+      A.Downscale randomly downsamples to 25-50% then upsamples back,
+      forcing the model to rely on shape/edges rather than fine texture.
+      Use this when you plan to run inference on lower-res Indian imagery.
+    """
+    augs = [
         A.HorizontalFlip(p=0.5),
         A.VerticalFlip(p=0.5),
         A.RandomRotate90(p=0.5),
         A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.2, rotate_limit=0, p=0.5),
         A.GaussNoise(var_limit=(10, 50), p=0.3),
         A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.1, hue=0.05, p=0.4),
+    ]
+    if simulate_low_res:
+        # scale_min=0.25 → simulates 30cm/px (4× AIRS resolution)
+        # scale_max=0.5  → simulates 15cm/px (2× AIRS resolution)
+        # p=0.5 → applied to half of batches so model still sees sharp data
+        augs.append(
+            A.Downscale(scale_min=0.25, scale_max=0.5,
+                        interpolation=cv2.INTER_LINEAR, p=0.5)
+        )
+    augs += [
         A.Normalize(mean=MEAN, std=STD),
         ToTensorV2(),
-    ])
+    ]
+    return A.Compose(augs)
 
 
 def val_aug():
@@ -387,7 +407,7 @@ def main(args):
         train_ds = CSVDataset(args.train_csv, args.image_dir, args.mask_dir, train_aug())
         val_ds   = CSVDataset(args.val_csv,   args.image_dir, args.mask_dir, val_aug())
     else:
-        train_ds = FolderDataset(args.train_dir, train_aug(), max_samples=args.max_samples)
+        train_ds = FolderDataset(args.train_dir, train_aug(simulate_low_res=args.simulate_low_res), max_samples=args.max_samples)
         val_ds   = FolderDataset(args.val_dir,   val_aug(),   max_samples=val_cap)
 
     train_loader = DataLoader(
@@ -570,9 +590,16 @@ def parse_args():
     g5.add_argument("--save_every", type=int, default=10,
                     help="Save a crash-recovery checkpoint every N epochs")
 
+    # ── Domain adaptation ────────────────────────────────────────────────────
+    g6 = p.add_argument_group("Domain adaptation")
+    g6.add_argument("--simulate_low_res", action="store_true",
+                    help="Add resolution simulation augmentation (Downscale 25-50%%). "
+                         "Use when target domain is ~30cm/px (e.g. Indian govt imagery) "
+                         "but training on 7.5cm/px AIRS data.")
+
     # ── Logging ───────────────────────────────────────────────────────────────
-    g6 = p.add_argument_group("Logging")
-    g6.add_argument("--log_dir", default="./logs",
+    g7 = p.add_argument_group("Logging")
+    g7.add_argument("--log_dir", default="./logs",
                     help="Directory for per-run JSON + TXT log files (pull this to track results)")
 
     return p.parse_args()
