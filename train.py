@@ -67,7 +67,11 @@ class FolderDataset(Dataset):
 
         img  = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
         mask = cv2.imread(str(mp), cv2.IMREAD_GRAYSCALE)
-        mask = (mask > 127).astype(np.float32)
+        # Handle both 0/1 masks (AIRS default) and 0/255 masks
+        if mask.max() <= 1:
+            mask = (mask > 0).astype(np.float32)
+        else:
+            mask = (mask > 127).astype(np.float32)
 
         if self.transform:
             out  = self.transform(image=img, mask=mask)
@@ -205,14 +209,18 @@ class GlobalMetrics:
 # Train / validate one epoch
 # ─────────────────────────────────────────────────────────────────────────────
 
-def run_epoch(model, loader, optimizer, scaler, device, metrics, is_train):
+def run_epoch(model, loader, optimizer, scaler, device, metrics, is_train, epoch=0, n_epochs=0):
     model.train() if is_train else model.eval()
     metrics.reset()
     total_loss = 0.0
 
+    phase = "Train" if is_train else "Val  "
+    pbar  = tqdm(loader, desc=f"Epoch {epoch}/{n_epochs} {phase}", leave=False,
+                 dynamic_ncols=True)
+
     ctx = torch.enable_grad() if is_train else torch.no_grad()
     with ctx:
-        for imgs, masks in loader:
+        for imgs, masks in pbar:
             imgs, masks = imgs.to(device), masks.to(device)
 
             with torch.cuda.amp.autocast(enabled=(device.type == "cuda")):
@@ -227,6 +235,7 @@ def run_epoch(model, loader, optimizer, scaler, device, metrics, is_train):
 
             total_loss += loss.item()
             metrics.update(preds, masks)
+            pbar.set_postfix(loss=f"{loss.item():.4f}")
 
     return total_loss / len(loader), metrics.compute()
 
@@ -323,9 +332,11 @@ def main(args):
         t0 = time.time()
 
         tr_loss, tr_m = run_epoch(
-            model, train_loader, optimizer, scaler, device, train_metrics, is_train=True)
+            model, train_loader, optimizer, scaler, device, train_metrics,
+            is_train=True,  epoch=epoch, n_epochs=args.epochs)
         va_loss, va_m = run_epoch(
-            model, val_loader,   optimizer, scaler, device, val_metrics,   is_train=False)
+            model, val_loader,   optimizer, scaler, device, val_metrics,
+            is_train=False, epoch=epoch, n_epochs=args.epochs)
 
         scheduler.step()
         elapsed = time.time() - t0
