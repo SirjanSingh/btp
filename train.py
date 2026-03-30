@@ -25,9 +25,11 @@ See --help for all options.
 """
 
 import argparse
+import json
 import os
 import random
 import time
+from datetime import datetime
 from pathlib import Path
 
 import cv2
@@ -41,6 +43,119 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import segmentation_models_pytorch as smp
 from tqdm import tqdm
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Run Logger  — writes JSON + human-readable TXT to logs/
+# ─────────────────────────────────────────────────────────────────────────────
+
+class RunLogger:
+    """
+    Logs per-epoch metrics + final summary to logs/<run_name>_<timestamp>.json
+    and a companion .txt file for quick human reading.
+
+    Usage:
+        logger = RunLogger(args, log_dir="./logs")
+        logger.log_epoch(epoch, tr_loss, va_loss, va_metrics, lr, elapsed_s)
+        logger.finish(best_val_iou, best_epoch, ckpt_path)
+    """
+
+    def __init__(self, args, log_dir: str = "./logs"):
+        self.log_dir  = Path(log_dir)
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+
+        ts  = datetime.now().strftime("%Y%m%d_%H%M%S")
+        tag = f"{args.arch}_{args.encoder}"
+        if args.max_samples:
+            tag += f"_{args.max_samples}samples"
+        tag += f"_{args.epochs}ep"
+        stem = f"{tag}_{ts}"
+
+        self.json_path = self.log_dir / f"{stem}.json"
+        self.txt_path  = self.log_dir / f"{stem}.txt"
+
+        # Collect hardware info
+        hw = {"device": "cpu"}
+        if torch.cuda.is_available():
+            hw = {
+                "device":    "cuda",
+                "n_gpus":    torch.cuda.device_count(),
+                "gpu_name":  torch.cuda.get_device_name(0),
+                "cuda_version": torch.version.cuda,
+            }
+
+        self.record = {
+            "run_name":  stem,
+            "timestamp": datetime.now().isoformat(),
+            "hardware":  hw,
+            "config":    vars(args),
+            "epochs":    [],
+            "summary":   {},
+        }
+
+        # TXT header
+        self._txt_write(
+            f"Run: {stem}\n"
+            f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            f"Hardware: {hw}\n"
+            f"Config: {json.dumps(vars(args), indent=2)}\n\n"
+            f"{'Epoch':>6}  {'TrLoss':>8}  {'VaLoss':>8}  "
+            f"{'IoU':>7}  {'F1':>7}  {'Prec':>7}  {'Rec':>7}  "
+            f"{'LR':>9}  {'Time(s)':>8}  Note\n"
+            + "─" * 80 + "\n"
+        )
+
+    def log_epoch(self, epoch: int, tr_loss: float, va_loss: float,
+                  va_metrics: dict, lr: float, elapsed_s: float, note: str = ""):
+        entry = {
+            "epoch":     epoch,
+            "tr_loss":   round(tr_loss, 6),
+            "va_loss":   round(va_loss, 6),
+            "iou":       round(va_metrics["iou"],       6),
+            "f1":        round(va_metrics["f1"],        6),
+            "precision": round(va_metrics["precision"], 6),
+            "recall":    round(va_metrics["recall"],    6),
+            "lr":        lr,
+            "elapsed_s": round(elapsed_s, 1),
+            "note":      note,
+        }
+        self.record["epochs"].append(entry)
+        self._flush_json()
+
+        self._txt_write(
+            f"{epoch:6d}  {tr_loss:8.4f}  {va_loss:8.4f}  "
+            f"{va_metrics['iou']:7.4f}  {va_metrics['f1']:7.4f}  "
+            f"{va_metrics['precision']:7.4f}  {va_metrics['recall']:7.4f}  "
+            f"{lr:9.2e}  {elapsed_s:8.1f}  {note}\n"
+        )
+
+    def finish(self, best_val_iou: float, best_epoch: int, ckpt_path: str):
+        self.record["summary"] = {
+            "best_val_iou": round(best_val_iou, 6),
+            "best_epoch":   best_epoch,
+            "checkpoint":   str(ckpt_path),
+            "baseline_pspnet_iou": 0.899,
+            "gap_vs_baseline": round(best_val_iou - 0.899, 6),
+        }
+        self._flush_json()
+        self._txt_write(
+            "─" * 80 + "\n"
+            f"Best val IoU : {best_val_iou:.4f}  "
+            f"(epoch {best_epoch})  "
+            f"[PSPNet baseline 0.899 | gap {best_val_iou - 0.899:+.4f}]\n"
+            f"Checkpoint   : {ckpt_path}\n"
+            f"Log (JSON)   : {self.json_path}\n"
+        )
+        print(f"[log] {self.json_path}")
+        print(f"[log] {self.txt_path}")
+
+    def _flush_json(self):
+        with open(self.json_path, "w") as f:
+            json.dump(self.record, f, indent=2)
+
+    def _txt_write(self, text: str):
+        with open(self.txt_path, "a") as f:
+            f.write(text)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -315,6 +430,9 @@ def main(args):
     best_ckpt = ckpt_dir / f"{run_name}_best.pth"
     writer    = SummaryWriter(log_dir=str(ckpt_dir / "tb_logs" / run_name))
 
+    # ── File logger ──────────────────────────────────────────────────────────
+    run_logger = RunLogger(args, log_dir=args.log_dir)
+
     # ── Resume ───────────────────────────────────────────────────────────────
     start_epoch   = 1
     best_val_iou  = 0.0
@@ -337,6 +455,8 @@ def main(args):
     print(f"{'Epoch':>6}  {'TrLoss':>8}  {'VaLoss':>8}  "
           f"{'IoU':>7}  {'F1':>7}  {'Prec':>7}  {'Rec':>7}  {'LR':>9}  Note")
     print(f"{'─'*72}")
+
+    best_epoch = start_epoch
 
     for epoch in range(start_epoch, args.epochs + 1):
         t0 = time.time()
@@ -361,6 +481,7 @@ def main(args):
         note = ""
         if va_m["iou"] > best_val_iou:
             best_val_iou  = va_m["iou"]
+            best_epoch    = epoch
             patience_left = args.patience
             note = "← best"
             base_model = model.module if isinstance(model, nn.DataParallel) else model
@@ -390,9 +511,14 @@ def main(args):
               f"{va_m['precision']:7.4f}  {va_m['recall']:7.4f}  "
               f"{lr_now:9.2e}  {note}")
 
+        # File logger — written after every epoch (crash-safe)
+        run_logger.log_epoch(epoch, tr_loss, va_loss, va_m, lr_now, elapsed, note)
+
         if patience_left <= 0:
             print(f"\nEarly stopping at epoch {epoch} (patience={args.patience}).")
             break
+
+    run_logger.finish(best_val_iou, best_epoch, best_ckpt)
 
     print(f"\nBest val IoU : {best_val_iou:.4f}  (PSPNet baseline: 0.899)")
     print(f"Checkpoint   : {best_ckpt}")
@@ -443,6 +569,11 @@ def parse_args():
     g5.add_argument("--resume",     default=None,  help="Path to checkpoint to resume from")
     g5.add_argument("--save_every", type=int, default=10,
                     help="Save a crash-recovery checkpoint every N epochs")
+
+    # ── Logging ───────────────────────────────────────────────────────────────
+    g6 = p.add_argument_group("Logging")
+    g6.add_argument("--log_dir", default="./logs",
+                    help="Directory for per-run JSON + TXT log files (pull this to track results)")
 
     return p.parse_args()
 

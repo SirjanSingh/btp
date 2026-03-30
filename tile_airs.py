@@ -36,7 +36,11 @@ def tile_pair(img_path: Path, mask_path: Path, crop_size: int, stride: int,
     mask = cv2.imread(str(mask_path), cv2.IMREAD_GRAYSCALE)
     if mask is None:
         raise IOError(f"Cannot read mask: {mask_path}")
-    mask = (mask > 127).astype(np.uint8) * 255   # ensure binary 0/255
+    # Handle both 0/1 masks (AIRS default) and 0/255 masks
+    if mask.max() <= 1:
+        mask = (mask > 0).astype(np.uint8) * 255
+    else:
+        mask = (mask > 127).astype(np.uint8) * 255
 
     H, W = img.shape[:2]
     idx = 0
