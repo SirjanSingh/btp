@@ -50,10 +50,12 @@ from tqdm import tqdm
 class FolderDataset(Dataset):
     """Load pre-tiled crops from images/ + masks/ subdirectories."""
 
-    def __init__(self, data_dir: str, transform=None):
+    def __init__(self, data_dir: str, transform=None, max_samples: int = None):
         self.img_dir  = Path(data_dir) / "images"
         self.msk_dir  = Path(data_dir) / "masks"
         self.paths    = sorted(self.img_dir.glob("*.png"))
+        if max_samples:
+            self.paths = self.paths[:max_samples]
         self.transform = transform
         if not self.paths:
             raise FileNotFoundError(f"No .png files found in {self.img_dir}")
@@ -258,12 +260,20 @@ def main(args):
         print(f"GPUs    : {n_gpus} × {torch.cuda.get_device_name(0)}")
 
     # ── Datasets ─────────────────────────────────────────────────────────────
+    # proportional val cap: same ratio as train cap vs full train set
+    val_cap = None
+    if args.max_samples:
+        full_train = len(list((Path(args.train_dir) / "images").glob("*.png")))
+        ratio      = args.max_samples / max(full_train, 1)
+        full_val   = len(list((Path(args.val_dir) / "images").glob("*.png")))
+        val_cap    = max(1, int(full_val * ratio))
+
     if args.train_csv:
         train_ds = CSVDataset(args.train_csv, args.image_dir, args.mask_dir, train_aug())
         val_ds   = CSVDataset(args.val_csv,   args.image_dir, args.mask_dir, val_aug())
     else:
-        train_ds = FolderDataset(args.train_dir, train_aug())
-        val_ds   = FolderDataset(args.val_dir,   val_aug())
+        train_ds = FolderDataset(args.train_dir, train_aug(), max_samples=args.max_samples)
+        val_ds   = FolderDataset(args.val_dir,   val_aug(),   max_samples=val_cap)
 
     train_loader = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True,
@@ -398,8 +408,10 @@ def parse_args():
 
     # ── Data (folder mode) ───────────────────────────────────────────────────
     g = p.add_argument_group("Data — folder mode (pre-tiled crops)")
-    g.add_argument("--train_dir", default=None, help="Dir with images/ masks/ for training")
-    g.add_argument("--val_dir",   default=None, help="Dir with images/ masks/ for validation")
+    g.add_argument("--train_dir",    default=None, help="Dir with images/ masks/ for training")
+    g.add_argument("--val_dir",      default=None, help="Dir with images/ masks/ for validation")
+    g.add_argument("--max_samples",  type=int, default=None,
+                   help="Cap training samples (val capped proportionally). E.g. 2000 for quick test")
 
     # ── Data (CSV mode) ──────────────────────────────────────────────────────
     g2 = p.add_argument_group("Data — CSV mode")
