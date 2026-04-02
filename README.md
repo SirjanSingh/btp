@@ -174,25 +174,149 @@ the encoder at `lr × 0.1` (differential learning rates).
 
 ---
 
-## Setup
+## DGX Setup & Docker
+
+### 0. Check your driver / CUDA version
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Or use Docker (CUDA 11.8)
-docker build -t btp .
-docker run --gpus all -v /data:/data btp
+nvidia-smi
+# Look for "CUDA Version: 11.x" → use the default Dockerfile tag (cu118)
+# If "CUDA Version: 12.x" → edit Dockerfile line 1:
+#   pytorch/pytorch:2.2.0-cuda12.1-cudnn8-runtime
 ```
+
+### 1. Build the image
+
+```bash
+# Run from the repo root on the DGX node
+docker build -t btp_seg .
+```
+
+### 2. Run an interactive container
+
+```bash
+docker run --gpus all -it --rm \
+    -v /scratch:/scratch \
+    -v $(pwd):/workspace \
+    -w /workspace \
+    btp_seg bash
+```
+
+- `--gpus all` — expose all DGX GPUs inside the container
+- `-v /scratch:/scratch` — mount shared scratch storage (datasets, checkpoints)
+- `-v $(pwd):/workspace` — mount the repo so edits are reflected inside
+- `-w /workspace` — set working directory to the repo root
+
+### 3. Commands inside the container
+
+**Tile raw AIRS images → 512×512 crops**
+```bash
+python rooftop/tile_airs.py \
+    --src_dir /scratch/airs/train \
+    --out_dir /scratch/airs_crops/train \
+    --crop_size 512 --overlap 0.1
+
+python rooftop/tile_airs.py \
+    --src_dir /scratch/airs/val \
+    --out_dir /scratch/airs_crops/val \
+    --crop_size 512 --overlap 0.1
+```
+
+**Train rooftop segmentation**
+```bash
+python rooftop/train.py \
+    --train_dir /scratch/airs_crops/train \
+    --val_dir   /scratch/airs_crops/val \
+    --ckpt_dir  /scratch/checkpoints/rooftop \
+    --arch unet --encoder resnet34 \
+    --epochs 50 --batch_size 8 --workers 8
+```
+
+**Evaluate rooftop model on test set**
+```bash
+python rooftop/evaluate.py \
+    --test_dir /scratch/airs_crops/test \
+    --ckpt     /scratch/checkpoints/rooftop/unet_resnet34_best.pth \
+    --arch unet --encoder resnet34
+```
+
+**Run rooftop inference**
+```bash
+# Single image
+python rooftop/infer.py \
+    --input /scratch/test_images/sample.png \
+    --ckpt  /scratch/checkpoints/rooftop/unet_resnet34_best.pth \
+    --arch unet --encoder resnet34
+
+# Whole folder
+python rooftop/infer.py \
+    --input   /scratch/test_images/ \
+    --ckpt    /scratch/checkpoints/rooftop/unet_resnet34_best.pth \
+    --out_dir /scratch/rooftop_predictions/
+```
+
+**Train solar panel segmentation**
+```bash
+python solar_panel/train_solar.py \
+    --train_dir /scratch/solar/train \
+    --val_dir   /scratch/solar/val \
+    --ckpt_dir  /scratch/checkpoints/solar_panel \
+    --log_dir   /scratch/logs/solar_panel \
+    --arch unet --encoder resnet34 \
+    --epochs 50 --batch_size 8 --workers 8
+```
+
+### 4. Resume a training run
+
+```bash
+python rooftop/train.py \
+    --train_dir /scratch/airs_crops/train \
+    --val_dir   /scratch/airs_crops/val \
+    --ckpt_dir  /scratch/checkpoints/rooftop \
+    --arch unet --encoder resnet34 \
+    --resume /scratch/checkpoints/rooftop/unet_resnet34_best.pth
+```
+
+### 5. Run training detached (long jobs on DGX)
+
+```bash
+# Use screen so the job survives SSH disconnection
+screen -S train_rooftop
+
+docker run --gpus all --rm \
+    -v /scratch:/scratch \
+    -v $(pwd):/workspace \
+    -w /workspace \
+    btp_seg \
+    python rooftop/train.py \
+        --train_dir /scratch/airs_crops/train \
+        --val_dir   /scratch/airs_crops/val \
+        --ckpt_dir  /scratch/checkpoints/rooftop \
+        --arch unet --encoder resnet34 \
+        --epochs 50 --batch_size 8
+
+# Detach from screen : Ctrl+A then D
+# Reattach later     : screen -r train_rooftop
+```
+
+### 6. Monitor with TensorBoard
+
+```bash
+# Rooftop logs
+tensorboard --logdir /scratch/checkpoints/rooftop/tb_logs --port 6006 --bind_all
+
+# Both tasks side by side
+tensorboard \
+    --logdir rooftop:/scratch/checkpoints/rooftop/tb_logs,solar:/scratch/logs/solar_panel \
+    --port 6006 --bind_all
+```
+
+Open `http://<dgx-node-ip>:6006` in your browser.
 
 ---
 
-## TensorBoard
+## Local Setup (without Docker)
 
 ```bash
-# Rooftop
-tensorboard --logdir rooftop/logs
-
-# Solar panel
-tensorboard --logdir solar_panel/logs
+pip install -r requirements.txt
 ```
