@@ -1,6 +1,6 @@
 # BTP — Rooftop & Solar Panel Segmentation
 
-Semantic segmentation pipeline for detecting **rooftop areas** and **solar panels**
+Semantic segmentation pipeline for detecting **rooftop areas** (Stage 1) and **solar panels** (Stage 2)
 from aerial/satellite imagery. Built for DGX multi-GPU training using
 [segmentation-models-pytorch](https://github.com/qubvel/segmentation_models.pytorch).
 
@@ -10,60 +10,123 @@ from aerial/satellite imagery. Built for DGX multi-GPU training using
 
 ```
 btp/
-├── rooftop/                        # Rooftop segmentation (Stage 1)
-│   ├── train.py                    # Training script (DGX-ready, multi-GPU, AMP)
-│   ├── evaluate.py                 # Test-set evaluation + visual overlays
-│   ├── infer.py                    # Single-image / batch inference + area estimation
-│   ├── tile_airs.py                # Preprocess: tile 10k×10k images → 512×512 crops
-│   ├── checkpoints/                # Saved model checkpoints (best + periodic)
-│   ├── logs/                       # TensorBoard logs
-│   ├── notebooks/
-│   │   ├── rooftop_segmentation.ipynb      # Exploratory analysis
-│   │   ├── rooftop_area.ipynb              # Area estimation experiments
-│   │   └── demo_rooftop_segmentation.ipynb # End-to-end demo
-│   └── airs_text.txt               # AIRS dataset reference
+├── rooftop/                        # Stage 1 — Rooftop segmentation
+│   ├── train.py                    # Training script (DGX-ready, multi-GPU, AMP, tqdm)
+│   ├── evaluate.py                 # Test-set evaluation + threshold sweep + overlays
+│   ├── infer.py                    # Sliding-window inference for any image size
+│   ├── tile_airs.py                # Preprocess: tile 10k×10k AIRS images → 512×512 crops
+│   ├── checkpoints/                # Saved model weights (.pth) — gitignored
+│   ├── logs/                       # Per-run JSON + TXT logs (epoch metrics) + TensorBoard
+│   ├── dataset/                    # Raw AIRS dataset — gitignored, placeholder only
+│   ├── dataset_crops/              # Tiled 512×512 crops — gitignored, placeholder only
+│   ├── infer_results/              # Inference outputs — gitignored, placeholder only
+│   └── notebooks/
+│       ├── rooftop_segmentation.ipynb
+│       ├── rooftop_area.ipynb
+│       └── demo_rooftop_segmentation.ipynb
 │
-├── solar_panel/                    # Solar panel segmentation (Stage 2)
-│   ├── train_solar.py              # Training script with black-mask fallback
-│   ├── checkpoints/                # Saved model checkpoints
-│   └── logs/                       # TensorBoard logs
+├── solar_panel/                    # Stage 2 — Solar panel segmentation
+│   ├── train_solar.py              # Training script (RunLogger, tqdm, black-mask fallback)
+│   ├── checkpoints/                # Saved model weights (.pth) — gitignored
+│   ├── logs/                       # Per-run JSON + TXT logs + TensorBoard
+│   ├── bdappv/                     # Raw BDAPPV dataset — gitignored, placeholder only
+│   └── bdappv_crops/               # Prepared crops — gitignored, placeholder only
 │
+├── prep_bdappv.py                  # Prepare BDAPPV solar panel dataset (resize, split)
 ├── Dockerfile                      # Docker image (PyTorch 2.1.2, CUDA 11.8)
 ├── requirements.txt                # Python dependencies
 └── README.md
 ```
 
+> **Gitignored:** All dataset folders, model weights (`.pth`), and generated outputs are excluded from git.
+> Each folder has a `.gitkeep` file so the directory structure is visible in the repo.
+
 ---
 
-## Rooftop Segmentation
+## Quickstart (DGX)
+
+### 0. Build the Docker image
+
+```bash
+# From repo root on the DGX node
+docker build -t btp_seg .
+```
+
+### 1. Start a screen session on the HOST (not inside Docker)
+
+```bash
+screen -S train
+# This survives SSH disconnects. Detach: Ctrl+A D  |  Reattach: screen -r train
+```
+
+### 2. Launch the container inside screen
+
+```bash
+docker run --gpus '"device=0,1"' -it --rm \
+    --shm-size=16g \
+    -v /scratch:/scratch \
+    -v $(pwd):/workspace \
+    -w /workspace \
+    btp_seg bash
+```
+
+- `--gpus '"device=0,1"'` — pick specific free GPUs (check `nvidia-smi` first)
+- `--shm-size=16g` — prevents bus errors with multiple DataLoader workers
+- `-v /scratch:/scratch` — mount shared scratch storage
+
+### 3. Copy datasets to /tmp for fast I/O
+
+NFS (`/scratch`) is slow (~4s/it). Copy crops to local NVMe `/tmp` before training:
+
+```bash
+cp -r /scratch/airs_crops /tmp/airs_crops
+cp -r /scratch/bdappv_crops /tmp/bdappv_crops
+```
+
+`/tmp` is local NVMe (~10× faster), does not count toward your quota, and is cleared on reboot.
+
+---
+
+## Stage 1 — Rooftop Segmentation
 
 ### Data Preparation
 
-Tile large aerial images (10,000 × 10,000 px) into 512 × 512 crops:
+Tile large AIRS images (10,000 × 10,000 px) into 512 × 512 crops:
 
 ```bash
 python rooftop/tile_airs.py \
-    --src_dir /data/airs/train \
-    --out_dir /data/airs_crops/train \
+    --src_dir /scratch/airs/train \
+    --out_dir /scratch/airs_crops/train \
     --crop_size 512 --overlap 0.1
+
+python rooftop/tile_airs.py \
+    --src_dir /scratch/airs/val \
+    --out_dir /scratch/airs_crops/val
+
+python rooftop/tile_airs.py \
+    --src_dir /scratch/airs/test \
+    --out_dir /scratch/airs_crops/test
 ```
 
-Expected input layout for `src_dir`:
+Expected AIRS input layout:
 ```
 src_dir/
-├── images/    ← .tif / .png source images
-└── masks/     ← .png binary masks (0 / 255)
+├── image/    ← .tif source images (use --img_subdir image)
+└── label/    ← .png binary masks  (use --mask_subdir label)
 ```
+
+AIRS masks use values 0/1 (not 0/255) — `tile_airs.py` handles this automatically.
 
 ### Training
 
 ```bash
 python rooftop/train.py \
-    --train_dir /data/airs_crops/train \
-    --val_dir   /data/airs_crops/val   \
-    --ckpt_dir  rooftop/checkpoints    \
-    --arch unet --encoder resnet34     \
-    --epochs 50 --batch_size 8
+    --train_dir /tmp/airs_crops/train \
+    --val_dir   /tmp/airs_crops/val   \
+    --ckpt_dir  rooftop/checkpoints   \
+    --log_dir   rooftop/logs          \
+    --arch unet --encoder resnet34    \
+    --epochs 100 --batch_size 32 --workers 2
 ```
 
 Key options:
@@ -73,92 +136,155 @@ Key options:
 | `--arch` | `unet` | Architecture: `unet`, `unetplusplus`, `fpn`, `pspnet`, `deeplabv3plus` |
 | `--encoder` | `resnet34` | Encoder backbone (any SMP-supported, e.g. `efficientnet-b4`) |
 | `--epochs` | `50` | Training epochs |
-| `--batch_size` | `8` | Batch size |
-| `--lr` | `1e-4` | Decoder learning rate (encoder gets `lr × 0.1`) |
+| `--batch_size` | `8` | Batch size (32 works well on V100 32GB) |
+| `--lr` | `1e-4` | Decoder LR (encoder gets `lr × 0.1`) |
+| `--workers` | `4` | DataLoader workers (keep at 2 to avoid OOM) |
+| `--max_samples` | — | Cap training samples (val capped proportionally) — useful for quick tests |
+| `--simulate_low_res` | off | Downscale augmentation to simulate 30cm/px from 7.5cm/px AIRS data |
 | `--patience` | `15` | Early-stopping patience |
 | `--resume` | — | Path to checkpoint to resume from |
+| `--log_dir` | `rooftop/logs` | Directory for TensorBoard + JSON/TXT run logs |
+
+After each epoch a `.json` and `.txt` log are written to `--log_dir`. Watch live:
+```bash
+tail -f rooftop/logs/$(ls -t rooftop/logs/*.txt | head -1)
+```
 
 ### Evaluation
 
 ```bash
 python rooftop/evaluate.py \
-    --test_dir /data/airs_crops/test \
+    --test_dir /tmp/airs_crops/test \
     --ckpt     rooftop/checkpoints/unet_resnet34_best.pth \
-    --arch unet --encoder resnet34
+    --arch unet --encoder resnet34  \
+    --log_dir  rooftop/logs
 ```
 
-### Inference
+Runs a threshold sweep (0.30–0.55), auto-picks best, saves per-sample IoU CSV and overlay PNGs.
+
+### Inference (any image size)
+
+`infer.py` uses sliding-window tiling with Hann-window blending — works on Google Maps screenshots or any arbitrary resolution.
 
 ```bash
 # Single image
 python rooftop/infer.py \
     --input /path/to/image.png \
     --ckpt  rooftop/checkpoints/unet_resnet34_best.pth \
-    --arch unet --encoder resnet34
+    --arch unet --encoder resnet34 \
+    --threshold 0.35
 
-# Directory of images
+# Whole folder
 python rooftop/infer.py \
-    --input /path/to/images/ \
-    --ckpt  rooftop/checkpoints/unet_resnet34_best.pth \
-    --out_dir rooftop/predictions/
+    --input   /path/to/images/ \
+    --ckpt    rooftop/checkpoints/unet_resnet34_best.pth \
+    --out_dir rooftop/infer_results/
 ```
 
-### Target Metrics (AIRS dataset)
+Use `--threshold 0.35` for best results (model is under-confident on limited training data).
 
-| Model | IoU | F1 |
-|-------|-----|----|
-| PSPNet (paper baseline) | 0.899 | 0.947 |
-| FPN | 0.882 | 0.937 |
+### Results (AIRS dataset)
+
+| Model | Samples | IoU |
+|-------|---------|-----|
+| PSPNet (Chen et al., 2019 — paper baseline) | full | 0.899 |
+| UNet ResNet-34 (ours, 2000 samples 100ep) | 210 test | **0.9016** ✅ |
+| UNet ResNet-34 (ours, 2000 samples 100ep) | full test | 0.8664 |
+
+> Training on more samples and with `--simulate_low_res` is expected to close the full-test gap.
 
 ---
 
-## Solar Panel Segmentation
+## Stage 2 — Solar Panel Segmentation
+
+### Dataset — BDAPPV
+
+Download from [Zenodo](https://zenodo.org/records/7358126):
+
+```bash
+wget -O bdappv.zip "https://zenodo.org/records/7358126/files/bdappv.zip?download=1"
+unzip bdappv.zip -d solar_panel/bdappv/
+```
+
+BDAPPV structure after unzip:
+```
+solar_panel/bdappv/bdappv/
+├── google/
+│   ├── img/    ← ~400×400px aerial images (Google Maps)
+│   └── mask/   ← binary masks (only for images WITH solar panels)
+└── ign/
+    ├── img/    ← higher-res IGN images
+    └── mask/
+```
+
+### Data Preparation
+
+```bash
+python prep_bdappv.py \
+    --src_dir solar_panel/bdappv/bdappv \
+    --out_dir /tmp/bdappv_crops \
+    --sources google ign \
+    --size 400 \
+    --val_frac 0.1 --test_frac 0.1
+```
+
+Output: `/tmp/bdappv_crops/train|val|test/images/` and `.../masks/`
+
+`prep_bdappv.py` options:
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--src_dir` | `./bdappv/bdappv` | Path to BDAPPV root |
+| `--out_dir` | `./bdappv_crops` | Output directory |
+| `--sources` | `google ign` | Which sources to use |
+| `--size` | `400` | Resize to N×N px (400 = keep original) |
+| `--min_panel_frac` | `0.001` | Skip crops with < this fraction of panel pixels |
 
 ### Key Difference from Rooftop
 
-Many aerial images contain **no solar panels**, so no mask file exists for them.
-`train_solar.py` handles this automatically:
+Many images have **no solar panels**, so no mask file exists for them.
+`train_solar.py` handles this with a black-mask fallback:
 
-- If a mask file **exists** → load it as ground truth.
-- If a mask file **does not exist** → use an **all-black mask** (correct ground truth: "no panels here").
+- Mask file **exists** → load it (solar panels present)
+- Mask file **missing** → use all-zeros mask (correct ground truth: "no panels here")
 
-This keeps negative examples in training rather than skipping them, which prevents
-the model from over-predicting panels.
+This keeps negative examples in training and prevents the model from over-predicting panels.
 
-At startup the dataset reports the split:
+At startup the dataset reports the breakdown:
 ```
-[SolarFolderDataset] /data/solar/train: 1200 images, 400 with masks, 800 without masks (→ black mask fallback)
-```
-
-### Data Layout
-
-```
-data_dir/
-├── images/    ← all 512×512 image crops (PNG)
-└── masks/     ← only crops that contain solar panels (PNG, 0/255)
-                  missing masks → black mask fallback
+[SolarFolderDataset] /tmp/bdappv_crops/train: 18432 images, 6200 with masks, 12232 without masks (→ black mask fallback)
 ```
 
 ### Training
 
 ```bash
 python solar_panel/train_solar.py \
-    --train_dir /data/solar/train \
-    --val_dir   /data/solar/val   \
-    --arch unet --encoder resnet34 \
-    --epochs 50 --batch_size 8
+    --train_dir /tmp/bdappv_crops/train \
+    --val_dir   /tmp/bdappv_crops/val   \
+    --arch unet --encoder resnet34      \
+    --epochs 100 --batch_size 32 --workers 2 \
+    --ckpt_dir solar_panel/checkpoints  \
+    --log_dir  solar_panel/logs
 ```
 
-Checkpoints save to `solar_panel/checkpoints/` and TensorBoard logs to
-`solar_panel/logs/` by default (configurable via `--ckpt_dir` / `--log_dir`).
+Quick smoke-test (3 epochs, 500 samples):
+```bash
+python solar_panel/train_solar.py \
+    --train_dir /tmp/bdappv_crops/train \
+    --val_dir   /tmp/bdappv_crops/val   \
+    --max_samples 500 --epochs 3        \
+    --arch unet --encoder resnet34      \
+    --batch_size 32 --workers 2         \
+    --ckpt_dir solar_panel/checkpoints  \
+    --log_dir  solar_panel/logs
+```
 
 ---
 
 ## Model Architectures
 
-All architectures are from `segmentation-models-pytorch` with ImageNet-pretrained
-encoders. The decoder and segmentation head are trained at full learning rate;
-the encoder at `lr × 0.1` (differential learning rates).
+All from `segmentation-models-pytorch` with ImageNet-pretrained encoders.
+Decoder + segmentation head train at full LR; encoder at `lr × 0.1`.
 
 | Architecture | `--arch` value |
 |--------------|----------------|
@@ -170,166 +296,49 @@ the encoder at `lr × 0.1` (differential learning rates).
 
 **Loss**: `0.5 × SoftBCEWithLogitsLoss + 0.5 × DiceLoss`
 
-**Metrics**: Global IoU, F1, Precision, Recall (accumulated across all batches per epoch).
+**Metrics**: Global IoU, F1, Precision, Recall — accumulated across all batches per epoch (not averaged per-batch).
 
 ---
 
-## DGX Setup & Docker
+## Monitoring
 
-### 0. Explore directory structure on DGX
-
+### Live log tail
 ```bash
-# Quick tree view (2 levels deep)
-find /scratch -maxdepth 2 -print | sed 's|[^/]*/|  |g'
-
-# Or with tree (if installed)
-tree /scratch -L 2
-
-# List top-level contents with sizes
-du -sh /scratch/* 2>/dev/null | sort -h
-
-# Check disk usage on scratch
-df -h /scratch
+tail -f solar_panel/logs/$(ls -t solar_panel/logs/*.txt | head -1)
 ```
 
----
-
-### 1. Check your driver / CUDA version
-
+### TensorBoard
 ```bash
-nvidia-smi
-# Look for "CUDA Version: 11.x" → use the default Dockerfile tag (cu118)
-# If "CUDA Version: 12.x" → edit Dockerfile line 1:
-#   pytorch/pytorch:2.2.0-cuda12.1-cudnn8-runtime
-```
+# Rooftop
+tensorboard --logdir rooftop/logs --port 6006 --bind_all
 
-### 1. Build the image
-
-```bash
-# Run from the repo root on the DGX node
-docker build -t btp_seg .
-```
-
-### 2. Run an interactive container
-
-```bash
-docker run --gpus all -it --rm \
-    -v /scratch:/scratch \
-    -v $(pwd):/workspace \
-    -w /workspace \
-    btp_seg bash
-```
-
-- `--gpus all` — expose all DGX GPUs inside the container
-- `-v /scratch:/scratch` — mount shared scratch storage (datasets, checkpoints)
-- `-v $(pwd):/workspace` — mount the repo so edits are reflected inside
-- `-w /workspace` — set working directory to the repo root
-
-### 3. Commands inside the container
-
-**Tile raw AIRS images → 512×512 crops**
-```bash
-python rooftop/tile_airs.py \
-    --src_dir /scratch/airs/train \
-    --out_dir /scratch/airs_crops/train \
-    --crop_size 512 --overlap 0.1
-
-python rooftop/tile_airs.py \
-    --src_dir /scratch/airs/val \
-    --out_dir /scratch/airs_crops/val \
-    --crop_size 512 --overlap 0.1
-```
-
-**Train rooftop segmentation**
-```bash
-python rooftop/train.py \
-    --train_dir /scratch/airs_crops/train \
-    --val_dir   /scratch/airs_crops/val \
-    --ckpt_dir  /scratch/checkpoints/rooftop \
-    --arch unet --encoder resnet34 \
-    --epochs 50 --batch_size 8 --workers 8
-```
-
-**Evaluate rooftop model on test set**
-```bash
-python rooftop/evaluate.py \
-    --test_dir /scratch/airs_crops/test \
-    --ckpt     /scratch/checkpoints/rooftop/unet_resnet34_best.pth \
-    --arch unet --encoder resnet34
-```
-
-**Run rooftop inference**
-```bash
-# Single image
-python rooftop/infer.py \
-    --input /scratch/test_images/sample.png \
-    --ckpt  /scratch/checkpoints/rooftop/unet_resnet34_best.pth \
-    --arch unet --encoder resnet34
-
-# Whole folder
-python rooftop/infer.py \
-    --input   /scratch/test_images/ \
-    --ckpt    /scratch/checkpoints/rooftop/unet_resnet34_best.pth \
-    --out_dir /scratch/rooftop_predictions/
-```
-
-**Train solar panel segmentation**
-```bash
-python solar_panel/train_solar.py \
-    --train_dir /scratch/solar/train \
-    --val_dir   /scratch/solar/val \
-    --ckpt_dir  /scratch/checkpoints/solar_panel \
-    --log_dir   /scratch/logs/solar_panel \
-    --arch unet --encoder resnet34 \
-    --epochs 50 --batch_size 8 --workers 8
-```
-
-### 4. Resume a training run
-
-```bash
-python rooftop/train.py \
-    --train_dir /scratch/airs_crops/train \
-    --val_dir   /scratch/airs_crops/val \
-    --ckpt_dir  /scratch/checkpoints/rooftop \
-    --arch unet --encoder resnet34 \
-    --resume /scratch/checkpoints/rooftop/unet_resnet34_best.pth
-```
-
-### 5. Run training detached (long jobs on DGX)
-
-```bash
-# Use screen so the job survives SSH disconnection
-screen -S train_rooftop
-
-docker run --gpus all --rm \
-    -v /scratch:/scratch \
-    -v $(pwd):/workspace \
-    -w /workspace \
-    btp_seg \
-    python rooftop/train.py \
-        --train_dir /scratch/airs_crops/train \
-        --val_dir   /scratch/airs_crops/val \
-        --ckpt_dir  /scratch/checkpoints/rooftop \
-        --arch unet --encoder resnet34 \
-        --epochs 50 --batch_size 8
-
-# Detach from screen : Ctrl+A then D
-# Reattach later     : screen -r train_rooftop
-```
-
-### 6. Monitor with TensorBoard
-
-```bash
-# Rooftop logs
-tensorboard --logdir /scratch/checkpoints/rooftop/tb_logs --port 6006 --bind_all
-
-# Both tasks side by side
+# Both stages side by side
 tensorboard \
-    --logdir rooftop:/scratch/checkpoints/rooftop/tb_logs,solar:/scratch/logs/solar_panel \
+    --logdir rooftop:rooftop/logs,solar:solar_panel/logs \
     --port 6006 --bind_all
 ```
 
 Open `http://<dgx-node-ip>:6006` in your browser.
+
+### Watch GPU usage
+```bash
+watch -n 2 nvidia-smi
+```
+
+---
+
+## Resume a crashed run
+
+```bash
+python rooftop/train.py \
+    --train_dir /tmp/airs_crops/train \
+    --val_dir   /tmp/airs_crops/val   \
+    --ckpt_dir  rooftop/checkpoints   \
+    --arch unet --encoder resnet34    \
+    --resume rooftop/checkpoints/unet_resnet34_best.pth
+```
+
+Periodic checkpoints (`unet_resnet34_epoch010.pth`, etc.) are saved every `--save_every` epochs for crash recovery.
 
 ---
 
