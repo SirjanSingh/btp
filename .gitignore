@@ -1,0 +1,26 @@
+# crash dumps
+core.*
+
+# datasets (too large)
+rooftop/dataset/
+rooftop/dataset_crops/
+solar_panel/bdappv/
+solar_panel/bdappv_crops/
+airs/
+
+# model weights (too large)
+rooftop/checkpoints/*.pth
+solar_panel/checkpoints/*.pth
+
+# generated outputs
+rooftop/infer_results/
+rooftop/eval_results/overlays/
+rooftop/eval_results/per_sample_iou.csv
+
+# tensorboard
+**/tb_logs/
+
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

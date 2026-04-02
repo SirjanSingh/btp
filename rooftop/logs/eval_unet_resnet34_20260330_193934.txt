@@ -1,0 +1,379 @@
+Eval Run : eval_unet_resnet34_20260330_193934
+Date     : 2026-03-30 19:39:34
+Checkpoint: epoch=90  val_IoU=0.8784
+Hardware : {'device': 'cuda', 'n_gpus': 1, 'gpu_name': 'Tesla V100-SXM2-32GB', 'cuda_version': '11.8'}
+Config   : {
+  "test_dir": "/workspace/dataset_crops/test",
+  "ckpt": "/workspace/checkpoints/unet_resnet34_best.pth",
+  "out_dir": "/workspace/eval_results",
+  "log_dir": "./logs",
+  "arch": "unet",
+  "encoder": "resnet34",
+  "batch_size": 8,
+  "threshold": 0.5,
+  "max_samples": null,
+  "sweep_threshold": true,
+  "n_overlays": 100
+}
+
+Threshold sweep:
+  threshold=0.30  IoU=0.8664  F1=0.9284  Prec=0.9390  Rec=0.9181
+  threshold=0.35  IoU=0.8664  F1=0.9284  Prec=0.9419  Rec=0.9153
+  threshold=0.40  IoU=0.8662  F1=0.9283  Prec=0.9444  Rec=0.9128
+  threshold=0.45  IoU=0.8659  F1=0.9281  Prec=0.9467  Rec=0.9103
+  threshold=0.50  IoU=0.8655  F1=0.9279  Prec=0.9488  Rec=0.9078
+  threshold=0.55  IoU=0.8649  F1=0.9275  Prec=0.9509  Rec=0.9053
+
+══════════════════════════════════════════════════
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+ Test Results  (threshold=0.3  n=13096)
+─
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+  Global IoU  : 0.8664  [PSPNet baseline 0.899 | gap -0.0326]
+  F1 Score    : 0.9284
+  Precision   : 0.9390
+  Recall      : 0.9181
+═
+Log (JSON) : logs/eval_unet_resnet34_20260330_193934.json
+Log (TXT)  : logs/eval_unet_resnet34_20260330_193934.txt
