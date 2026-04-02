@@ -31,9 +31,11 @@ See --help for all options.
 """
 
 import argparse
+import json
 import os
 import random
 import time
+from datetime import datetime
 from pathlib import Path
 
 import cv2
@@ -47,6 +49,65 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import segmentation_models_pytorch as smp
 from tqdm import tqdm
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Run Logger
+# ─────────────────────────────────────────────────────────────────────────────
+
+class RunLogger:
+    def __init__(self, args, log_dir: str):
+        self.log_dir = Path(log_dir)
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+        ts   = datetime.now().strftime("%Y%m%d_%H%M%S")
+        tag  = f"{args.arch}_{args.encoder}"
+        if getattr(args, "max_samples", None):
+            tag += f"_{args.max_samples}samples"
+        tag += f"_{args.epochs}ep"
+        stem = f"{tag}_{ts}"
+        self.json_path = self.log_dir / f"{stem}.json"
+        self.txt_path  = self.log_dir / f"{stem}.txt"
+        hw = {"device": "cpu"}
+        if torch.cuda.is_available():
+            hw = {"device": "cuda", "n_gpus": torch.cuda.device_count(),
+                  "gpu_name": torch.cuda.get_device_name(0),
+                  "cuda_version": torch.version.cuda}
+        self.record = {"run_name": stem, "timestamp": datetime.now().isoformat(),
+                       "hardware": hw, "config": vars(args), "epochs": [], "summary": {}}
+        self._txt_write(
+            f"Run: {stem}\nDate: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            f"Hardware: {hw}\nConfig: {json.dumps(vars(args), indent=2)}\n\n"
+            f"{'Epoch':>6}  {'TrLoss':>8}  {'VaLoss':>8}  "
+            f"{'IoU':>7}  {'F1':>7}  {'Prec':>7}  {'Rec':>7}  {'LR':>9}  Note\n"
+            + "─" * 80 + "\n")
+
+    def log_epoch(self, epoch, tr_loss, va_loss, va_m, lr, elapsed, note=""):
+        entry = {"epoch": epoch, "tr_loss": round(tr_loss, 6), "va_loss": round(va_loss, 6),
+                 **{k: round(v, 6) for k, v in va_m.items()}, "lr": lr,
+                 "elapsed_s": round(elapsed, 1), "note": note}
+        self.record["epochs"].append(entry)
+        self._flush_json()
+        self._txt_write(
+            f"{epoch:6d}  {tr_loss:8.4f}  {va_loss:8.4f}  "
+            f"{va_m['iou']:7.4f}  {va_m['f1']:7.4f}  "
+            f"{va_m['precision']:7.4f}  {va_m['recall']:7.4f}  "
+            f"{lr:9.2e}  {elapsed:8.1f}  {note}\n")
+
+    def finish(self, best_iou, best_epoch, ckpt_path):
+        self.record["summary"] = {"best_val_iou": round(best_iou, 6),
+                                   "best_epoch": best_epoch, "checkpoint": str(ckpt_path)}
+        self._flush_json()
+        self._txt_write("─" * 80 + f"\nBest val IoU : {best_iou:.4f}  (epoch {best_epoch})\n"
+                        f"Checkpoint   : {ckpt_path}\n")
+        print(f"[log] {self.json_path}")
+
+    def _flush_json(self):
+        with open(self.json_path, "w") as f:
+            json.dump(self.record, f, indent=2)
+
+    def _txt_write(self, text):
+        with open(self.txt_path, "a") as f:
+            f.write(text)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -66,12 +127,13 @@ class SolarFolderDataset(Dataset):
     Reports how many images use the black-mask fallback at construction time.
     """
 
-    def __init__(self, data_dir: str, transform=None):
+    def __init__(self, data_dir: str, transform=None, max_samples: int = None):
         self.img_dir   = Path(data_dir) / "images"
         self.msk_dir   = Path(data_dir) / "masks"
         self.transform = transform
 
-        self.paths = sorted(self.img_dir.glob("*.png"))
+        all_paths = sorted(self.img_dir.glob("*.png"))
+        self.paths = all_paths[:max_samples] if max_samples else all_paths
         if not self.paths:
             raise FileNotFoundError(f"No .png files found in {self.img_dir}")
 
@@ -208,14 +270,19 @@ class GlobalMetrics:
 # Train / validate one epoch
 # ─────────────────────────────────────────────────────────────────────────────
 
-def run_epoch(model, loader, optimizer, scaler, device, metrics, is_train):
+def run_epoch(model, loader, optimizer, scaler, device, metrics, is_train,
+              epoch=0, n_epochs=0):
     model.train() if is_train else model.eval()
     metrics.reset()
     total_loss = 0.0
 
+    phase = "Train" if is_train else "Val  "
+    pbar  = tqdm(loader, desc=f"Epoch {epoch}/{n_epochs} {phase}",
+                 leave=False, dynamic_ncols=True)
+
     ctx = torch.enable_grad() if is_train else torch.no_grad()
     with ctx:
-        for imgs, masks in loader:
+        for imgs, masks in pbar:
             imgs, masks = imgs.to(device), masks.to(device)
 
             with torch.cuda.amp.autocast(enabled=(device.type == "cuda")):
@@ -230,6 +297,7 @@ def run_epoch(model, loader, optimizer, scaler, device, metrics, is_train):
 
             total_loss += loss.item()
             metrics.update(preds, masks)
+            pbar.set_postfix(loss=f"{loss.item():.4f}")
 
     return total_loss / len(loader), metrics.compute()
 
@@ -254,8 +322,16 @@ def main(args):
     # ── Datasets ─────────────────────────────────────────────────────────────
     # SolarFolderDataset automatically handles images without paired masks
     # by using an all-black (all-zero) fallback mask.
-    train_ds = SolarFolderDataset(args.train_dir, train_aug())
-    val_ds   = SolarFolderDataset(args.val_dir,   val_aug())
+    val_cap = None
+    if args.max_samples:
+        import glob
+        n_train = len(glob.glob(str(Path(args.train_dir) / "images" / "*.png")))
+        ratio   = args.max_samples / max(n_train, 1)
+        n_val   = len(glob.glob(str(Path(args.val_dir) / "images" / "*.png")))
+        val_cap = max(1, int(n_val * ratio))
+
+    train_ds = SolarFolderDataset(args.train_dir, train_aug(), max_samples=args.max_samples)
+    val_ds   = SolarFolderDataset(args.val_dir,   val_aug(),   max_samples=val_cap)
 
     train_loader = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True,
@@ -296,9 +372,10 @@ def main(args):
     log_dir = Path(args.log_dir)
     log_dir.mkdir(parents=True, exist_ok=True)
 
-    run_name  = f"{args.arch}_{args.encoder}"
-    best_ckpt = ckpt_dir / f"{run_name}_best.pth"
-    writer    = SummaryWriter(log_dir=str(log_dir / run_name))
+    run_name   = f"{args.arch}_{args.encoder}"
+    best_ckpt  = ckpt_dir / f"{run_name}_best.pth"
+    writer     = SummaryWriter(log_dir=str(log_dir / run_name))
+    run_logger = RunLogger(args, log_dir=str(log_dir))
 
     # ── Resume ───────────────────────────────────────────────────────────────
     start_epoch   = 1
@@ -323,13 +400,17 @@ def main(args):
           f"{'IoU':>7}  {'F1':>7}  {'Prec':>7}  {'Rec':>7}  {'LR':>9}  Note")
     print(f"{'─'*72}")
 
+    best_epoch = start_epoch
+
     for epoch in range(start_epoch, args.epochs + 1):
         t0 = time.time()
 
         tr_loss, tr_m = run_epoch(
-            model, train_loader, optimizer, scaler, device, train_metrics, is_train=True)
+            model, train_loader, optimizer, scaler, device, train_metrics,
+            is_train=True, epoch=epoch, n_epochs=args.epochs)
         va_loss, va_m = run_epoch(
-            model, val_loader,   optimizer, scaler, device, val_metrics,   is_train=False)
+            model, val_loader,   optimizer, scaler, device, val_metrics,
+            is_train=False, epoch=epoch, n_epochs=args.epochs)
 
         scheduler.step()
         elapsed = time.time() - t0
@@ -341,9 +422,11 @@ def main(args):
         writer.add_scalars("f1",    {"train": tr_m["f1"],  "val": va_m["f1"]},  epoch)
         writer.add_scalar ("lr",    lr_now, epoch)
 
+        elapsed = time.time() - t0
         note = ""
         if va_m["iou"] > best_val_iou:
             best_val_iou  = va_m["iou"]
+            best_epoch    = epoch
             patience_left = args.patience
             note = "← best"
             base_model = model.module if isinstance(model, nn.DataParallel) else model
@@ -373,10 +456,13 @@ def main(args):
               f"{va_m['precision']:7.4f}  {va_m['recall']:7.4f}  "
               f"{lr_now:9.2e}  {note}")
 
+        run_logger.log_epoch(epoch, tr_loss, va_loss, va_m, lr_now, elapsed, note)
+
         if patience_left <= 0:
             print(f"\nEarly stopping at epoch {epoch} (patience={args.patience}).")
             break
 
+    run_logger.finish(best_val_iou, best_epoch, best_ckpt)
     print(f"\nBest val IoU : {best_val_iou:.4f}")
     print(f"Checkpoint   : {best_ckpt}")
     writer.close()
@@ -394,6 +480,8 @@ def parse_args():
 
     # ── Data ─────────────────────────────────────────────────────────────────
     g = p.add_argument_group("Data — folder mode (pre-tiled crops)")
+    g.add_argument("--max_samples", type=int, default=None,
+                   help="Cap training samples (val capped proportionally)")
     g.add_argument("--train_dir", required=True,
                    help="Directory with images/ (and optionally masks/) for training. "
                         "Images without a paired mask file use an all-black mask.")

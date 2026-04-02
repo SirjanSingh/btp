@@ -176,7 +176,25 @@ the encoder at `lr × 0.1` (differential learning rates).
 
 ## DGX Setup & Docker
 
-### 0. Check your driver / CUDA version
+### 0. Explore directory structure on DGX
+
+```bash
+# Quick tree view (2 levels deep)
+find /scratch -maxdepth 2 -print | sed 's|[^/]*/|  |g'
+
+# Or with tree (if installed)
+tree /scratch -L 2
+
+# List top-level contents with sizes
+du -sh /scratch/* 2>/dev/null | sort -h
+
+# Check disk usage on scratch
+df -h /scratch
+```
+
+---
+
+### 1. Check your driver / CUDA version
 
 ```bash
 nvidia-smi
