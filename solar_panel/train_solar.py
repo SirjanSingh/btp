@@ -180,6 +180,7 @@ STD  = (0.229, 0.224, 0.225)
 
 def train_aug(crop_size: int = 512):
     return A.Compose([
+        A.Resize(crop_size, crop_size),
         A.HorizontalFlip(p=0.5),
         A.VerticalFlip(p=0.5),
         A.RandomRotate90(p=0.5),
@@ -191,8 +192,9 @@ def train_aug(crop_size: int = 512):
     ])
 
 
-def val_aug():
+def val_aug(crop_size: int = 512):
     return A.Compose([
+        A.Resize(crop_size, crop_size),
         A.Normalize(mean=MEAN, std=STD),
         ToTensorV2(),
     ])
@@ -330,8 +332,8 @@ def main(args):
         n_val   = len(glob.glob(str(Path(args.val_dir) / "images" / "*.png")))
         val_cap = max(1, int(n_val * ratio))
 
-    train_ds = SolarFolderDataset(args.train_dir, train_aug(), max_samples=args.max_samples)
-    val_ds   = SolarFolderDataset(args.val_dir,   val_aug(),   max_samples=val_cap)
+    train_ds = SolarFolderDataset(args.train_dir, train_aug(args.crop_size), max_samples=args.max_samples)
+    val_ds   = SolarFolderDataset(args.val_dir,   val_aug(args.crop_size),   max_samples=val_cap)
 
     train_loader = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True,
@@ -499,6 +501,8 @@ def parse_args():
     g3 = p.add_argument_group("Training")
     g3.add_argument("--epochs",     type=int,   default=50)
     g3.add_argument("--batch_size", type=int,   default=8)
+    g3.add_argument("--crop_size",  type=int,   default=512,
+                    help="Resize input images to this size (must be divisible by 32)")
     g3.add_argument("--lr",         type=float, default=1e-4)
     g3.add_argument("--threshold",  type=float, default=0.5,
                     help="Binarisation threshold for metrics")
