@@ -1,0 +1,73 @@
+{
+  "run_name": "unet_resnet34_500samples_3ep_20260402_200251",
+  "timestamp": "2026-04-02T20:02:51.280138",
+  "hardware": {
+    "device": "cuda",
+    "n_gpus": 2,
+    "gpu_name": "Tesla V100-SXM2-32GB",
+    "cuda_version": "11.8"
+  },
+  "config": {
+    "max_samples": 500,
+    "train_dir": "/tmp/bdappv_crops/train",
+    "val_dir": "/tmp/bdappv_crops/val",
+    "arch": "unet",
+    "encoder": "resnet34",
+    "encoder_weights": "imagenet",
+    "epochs": 3,
+    "batch_size": 32,
+    "crop_size": 512,
+    "lr": 0.0001,
+    "threshold": 0.5,
+    "patience": 15,
+    "workers": 2,
+    "seed": 42,
+    "ckpt_dir": "solar_panel/checkpoints",
+    "log_dir": "solar_panel/logs",
+    "resume": null,
+    "save_every": 10
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "tr_loss": 0.908868,
+      "va_loss": 1.088522,
+      "iou": 0.026932,
+      "f1": 0.052451,
+      "precision": 0.026943,
+      "recall": 0.984077,
+      "lr": 7.525e-05,
+      "elapsed_s": 40.5,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 2,
+      "tr_loss": 0.801029,
+      "va_loss": 0.807361,
+      "iou": 0.043062,
+      "f1": 0.082568,
+      "precision": 0.043198,
+      "recall": 0.931659,
+      "lr": 2.5750000000000013e-05,
+      "elapsed_s": 32.9,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 3,
+      "tr_loss": 0.762106,
+      "va_loss": 0.772573,
+      "iou": 0.054592,
+      "f1": 0.103532,
+      "precision": 0.05479,
+      "recall": 0.937886,
+      "lr": 1e-06,
+      "elapsed_s": 33.6,
+      "note": "\u2190 best"
+    }
+  ],
+  "summary": {
+    "best_val_iou": 0.054592,
+    "best_epoch": 3,
+    "checkpoint": "solar_panel/checkpoints/unet_resnet34_best.pth"
+  }
+}
