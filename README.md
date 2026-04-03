@@ -27,6 +27,9 @@ btp/
 │
 ├── solar_panel/                    # Stage 2 — Solar panel segmentation
 │   ├── train_solar.py              # Training script (RunLogger, tqdm, black-mask fallback)
+│   ├── evaluate_solar.py           # Test-set evaluation + threshold sweep + overlays
+│   ├── infer_solar.py              # Sliding-window inference for any image size
+│   ├── prep_bdappv.py              # Prepare BDAPPV dataset (resize, split train/val/test)
 │   ├── checkpoints/                # Saved model weights (.pth) — gitignored
 │   ├── logs/                       # Per-run JSON + TXT logs + TensorBoard
 │   ├── bdappv/                     # Raw BDAPPV dataset — gitignored, placeholder only
@@ -278,6 +281,38 @@ python solar_panel/train_solar.py \
     --ckpt_dir solar_panel/checkpoints  \
     --log_dir  solar_panel/logs
 ```
+
+### Evaluation
+
+```bash
+python solar_panel/evaluate_solar.py \
+    --test_dir /tmp/bdappv_crops/test \
+    --ckpt     solar_panel/checkpoints/unet_resnet34_best.pth \
+    --arch unet --encoder resnet34 \
+    --sweep_threshold \
+    --out_dir  solar_panel/eval_results \
+    --log_dir  solar_panel/logs
+```
+
+Runs a threshold sweep (0.30–0.55), auto-picks best, saves per-sample IoU CSV and 4-panel overlay PNGs (image | GT | prediction | yellow blend).
+
+### Inference (any image size)
+
+```bash
+# Single image
+python solar_panel/infer_solar.py \
+    --image /path/to/aerial.png \
+    --ckpt  solar_panel/checkpoints/unet_resnet34_best.pth \
+    --gsd   0.25
+
+# Whole folder
+python solar_panel/infer_solar.py \
+    --image   /path/to/images/ \
+    --ckpt    solar_panel/checkpoints/unet_resnet34_best.pth \
+    --out_dir solar_panel/infer_results/
+```
+
+Outputs per-image PNG: original | binary mask | yellow overlay + panel area (m²) + estimated peak power (kW).
 
 ---
 
