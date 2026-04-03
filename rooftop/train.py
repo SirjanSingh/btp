@@ -70,6 +70,7 @@ class RunLogger:
             tag += f"_{args.max_samples}samples"
         tag += f"_{args.epochs}ep"
         stem = f"{tag}_{ts}"
+        self.stem      = stem
 
         self.json_path = self.log_dir / f"{stem}.json"
         self.txt_path  = self.log_dir / f"{stem}.txt"
@@ -444,14 +445,14 @@ def main(args):
     scaler = torch.cuda.amp.GradScaler(enabled=(device.type == "cuda"))
 
     # ── Checkpoint dir & TensorBoard ─────────────────────────────────────────
-    ckpt_dir = Path(args.ckpt_dir)
-    ckpt_dir.mkdir(parents=True, exist_ok=True)
-    run_name = f"{args.arch}_{args.encoder}"
-    best_ckpt = ckpt_dir / f"{run_name}_best.pth"
-    writer    = SummaryWriter(log_dir=str(ckpt_dir / "tb_logs" / run_name))
-
-    # ── File logger ──────────────────────────────────────────────────────────
+    # RunLogger generates the timestamped stem — reuse it for the ckpt folder
+    # so every run gets its own subdirectory and never overwrites another run.
     run_logger = RunLogger(args, log_dir=args.log_dir)
+    ckpt_dir   = Path(args.ckpt_dir) / run_logger.stem
+    ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+    best_ckpt = ckpt_dir / "best.pth"
+    writer    = SummaryWriter(log_dir=str(Path(args.log_dir) / run_logger.stem / "tb"))
 
     # ── Resume ───────────────────────────────────────────────────────────────
     start_epoch   = 1
@@ -524,7 +525,7 @@ def main(args):
                 "model_state":    base_model.state_dict(),
                 "optimizer_state":optimizer.state_dict(),
                 "val_iou":        va_m["iou"],
-            }, ckpt_dir / f"{run_name}_epoch{epoch:03d}.pth")
+            }, ckpt_dir / f"epoch{epoch:03d}.pth")
 
         print(f"{epoch:6d}  {tr_loss:8.4f}  {va_loss:8.4f}  "
               f"{va_m['iou']:7.4f}  {va_m['f1']:7.4f}  "
