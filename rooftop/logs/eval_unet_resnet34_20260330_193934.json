@@ -1,0 +1,85 @@
+{
+  "run_name": "eval_unet_resnet34_20260330_193934",
+  "timestamp": "2026-03-30T19:39:34.845304",
+  "hardware": {
+    "device": "cuda",
+    "n_gpus": 1,
+    "gpu_name": "Tesla V100-SXM2-32GB",
+    "cuda_version": "11.8"
+  },
+  "config": {
+    "test_dir": "/workspace/dataset_crops/test",
+    "ckpt": "/workspace/checkpoints/unet_resnet34_best.pth",
+    "out_dir": "/workspace/eval_results",
+    "log_dir": "./logs",
+    "arch": "unet",
+    "encoder": "resnet34",
+    "batch_size": 8,
+    "threshold": 0.3,
+    "max_samples": null,
+    "sweep_threshold": true,
+    "n_overlays": 100
+  },
+  "checkpoint": {
+    "path": "/workspace/checkpoints/unet_resnet34_best.pth",
+    "epoch": 90,
+    "val_iou": 0.8783830125355507,
+    "val_f1": 0.9352543754133615
+  },
+  "threshold_sweep": [
+    {
+      "threshold": 0.3,
+      "iou": 0.866416,
+      "f1": 0.928427,
+      "precision": 0.939029,
+      "recall": 0.918063
+    },
+    {
+      "threshold": 0.35,
+      "iou": 0.86641,
+      "f1": 0.928424,
+      "precision": 0.941884,
+      "recall": 0.915344
+    },
+    {
+      "threshold": 0.4,
+      "iou": 0.866235,
+      "f1": 0.928324,
+      "precision": 0.944379,
+      "recall": 0.912805
+    },
+    {
+      "threshold": 0.45,
+      "iou": 0.86592,
+      "f1": 0.928143,
+      "precision": 0.946675,
+      "recall": 0.910322
+    },
+    {
+      "threshold": 0.5,
+      "iou": 0.865466,
+      "f1": 0.927882,
+      "precision": 0.948841,
+      "recall": 0.907829
+    },
+    {
+      "threshold": 0.55,
+      "iou": 0.864867,
+      "f1": 0.927537,
+      "precision": 0.950925,
+      "recall": 0.905272
+    }
+  ],
+  "results": {
+    "threshold": 0.3,
+    "n_test_samples": 13096,
+    "iou": 0.866416,
+    "f1": 0.928427,
+    "precision": 0.939029,
+    "recall": 0.918063,
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.032584,
+    "csv_path": "/workspace/eval_results/per_sample_iou.csv",
+    "out_dir": "/workspace/eval_results"
+  }
+}

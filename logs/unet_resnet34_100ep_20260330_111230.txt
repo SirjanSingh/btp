@@ -1,0 +1,29 @@
+Run: unet_resnet34_100ep_20260330_111230
+Date: 2026-03-30 11:12:30
+Hardware: {'device': 'cuda', 'n_gpus': 2, 'gpu_name': 'Tesla V100-SXM2-32GB', 'cuda_version': '11.8'}
+Config: {
+  "train_dir": "/tmp/train_crops",
+  "val_dir": "/tmp/val_crops",
+  "max_samples": null,
+  "train_csv": null,
+  "val_csv": null,
+  "image_dir": null,
+  "mask_dir": null,
+  "arch": "unet",
+  "encoder": "resnet34",
+  "encoder_weights": "imagenet",
+  "epochs": 100,
+  "batch_size": 48,
+  "lr": 0.0001,
+  "threshold": 0.5,
+  "patience": 15,
+  "workers": 8,
+  "seed": 42,
+  "ckpt_dir": "/workspace/checkpoints",
+  "resume": null,
+  "save_every": 10,
+  "log_dir": "./logs"
+}
+
+ Epoch    TrLoss    VaLoss      IoU       F1     Prec      Rec         LR   Time(s)  Note
+────────────────────────────────────────────────────────────────────────────────

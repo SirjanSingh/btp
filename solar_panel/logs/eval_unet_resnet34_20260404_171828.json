@@ -1,0 +1,85 @@
+{
+  "run_name": "eval_unet_resnet34_20260404_171828",
+  "timestamp": "2026-04-04T17:18:28.447615",
+  "hardware": {
+    "device": "cuda",
+    "n_gpus": 2,
+    "gpu_name": "Tesla V100-SXM2-32GB",
+    "cuda_version": "11.8"
+  },
+  "config": {
+    "test_dir": "/tmp/bdappv_crops/test",
+    "ckpt": "solar_panel/checkpoints/unet_resnet34_100ep_20260404_061348/best.pth",
+    "out_dir": "solar_panel/eval_results",
+    "log_dir": "solar_panel/logs",
+    "arch": "unet",
+    "encoder": "resnet34",
+    "crop_size": 512,
+    "batch_size": 32,
+    "workers": 2,
+    "threshold": 0.55,
+    "max_samples": null,
+    "sweep_threshold": true,
+    "n_overlays": 20
+  },
+  "checkpoint": {
+    "path": "solar_panel/checkpoints/unet_resnet34_100ep_20260404_061348/best.pth",
+    "epoch": 78,
+    "val_iou": 0.8539946990797764,
+    "val_f1": 0.921248214090136
+  },
+  "threshold_sweep": [
+    {
+      "threshold": 0.3,
+      "iou": 0.847928,
+      "f1": 0.917706,
+      "precision": 0.908882,
+      "recall": 0.926704
+    },
+    {
+      "threshold": 0.35,
+      "iou": 0.848107,
+      "f1": 0.917812,
+      "precision": 0.910345,
+      "recall": 0.925402
+    },
+    {
+      "threshold": 0.4,
+      "iou": 0.848246,
+      "f1": 0.917893,
+      "precision": 0.911674,
+      "recall": 0.924197
+    },
+    {
+      "threshold": 0.45,
+      "iou": 0.84836,
+      "f1": 0.91796,
+      "precision": 0.912922,
+      "recall": 0.923053
+    },
+    {
+      "threshold": 0.5,
+      "iou": 0.848395,
+      "f1": 0.91798,
+      "precision": 0.914119,
+      "recall": 0.921874
+    },
+    {
+      "threshold": 0.55,
+      "iou": 0.848408,
+      "f1": 0.917988,
+      "precision": 0.915292,
+      "recall": 0.920699
+    }
+  ],
+  "results": {
+    "threshold": 0.55,
+    "n_test_samples": 2095,
+    "iou": 0.848408,
+    "f1": 0.917988,
+    "precision": 0.915292,
+    "recall": 0.920699,
+    "csv_path": "solar_panel/eval_results/per_sample_iou.csv",
+    "out_dir": "solar_panel/eval_results"
+  }
+}

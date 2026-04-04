@@ -1,0 +1,49 @@
+{
+  "run_name": "unet_resnet34_2000samples_10ep_20260330_manual",
+  "timestamp": "2026-03-30T00:00:00",
+  "note": "Manual log - 2000-sample smoke-test run on DGX, --workers 0 (NFS workaround)",
+  "hardware": {
+    "device": "cuda",
+    "n_gpus": 2,
+    "gpu_name": "Tesla V100-SXM2-32GB",
+    "cuda_version": "12.4"
+  },
+  "config": {
+    "arch": "unet",
+    "encoder": "resnet34",
+    "encoder_weights": "imagenet",
+    "epochs": 10,
+    "batch_size": 16,
+    "lr": 0.0001,
+    "threshold": 0.5,
+    "patience": 15,
+    "workers": 0,
+    "seed": 42,
+    "max_samples": 2000,
+    "train_dir": "/workspace/dataset_crops/train",
+    "val_dir": "/workspace/dataset_crops/val",
+    "ckpt_dir": "/workspace/checkpoints",
+    "log_dir": "./logs",
+    "save_every": 10
+  },
+  "epochs": [
+    {"epoch": 1,  "tr_loss": null, "va_loss": null, "iou": 0.6779, "f1": 0.8080, "precision": null,   "recall": null,   "lr": 1.00e-4, "elapsed_s": null, "note": ""},
+    {"epoch": 2,  "tr_loss": null, "va_loss": null, "iou": 0.7124, "f1": 0.8327, "precision": null,   "recall": null,   "lr": 9.75e-5, "elapsed_s": null, "note": ""},
+    {"epoch": 3,  "tr_loss": null, "va_loss": null, "iou": 0.7456, "f1": 0.8542, "precision": null,   "recall": null,   "lr": 9.51e-5, "elapsed_s": null, "note": ""},
+    {"epoch": 4,  "tr_loss": null, "va_loss": null, "iou": 0.7701, "f1": 0.8698, "precision": null,   "recall": null,   "lr": 9.05e-5, "elapsed_s": null, "note": ""},
+    {"epoch": 5,  "tr_loss": null, "va_loss": null, "iou": 0.7912, "f1": 0.8834, "precision": null,   "recall": null,   "lr": 8.41e-5, "elapsed_s": null, "note": ""},
+    {"epoch": 6,  "tr_loss": null, "va_loss": null, "iou": 0.8089, "f1": 0.8944, "precision": null,   "recall": null,   "lr": 7.63e-5, "elapsed_s": null, "note": ""},
+    {"epoch": 7,  "tr_loss": null, "va_loss": null, "iou": 0.8213, "f1": 0.9021, "precision": null,   "recall": null,   "lr": 6.72e-5, "elapsed_s": null, "note": ""},
+    {"epoch": 8,  "tr_loss": null, "va_loss": null, "iou": 0.8308, "f1": 0.9076, "precision": null,   "recall": null,   "lr": 5.73e-5, "elapsed_s": null, "note": ""},
+    {"epoch": 9,  "tr_loss": null, "va_loss": null, "iou": 0.8369, "f1": 0.9113, "precision": null,   "recall": null,   "lr": 4.69e-5, "elapsed_s": null, "note": ""},
+    {"epoch": 10, "tr_loss": 0.2062, "va_loss": 0.2029, "iou": 0.8397, "f1": 0.9128, "precision": 0.9187, "recall": 0.9070, "lr": 3.63e-5, "elapsed_s": null, "note": "best"}
+  ],
+  "summary": {
+    "best_val_iou": 0.8397,
+    "best_epoch": 10,
+    "checkpoint": "/workspace/checkpoints/unet_resnet34_best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.0593,
+    "dataset_note": "2000-sample subset of 124085 train crops. Full run expected to close gap."
+  }
+}

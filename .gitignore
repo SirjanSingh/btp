@@ -1,0 +1,33 @@
+# ── Crash dumps ──────────────────────────────────────
+core.*
+
+# ── Datasets (too large for git) ─────────────────────
+rooftop/dataset/
+rooftop/dataset_crops/
+solar_panel/bdappv/
+solar_panel/bdappv_crops/
+airs/
+test_indian/
+
+# ── Model weights (too large) ────────────────────────
+rooftop/checkpoints/*.pth
+solar_panel/checkpoints/*.pth
+
+# ── Generated outputs ────────────────────────────────
+rooftop/infer_results/
+rooftop/eval_results/overlays/
+rooftop/eval_results/per_sample_iou.csv
+solar_panel/eval_results/
+
+# ── TensorBoard ──────────────────────────────────────
+**/tb_logs/
+
+# ── Python ───────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# ── IDE ───────────────────────────────────────────────
+.vscode/
+.idea/

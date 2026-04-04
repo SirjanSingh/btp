@@ -1,0 +1,93 @@
+{
+  "run_name": "unet_resnet34_100ep_20260403_163032",
+  "timestamp": "2026-04-03T16:30:32.798281",
+  "hardware": {
+    "device": "cuda",
+    "n_gpus": 8,
+    "gpu_name": "Tesla V100-SXM2-32GB",
+    "cuda_version": "11.8"
+  },
+  "config": {
+    "max_samples": null,
+    "train_dir": "/tmp/bdappv_crops/train",
+    "val_dir": "/tmp/bdappv_crops/val",
+    "arch": "unet",
+    "encoder": "resnet34",
+    "encoder_weights": "imagenet",
+    "epochs": 100,
+    "batch_size": 32,
+    "crop_size": 512,
+    "lr": 0.0001,
+    "threshold": 0.5,
+    "patience": 15,
+    "workers": 8,
+    "seed": 42,
+    "ckpt_dir": "solar_panel/checkpoints",
+    "log_dir": "solar_panel/logs",
+    "resume": "solar_panel/checkpoints/unet_resnet34_best.pth",
+    "save_every": 10
+  },
+  "epochs": [
+    {
+      "epoch": 34,
+      "tr_loss": 0.044658,
+      "va_loss": 0.062951,
+      "iou": 0.839481,
+      "f1": 0.912737,
+      "precision": 0.907616,
+      "recall": 0.917916,
+      "lr": 7.567912071374738e-05,
+      "elapsed_s": 1027.0,
+      "note": ""
+    },
+    {
+      "epoch": 35,
+      "tr_loss": 0.044319,
+      "va_loss": 0.062177,
+      "iou": 0.840024,
+      "f1": 0.913057,
+      "precision": 0.911173,
+      "recall": 0.91495,
+      "lr": 7.562385080361844e-05,
+      "elapsed_s": 1007.0,
+      "note": ""
+    },
+    {
+      "epoch": 36,
+      "tr_loss": 0.043981,
+      "va_loss": 0.060806,
+      "iou": 0.843385,
+      "f1": 0.915039,
+      "precision": 0.908402,
+      "recall": 0.921775,
+      "lr": 7.553179489398507e-05,
+      "elapsed_s": 999.1,
+      "note": ""
+    },
+    {
+      "epoch": 37,
+      "tr_loss": 0.043305,
+      "va_loss": 0.060601,
+      "iou": 0.844473,
+      "f1": 0.91568,
+      "precision": 0.907012,
+      "recall": 0.924514,
+      "lr": 7.540304383291604e-05,
+      "elapsed_s": 987.5,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 38,
+      "tr_loss": 0.043842,
+      "va_loss": 0.060627,
+      "iou": 0.846277,
+      "f1": 0.916739,
+      "precision": 0.921242,
+      "recall": 0.91228,
+      "lr": 7.523772468216429e-05,
+      "elapsed_s": 1022.7,
+      "note": "\u2190 best"
+    }
+  ],
+  "summary": {}
+}
