@@ -42,8 +42,8 @@ The model is a **U-Net** with a pretrained **ResNet-34 encoder** from [`segmenta
 The encoder **replaces the original U-Net contracting path** with a pretrained ResNet-34. Pretraining on ImageNet gives the model a strong low-level feature head-start.
 
 <p align="center">
-  <img src="https://production-media.paperswithcode.com/methods/resnet-e1548261477164.png" width="660"/>
-  <br><i>ResNet residual block. Skip connections prevent vanishing gradients, enabling deeper encoders.</i>
+  <img src="https://d2l.ai/_images/resnet-block.svg" width="560"/>
+  <br><i>ResNet residual block. The skip connection (curved arrow) lets gradients flow directly, enabling stable training of 34+ layers.</i>
 </p>
 
 | Stage | Output Size | Channels | Operation |
@@ -103,8 +103,8 @@ Differential learning rates prevent over-distorting pretrained encoder weights w
 Resolution: **7.5 cm/pixel** | City: Christchurch, New Zealand
 
 <p align="center">
-  <img src="https://captain-whu.github.io/DOTA/images/instances.png" width="700"/>
-  <br><i>Example of high-resolution aerial imagery segmentation. AIRS has similar density and resolution.</i>
+  <img src="https://d2l.ai/_images/fcn.svg" width="700"/>
+  <br><i>Example of semantic segmentation on aerial/natural imagery — each pixel gets a class label (roof, road, vegetation, etc.).</i>
 </p>
 
 ### Raw Data
@@ -177,8 +177,8 @@ scheduler = CosineAnnealingLR(optimizer, T_max=epochs, eta_min=1e-6)
 ```
 
 <p align="center">
-  <img src="https://miro.medium.com/v2/resize:fit:1400/1*vdAGYu8QHKJXBkdaCGKAig.png" width="560"/>
-  <br><i>Cosine annealing LR schedule. Smooth decay avoids abrupt LR drops that can destabilise training.</i>
+  <img src="https://raw.githubusercontent.com/katsura-jp/pytorch-cosine-annealing-with-warmup/master/src/plot002.png" width="560"/>
+  <br><i>Cosine annealing LR schedule. Smoothly decays from max LR to eta_min=1e-6 over T_max epochs — avoids abrupt drops that destabilise training.</i>
 </p>
 
 ### Mixed Precision (AMP)

@@ -70,8 +70,8 @@ Solar panels have strong **local texture** (uniform blue/black rectangular cells
 | Layer 4 | 16 × 16 | 512 | 3 residual blocks |
 
 <p align="center">
-  <img src="https://miro.medium.com/v2/resize:fit:1400/1*BnarLMa5bJmBtvf_QNQY9w.png" width="640"/>
-  <br><i>ResNet-34 architecture. Stacked residual blocks allow gradients to flow directly through skip connections, enabling effective training of 34 layers.</i>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Resnet-18_architecture.svg" width="640"/>
+  <br><i>ResNet architecture. Stacked residual blocks allow gradients to flow directly through skip connections, enabling effective training of 34 layers.</i>
 </p>
 
 ### Decoder — Skip Connection Expansion
@@ -106,9 +106,7 @@ Output      (512×512,  1ch)  ← sigmoid → [0,1] panel probability map
 **Building Detection and Aerial Photovoltaic Panel Vision (BDAPPV)** — Kasmi et al., 2023
 [Zenodo Link](https://zenodo.org/records/7358126) | French aerial imagery | ~28,000 crops
 
-<p align="center">
-  <img src="https://zenodo.org/records/7358126/files/bdappv_example.png?download=1" width="680"/>
-</p>
+> Dataset contains ~28,000 aerial crops from two sources: Google Maps imagery and French IGN national survey imagery, both at ~0.20–0.25 m/px resolution. Only images that contain solar panels come with a mask file — panel-free images use the black mask fallback.
 
 ### Sources
 
@@ -193,10 +191,15 @@ Loss = 0.5 × SoftBCEWithLogitsLoss + 0.5 × DiceLoss
 
 Solar panels typically occupy **<5% of pixels** per crop (highly imbalanced). Dice loss is critical here — it directly optimises the overlap between prediction and ground truth regardless of class imbalance.
 
-<p align="center">
-  <img src="https://miro.medium.com/v2/resize:fit:1400/1*yUd5ckecHjWZf6hGrdlwHQ.png" width="560"/>
-  <br><i>Dice loss vs BCE. Dice is insensitive to class imbalance because it only considers foreground pixels (panels), making it ideal for sparse targets like solar panels.</i>
-</p>
+```
+         2 × |A ∩ B|          2 × TP
+Dice = ─────────────────  =  ──────────────────
+          |A| + |B|           2×TP + FP + FN
+
+BCE  = -[y·log(p) + (1-y)·log(1-p)]   ← penalises each pixel equally
+```
+
+Dice only cares about the ratio of correctly detected panel pixels to total panel pixels — unaffected by the large number of background (non-panel) pixels. BCE treats every pixel equally, so the loss is dominated by background. Combined 50/50, we get both pixel-level calibration and overlap optimisation.
 
 ### Optimiser & Scheduler
 
