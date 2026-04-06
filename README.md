@@ -1,4 +1,4 @@
-# BTP — Rooftop & Solar Panel Segmentation
+# BTP — Rooftop & Solar Panel Segmentation 
 
 Semantic segmentation pipeline for detecting **rooftop areas** (Stage 1) and **solar panels** (Stage 2)
 from aerial/satellite imagery. Built for DGX multi-GPU training using
