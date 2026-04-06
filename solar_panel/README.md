@@ -70,7 +70,7 @@ Solar panels have strong **local texture** (uniform blue/black rectangular cells
 | Layer 4 | 16 × 16 | 512 | 3 residual blocks |
 
 <p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Resnet-18_architecture.svg" width="640"/>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Resnet-18_architecture.svg/400px-Resnet-18_architecture.svg.png" width="640"/>
   <br><i>ResNet architecture. Stacked residual blocks allow gradients to flow directly through skip connections, enabling effective training of 34 layers.</i>
 </p>
 
