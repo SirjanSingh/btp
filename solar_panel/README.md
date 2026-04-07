@@ -232,6 +232,11 @@ scheduler = CosineAnnealingLR(T_max=100, eta_min=1e-6)
 
 ### Training Curves
 
+<p align="center">
+  <img src="assets/training_curves.png" width="800"/>
+  <br><i>Full training run (16,763 BDAPPV samples, 93 epochs across 4 resumed sessions). Best val IoU = 0.8540 at epoch 78. Dashed lines mark resume boundaries.</i>
+</p>
+
 **Small run (4,000 samples):**
 
 | Epoch | Train Loss | Val IoU | Note |

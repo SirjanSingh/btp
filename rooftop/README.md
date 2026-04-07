@@ -218,6 +218,11 @@ F1   = 2·Prec·Rec / (Prec + Rec)
 
 ### Training Curve
 
+<p align="center">
+  <img src="assets/training_curves.png" width="800"/>
+  <br><i>Training loss and validation IoU over 100 epochs (2,000 AIRS samples). Best val IoU = 0.8784 at epoch 90.</i>
+</p>
+
 | Epoch | Train Loss | Val Loss | Val IoU | Val F1 | Note |
 |-------|-----------|---------|--------|-------|------|
 | 1 | 0.512 | 0.398 | 0.621 | 0.766 | |
