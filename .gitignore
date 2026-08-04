@@ -31,3 +31,15 @@ __pycache__/
 # ── IDE ───────────────────────────────────────────────
 .vscode/
 .idea/
+
+# ── Jaipur target-domain data (1+ GB) ────────────────
+daraset/
+jaipur/
+jaipur_crops/
+adapt/labels/
+adapt/cache/
+
+# ── Papers & reference rasters ───────────────────────
+*.pdf
+rooftop/*.tif
+rooftop/eval_results/*.png

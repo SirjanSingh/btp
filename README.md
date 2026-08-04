@@ -1,4 +1,4 @@
-# BTP — Rooftop & Solar Panel Segmentation
+# BTP — Rooftop & Solar Panel Segmentation 
 
 Semantic segmentation pipeline for detecting **rooftop areas** (Stage 1) and **solar panels** (Stage 2)
 from aerial/satellite imagery. Built for DGX multi-GPU training using
@@ -35,6 +35,17 @@ btp/
 │   ├── bdappv/                     # Raw BDAPPV dataset — gitignored, placeholder only
 │   └── bdappv_crops/               # Prepared crops — gitignored, placeholder only
 │
+├── plan/                           # Jaipur domain-adaptation research + plan (docs only)
+│   ├── README.md                   # Start here — TL;DR and reading order
+│   ├── 01-situation-and-assets.md  # What we have, measured
+│   ├── 02-domain-gap-analysis.md   # The six gaps, quantified
+│   ├── 03-methods-and-literature.md# Ranked method shortlist with sources
+│   ├── 04-pipeline.md              # Full end-to-end pipeline + diagrams
+│   ├── 05-compute-and-schedule.md  # 600 Colab units + DGX budget, 6-week Gantt
+│   ├── 06-implementation-plan.md   # Task-by-task, executable, TDD
+│   ├── 07-risks-licensing-ethics.md# Risk register + imagery licensing
+│   └── 08-sources.md               # Every source cited
+│
 ├── prep_bdappv.py                  # Prepare BDAPPV solar panel dataset (resize, split)
 ├── Dockerfile                      # Docker image (PyTorch 2.1.2, CUDA 11.8)
 ├── requirements.txt                # Python dependencies
@@ -43,6 +54,29 @@ btp/
 
 > **Gitignored:** All dataset folders, model weights (`.pth`), and generated outputs are excluded from git.
 > Each folder has a `.gitkeep` file so the directory structure is visible in the repo.
+
+---
+
+## Domain Adaptation — Jaipur, India
+
+The models above are trained on **New Zealand** (AIRS, 7.5 cm/px) and **French**
+(BDAPPV) imagery. Making them work on **Jaipur** imagery is a separate, planned
+piece of work. The complete research report, gap analysis, pipeline design,
+compute budget, and task-by-task implementation plan live in
+[**`plan/`**](plan/) — start with [`plan/README.md`](plan/README.md).
+
+Three things to know if you only read this section:
+
+1. The Jaipur imagery in `daraset/` is **26.6 cm/px** on the ground, not 10 cm.
+   It is Web Mercator (EPSG:3857) zoom-19, and the stored `0.2986 m` pixel scale
+   is in *Mercator* metres, which must be multiplied by `cos(26.96°)`.
+   That makes the resolution gap to AIRS **3.55×**, and the ground area per
+   pixel **0.0708 m²** (vs 0.0056 m² for AIRS).
+2. There are **no Jaipur labels yet**. Building a labelled target-domain
+   evaluation set is the critical path — see [`plan/04-pipeline.md`](plan/04-pipeline.md) §3.
+3. Google Maps imagery **may not be used to train ML models** under Google's
+   terms. Read [`plan/07-risks-licensing-ethics.md`](plan/07-risks-licensing-ethics.md)
+   before training on it.
 
 ---
 
