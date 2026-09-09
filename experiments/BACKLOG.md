@@ -1,0 +1,101 @@
+# Experiment backlog — the queue the 30-minute loop pulls from
+
+Top unblocked item wins. Move an entry to `## Done` with its result when it lands, and
+write the full entry under `experiments/<date>-<slug>/`.
+
+**Launch rules**
+- Only use a GPU whose **free VRAM ≥ job need + 2 GB margin**. Our runs take ~6 GB at
+  batch 16, so ~8 GB free is the bar. Never evict or disrupt another student's job.
+- **Quota guard:** `/home` is a hard 40 GB. If free space < 3 GB, do not launch — delete
+  `epoch*.pth` first (never any `best.pth`), then re-check.
+- New runs should pass `--save_every 999` so only `best.pth` is written.
+- Every run: prediction written **before** launch, results after, index updated, pushed.
+
+---
+
+## Queue — rooftop (Stage 1)
+
+### R1 · Boundary-relaxed loss ★ next
+Ignore a 4 px band around each label edge when computing loss. Directly targets the
+measured precision/recall gap (recall ran 0.11 above precision — the roof-vs-footprint
+offset, Gap 4). `plan/03` Tier 4 lists it; nothing has tested it.
+*Needs:* code change in `train.py`. ~2 h GPU. **Predict: +0.02–0.05 IoU, precision up.**
+
+### R2 · Does the AIRS seed even help?
+Same weak-supervision run from **ImageNet init** instead of the AIRS checkpoint. If it
+matches 0.6475, the AIRS seed contributes nothing and the whole source-domain question is
+moot — which would be the single most plan-changing result available.
+*Needs:* nothing new. ~2 h GPU. **Predict: 0.60–0.64, slightly below the seeded run.**
+
+### R3 · Label quantity vs quality
+Rebuild weak labels at confidence ≥ 0.0 (523k polygons) instead of ≥ 0.75 (318k) and
+retrain. Tests whether the 205k discarded low-confidence buildings are the *hard* ones.
+*Needs:* `make_weak_labels.py --min_conf 0.0` (~40 min CPU) + ~2 h GPU. **Predict: within
+±0.02 — noisier labels, but more of them.**
+
+### R4 · Backbone: SegFormer vs ResNet-34
+DAFormer's central claim is architecture beats algorithm. `plan/03` §2.3 wants this table
+regardless of winner.
+*Needs:* `--arch segformer --encoder mit_b2`, verify smp support. ~3 h GPU.
+**Predict: +0.03–0.08 IoU.**
+
+### R5 · Self-training / CBST on top of the weak model
+Pseudo-label Jaipur with the weak model, keep confident pixels using the **measured** 23 %
+class ratio (not a fixed 0.95), retrain. This is the Tier-3 UDA arm the supervisor's
+CVF-venue list wants.
+*Needs:* new script. ~3 h GPU. **Predict: +0.01–0.04; collapse risk if the ratio is wrong.**
+
+### R6 · Multi-source co-training
+Add the 2,326 labelled American-house pairs sitting unused in Drive. Tests `plan/03` §2.2
+(a second source domain) with data we already have rather than downloading Inria.
+*Needs:* download ~2 GB, quota permitting. ~3 h GPU. **Predict: +0.01–0.03.**
+
+### R7 · Low-resolution simulation
+Train on AIRS downsampled to 0.15–0.40 m so the training distribution matches Jaipur's
+26.6 cm. `plan/03` calls this the highest value-per-effort action; `--simulate_low_res`
+already exists.
+*Blocked:* needs AIRS imagery (~14 GB). Use the container-`/tmp` route so the quota never
+sees it — but write `make_airs_crops.py` first, so the crops are regenerable. The 2026-03
+baseline is unreproducible precisely because that script never existed.
+
+---
+
+## Queue — solar (Stage 2)
+
+### S1 · google → ign source-only baseline ★ high value
+Train on `google_` crops, evaluate on `ign_`. **The only rung where target IoU is
+measurable**, because both domains have labels. Everything tuned here transfers to Jaipur,
+where nothing can be measured. `MASTER_CONTEXT`'s ordering principle says do this first.
+*Needs:* filename filter on `bdappv_crops` (10,665 google / 6,098 ign train). ~3 h GPU.
+**Predict: large google→ign drop; that drop is the thing to close.**
+
+### S2 · google → ign with self-training
+The same CBST recipe as R5, tuned where the score is visible.
+*Needs:* S1 first.
+
+### S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ blocks all Stage-2 numbers
+`prep_bdappv.py:85` drops mask-less images, so **every** training crop contains a panel and
+the model never learns "no panel here". Re-prep keeping negatives, verify the fraction is
+non-zero, then re-run S1.
+*Needs:* CPU re-prep. **Do before quoting any Stage-2 precision.**
+
+---
+
+## Queue — diagnostics (CPU, cheap)
+
+- **D4 · adjacency rate** — do Jaipur footprints touch? Decides whether the three-class /
+  instance-merge work is needed at all. Open Buildings only; runnable now.
+- **D2 · source foreground fraction** — needs AIRS labels (downloading, 400/857).
+- **D3 · building size distribution** — AIRS labels vs Open Buildings, in m².
+- **D7 · clutter inventory** — build a contact sheet of 20 tiles for manual tallying.
+
+---
+
+## Done
+
+| ID | Result |
+|---|---|
+| D1 target prior | 28.19 % (23.06 % @ conf ≥ 0.75) |
+| D6 seed probe | 5.69 % predicted foreground — ~5× under |
+| Weak supervision | **IoU 0.6475** |
+| Method comparison | weak 0.65 ≫ adabn 0.25 > seed 0.14 > fda 0.09 > histmatch 0.03 |
