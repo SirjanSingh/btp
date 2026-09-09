@@ -99,8 +99,13 @@ def main(a):
 
                     m = mask_full[top:top + a.crop, left:left + a.crop]
                     stem = f"{os.path.splitext(name)[0]}_{top:06d}_{left:06d}"
-                    Image.fromarray(img).save(
-                        os.path.join(a.out_dir, split, "images", stem + ".png"))
+                    # --masks_only: a second label set at a different confidence
+                    # cutoff shares the SAME imagery, and the images are ~3.5 GB
+                    # of the 4.2 GB set. Write masks alone and symlink images in,
+                    # or a confidence sweep exhausts the 40 GB quota in two runs.
+                    if not a.masks_only:
+                        Image.fromarray(img).save(
+                            os.path.join(a.out_dir, split, "images", stem + ".png"))
                     Image.fromarray(m * 255).save(
                         os.path.join(a.out_dir, split, "masks", stem + ".png"))
                     fg_fractions.append(float(m.mean()))
@@ -142,6 +147,9 @@ if __name__ == "__main__":
     p.add_argument("--crop", type=int, default=512)
     p.add_argument("--stride", type=int, default=512)
     p.add_argument("--min_conf", type=float, default=0.75)
+    p.add_argument("--masks_only", action="store_true",
+                   help="write masks but not images (symlink images from an "
+                        "existing set; they are identical across cutoffs)")
     p.add_argument("--limit_tiles", type=int, default=0,
                    help="only process the first N tiles (smoke test)")
     a = p.parse_args()
