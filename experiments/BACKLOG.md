@@ -9,6 +9,10 @@ write the full entry under `experiments/<date>-<slug>/`.
 - **Quota guard:** `/home` is a hard 40 GB. If free space < 3 GB, do not launch — delete
   `epoch*.pth` first (never any `best.pth`), then re-check.
 - New runs should pass `--save_every 999` so only `best.pth` is written.
+- **Never delete a checkpoint before running `python scripts/build_run_ledger.py`.** Weights
+  are regenerable; the numbers inside them are what the paper needs. The ledger consolidates
+  every run's config, hardware and full per-epoch curve into `experiments/RUN_LEDGER.{md,json}`
+  so the stats outlive the `.pth`. Rebuild it after every run too.
 - Every run: prediction written **before** launch, results after, index updated, pushed.
 
 ---

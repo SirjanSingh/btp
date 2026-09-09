@@ -1,0 +1,71 @@
+# Run ledger — every training and evaluation run, consolidated
+
+Generated 2026-09-09 22:56 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+
+Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
+
+**34 runs · 21 checkpoints currently on disk**
+
+| Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
+|---|---|---|---|---|---|---|---|---|
+| `unet_resnet34_2000samples_10ep_20260330_manual` | rooftop | train | 10 | **0.8397** | 10 | 0.9128 | 0.9187 | 0.9070 |
+| `unet_resnet34_2000samples_100ep_20260330_102932` | rooftop | train | 1 | **0.6782** | 1 | 0.8082 | 0.7212 | 0.9191 |
+| `unet_resnet34_2000samples_100ep_20260330_125206` | rooftop | train | 100 | **0.8784** | 90 | 0.9353 | 0.9505 | 0.9205 |
+| `eval_unet_resnet34_210samples_20260330_192603` | rooftop | eval | 0 | **0.9016** | thr 0.45 | 0.9483 | 0.9527 | 0.9438 |
+| `eval_unet_resnet34_2000samples_20260330_193154` | rooftop | eval | 0 | **0.8723** | thr 0.35 | 0.9318 | 0.9424 | 0.9214 |
+| `eval_unet_resnet34_20260330_193934` | rooftop | eval | 0 | **0.8664** | thr 0.3 | 0.9284 | 0.9390 | 0.9181 |
+| `unet_resnet34_500samples_3ep_20260402_200251` | solar | train | 3 | **0.0546** | 3 | 0.1035 | 0.0548 | 0.9379 |
+| `unet_resnet34_4000samples_100ep_20260402_201304` | solar | train | 30 | **0.8535** | 15 | 0.9209 | 0.9215 | 0.9204 |
+| `eval_unet_resnet34_20260403_054802` | solar | eval | 0 | **0.7719** | thr 0.55 | 0.8713 | 0.8670 | 0.8756 |
+| `unet_resnet34_100ep_20260403_062049` | solar | train | 33 | **0.8442** | 33 | 0.9155 | 0.9235 | 0.9077 |
+| `unet_resnet34_100ep_20260403_163032` | solar | train | 5 | **0.8463** | 38 | 0.9167 | 0.9212 | 0.9123 |
+| `unet_resnet34_100ep_20260403_185446` | solar | train | 19 | **0.8506** | 47 | 0.9193 | 0.9190 | 0.9196 |
+| `unet_resnet34_100ep_20260404_051627` | solar | train | 2 | **0.8476** | 56 | 0.9175 | 0.9181 | 0.9169 |
+| `unet_resnet34_100ep_20260404_061348` | solar | train | 38 | **0.8540** | 78 | 0.9212 | 0.9216 | 0.9209 |
+| `eval_unet_resnet34_20260404_171828` | solar | eval | 0 | **0.8484** | thr 0.55 | 0.9180 | 0.9153 | 0.9207 |
+| `eval_unet_resnet34_20260404_175648` | solar | eval | 0 | **0.8484** | thr 0.55 | 0.9180 | 0.9153 | 0.9207 |
+| `unet_resnet34_40ep_20260909_152425` | rooftop | train | 40 | **0.6475** | 33 | 0.7861 | 0.7361 | 0.8434 |
+| `unet_resnet34_40ep_20260909_171814` | rooftop | train | 2 | **0.5971** | 2 | 0.7477 | 0.6865 | 0.8210 |
+| `d1_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `d6_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `eval_unet_resnet34_210samples_20260330_192349` | rooftop | train (txt only) | 0 | — | — | — | — | — |
+| `method_comparison` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `unet_resnet34_100ep_20260330_111230` | rooftop | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_100ep_20260330_112025` | rooftop | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_100ep_20260330_115938` | rooftop | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_100ep_20260330_124500` | rooftop | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_100ep_20260402_200839` | solar | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_100ep_20260403_180709` | solar | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_100ep_20260404_050947` | solar | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_100ep_20260404_051053` | solar | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_2000samples_100ep_20260330_112130` | rooftop | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_500samples_3ep_20260402_192118` | solar | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_500samples_3ep_20260402_193129` | solar | train (txt only) | 0 | — | — | — | — | — |
+| `unet_resnet34_500samples_3ep_20260402_194953` | solar | train (txt only) | 0 | — | — | — | — | — |
+
+## Runs that completed zero epochs
+
+Kept deliberately — a crashed configuration is evidence too.
+
+- `eval_unet_resnet34_210samples_20260330_192603` (rooftop/logs/eval_unet_resnet34_210samples_20260330_192603.json)
+- `eval_unet_resnet34_2000samples_20260330_193154` (rooftop/logs/eval_unet_resnet34_2000samples_20260330_193154.json)
+- `eval_unet_resnet34_20260330_193934` (rooftop/logs/eval_unet_resnet34_20260330_193934.json)
+- `eval_unet_resnet34_20260403_054802` (solar_panel/logs/eval_unet_resnet34_20260403_054802.json)
+- `eval_unet_resnet34_20260404_171828` (solar_panel/logs/eval_unet_resnet34_20260404_171828.json)
+- `eval_unet_resnet34_20260404_175648` (solar_panel/logs/eval_unet_resnet34_20260404_175648.json)
+- `d1_summary` (diagnostics/d1/d1_summary.json)
+- `d6_summary` (diagnostics/d6_smoke/d6_summary.json)
+- `eval_unet_resnet34_210samples_20260330_192349` (rooftop/logs/eval_unet_resnet34_210samples_20260330_192349.txt)
+- `method_comparison` (diagnostics/method_comparison.json)
+- `unet_resnet34_100ep_20260330_111230` (logs/unet_resnet34_100ep_20260330_111230.txt)
+- `unet_resnet34_100ep_20260330_112025` (logs/unet_resnet34_100ep_20260330_112025.txt)
+- `unet_resnet34_100ep_20260330_115938` (logs/unet_resnet34_100ep_20260330_115938.txt)
+- `unet_resnet34_100ep_20260330_124500` (logs/unet_resnet34_100ep_20260330_124500.txt)
+- `unet_resnet34_100ep_20260402_200839` (solar_panel/logs/unet_resnet34_100ep_20260402_200839.txt)
+- `unet_resnet34_100ep_20260403_180709` (solar_panel/logs/unet_resnet34_100ep_20260403_180709.txt)
+- `unet_resnet34_100ep_20260404_050947` (solar_panel/logs/unet_resnet34_100ep_20260404_050947.txt)
+- `unet_resnet34_100ep_20260404_051053` (solar_panel/logs/unet_resnet34_100ep_20260404_051053.txt)
+- `unet_resnet34_2000samples_100ep_20260330_112130` (logs/unet_resnet34_2000samples_100ep_20260330_112130.txt)
+- `unet_resnet34_500samples_3ep_20260402_192118` (solar_panel/logs/unet_resnet34_500samples_3ep_20260402_192118.txt)
+- `unet_resnet34_500samples_3ep_20260402_193129` (solar_panel/logs/unet_resnet34_500samples_3ep_20260402_193129.txt)
+- `unet_resnet34_500samples_3ep_20260402_194953` (solar_panel/logs/unet_resnet34_500samples_3ep_20260402_194953.txt)
