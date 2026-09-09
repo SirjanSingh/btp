@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-09 22:56 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-10 01:43 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**34 runs · 21 checkpoints currently on disk**
+**37 runs · 23 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -25,8 +25,11 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `eval_unet_resnet34_20260404_171828` | solar | eval | 0 | **0.8484** | thr 0.55 | 0.9180 | 0.9153 | 0.9207 |
 | `eval_unet_resnet34_20260404_175648` | solar | eval | 0 | **0.8484** | thr 0.55 | 0.9180 | 0.9153 | 0.9207 |
 | `unet_resnet34_40ep_20260909_152425` | rooftop | train | 40 | **0.6475** | 33 | 0.7861 | 0.7361 | 0.8434 |
-| `unet_resnet34_40ep_20260909_171814` | rooftop | train | 2 | **0.5971** | 2 | 0.7477 | 0.6865 | 0.8210 |
+| `unet_resnet34_40ep_20260909_171814` | rooftop | train | 40 | **0.6483** | 33 | 0.7866 | 0.7363 | 0.8443 |
+| `unet_resnet34_40ep_20260909_173038` | rooftop | train | 1 | **0.5823** | 1 | 0.7360 | 0.7091 | 0.7651 |
+| `unet_resnet34_40ep_20260909_173651` | rooftop | train | 31 | **0.6366** | 22 | 0.7779 | 0.7402 | 0.8197 |
 | `d1_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d6_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `eval_unet_resnet34_210samples_20260330_192349` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `method_comparison` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -54,6 +57,7 @@ Kept deliberately — a crashed configuration is evidence too.
 - `eval_unet_resnet34_20260404_171828` (solar_panel/logs/eval_unet_resnet34_20260404_171828.json)
 - `eval_unet_resnet34_20260404_175648` (solar_panel/logs/eval_unet_resnet34_20260404_175648.json)
 - `d1_summary` (diagnostics/d1/d1_summary.json)
+- `d2_d3_summary` (diagnostics/d2_d3/d2_d3_summary.json)
 - `d6_summary` (diagnostics/d6_smoke/d6_summary.json)
 - `eval_unet_resnet34_210samples_20260330_192349` (rooftop/logs/eval_unet_resnet34_210samples_20260330_192349.txt)
 - `method_comparison` (diagnostics/method_comparison.json)

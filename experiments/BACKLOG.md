@@ -25,12 +25,6 @@ measured precision/recall gap (recall ran 0.11 above precision — the roof-vs-f
 offset, Gap 4). `plan/03` Tier 4 lists it; nothing has tested it.
 *Needs:* code change in `train.py`. ~2 h GPU. **Predict: +0.02–0.05 IoU, precision up.**
 
-### R2 · Does the AIRS seed even help?
-Same weak-supervision run from **ImageNet init** instead of the AIRS checkpoint. If it
-matches 0.6475, the AIRS seed contributes nothing and the whole source-domain question is
-moot — which would be the single most plan-changing result available.
-*Needs:* nothing new. ~2 h GPU. **Predict: 0.60–0.64, slightly below the seeded run.**
-
 ### R3 · Label quantity vs quality
 Rebuild weak labels at confidence ≥ 0.0 (523k polygons) instead of ≥ 0.75 (318k) and
 retrain. Tests whether the 205k discarded low-confidence buildings are the *hard* ones.
@@ -100,6 +94,7 @@ non-zero, then re-run S1.
 | D1 target prior | 28.19 % (23.06 % @ conf ≥ 0.75) |
 | D6 seed probe | 5.69 % predicted foreground — ~5× under |
 | Weak supervision | **IoU 0.6475** |
+| **R2 AIRS seed ablation** | **ImageNet init 0.6483 vs AIRS-seeded 0.6475 — seed worth nothing** |
 | D2 source prior | **7.69 %** mean / 2.06 % median (assumed 15 %) — shift 3.66× |
 | D3 building size | AIRS 21,084 px vs Jaipur 913 px — **23× smaller** |
 | Method comparison | weak 0.65 ≫ adabn 0.25 > seed 0.14 > fda 0.09 > histmatch 0.03 |
