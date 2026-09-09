@@ -22,16 +22,31 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import gdown
+import requests
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
 def enumerate_folder(url, dest):
-    """Return [(file_id, local_path)] without downloading anything."""
-    entries = gdown.download_folder(
-        url=url, output=dest, skip_download=True, quiet=True, remaining_ok=True
-    )
-    if not entries:
+    """Return [(file_id, local_path)] without downloading anything.
+
+    Uses drive_list, NOT gdown.download_folder. gdown scrapes the folder's
+    rendered HTML, which only ever contains the first ~50 entries; the rest load
+    by XHR that gdown never issues. That silently truncated AIRS to 50 of 857
+    images and made the folder look like a sample of the dataset rather than the
+    dataset. `MAX_NUMBER_FILES` does not control this and raising it proves
+    nothing -- it only gates a warning.
+    """
+    from drive_list import folder_id, walk       # same directory
+
+    class _Args:
+        retries, pause = 6, 1.0
+
+    rows, seen = [], set()
+    walk(folder_id(url), "", requests.Session(), _Args(), rows, seen)
+    if not rows:
         sys.exit("could not enumerate folder (private? bad id?)")
-    return [(e.id, e.local_path) for e in entries]
+    return [(r["id"], os.path.join(dest, r["path"])) for r in rows]
 
 
 def fetch(file_id, path, retries=5):
