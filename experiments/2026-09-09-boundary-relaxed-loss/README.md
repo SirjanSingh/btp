@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ✅ done — **negative result** |
 | **Date** | 2026-09-09 |
 | **Commit** | `HEAD` on `feat/init-project-setup` |
 
@@ -42,7 +42,49 @@ quietly poison the term.
 
 ## Results
 
-*pending*
+| | baseline | **relax = 4 px** | delta |
+|---|---|---|---|
+| best val IoU | **0.6475** @ep33 | 0.6366 @ep22 | **−0.0110** |
+| precision | 0.7361 | 0.7402 | +0.0042 |
+| recall | 0.8434 | 0.8197 | **−0.0237** |
+| F1 | 0.7861 | 0.7779 | −0.0082 |
+| recall − precision gap | +0.1073 | **+0.0795** | −0.0278 |
+
+**Predicted +0.02 to +0.05 IoU with precision up. Measured −0.011.** Wrong.
+
+## Interpretation
+
+**The mechanism worked; the trade did not.** The precision/recall gap did narrow, from
++0.107 to +0.080 — so ignoring the band genuinely did relieve the pressure to shrink roofs
+down to footprint size, exactly as intended. But it bought **+0.004 precision at a cost of
+−0.024 recall**, roughly a 6:1 bad exchange, and IoU fell.
+
+The reading: **at this building density a 4 px band removes far more true signal than label
+noise.** D3 measured the median Jaipur building at 913 px, about 30×30. A ±4 px band around
+such a shape covers a large fraction of it — the boundary *is* most of the object. The idea
+is sound for large buildings and self-defeating for small ones, and Jaipur is small ones.
+
+It also converged early (best at epoch 22, then 18 epochs of drift) which fits a model given
+less to learn from.
+
+## Decision
+
+- [x] **Do not use boundary relaxation at 4 px.** Keep the standard loss.
+- [ ] Not fully dead: a **1–2 px** band might sit on the right side of the trade, and the
+      result would differ on larger buildings. But it is no longer a priority — R4's early
+      numbers suggest architecture is the better lever.
+- [x] The roof-vs-footprint offset is real (the gap moved) but **cannot be fixed by throwing
+      pixels away**. Shift correction or SAM2 refinement — moving the labels rather than
+      deleting them — remains the right approach (`plan/03` Tier 4).
+
+## Threats to validity
+
+- Single band width, single seed. A sweep over 1/2/4/8 px is the honest follow-up.
+- Validation was deliberately **unrelaxed**, so this is a fair comparison to the baseline —
+  but it also means the relaxed model is scored on the very pixels it was told to ignore.
+  That is the correct choice (the task is roofs, not footprints-minus-boundaries) and it does
+  disadvantage the method by construction.
+- Footprint labels, not roof ground truth.
 
 ## Threats to validity
 

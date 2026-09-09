@@ -19,12 +19,6 @@ write the full entry under `experiments/<date>-<slug>/`.
 
 ## Queue — rooftop (Stage 1)
 
-### R1 · Boundary-relaxed loss ★ next
-Ignore a 4 px band around each label edge when computing loss. Directly targets the
-measured precision/recall gap (recall ran 0.11 above precision — the roof-vs-footprint
-offset, Gap 4). `plan/03` Tier 4 lists it; nothing has tested it.
-*Needs:* code change in `train.py`. ~2 h GPU. **Predict: +0.02–0.05 IoU, precision up.**
-
 ### R3 · Label quantity vs quality
 Rebuild weak labels at confidence ≥ 0.0 (523k polygons) instead of ≥ 0.75 (318k) and
 retrain. Tests whether the 205k discarded low-confidence buildings are the *hard* ones.
@@ -94,6 +88,7 @@ non-zero, then re-run S1.
 | D1 target prior | 28.19 % (23.06 % @ conf ≥ 0.75) |
 | D6 seed probe | 5.69 % predicted foreground — ~5× under |
 | Weak supervision | **IoU 0.6475** |
+| **R1 boundary relax (4 px)** | ❌ 0.6366 vs 0.6475 — band removes signal, not just noise |
 | **R2 AIRS seed ablation** | **ImageNet init 0.6483 vs AIRS-seeded 0.6475 — seed worth nothing** |
 | D2 source prior | **7.69 %** mean / 2.06 % median (assumed 15 %) — shift 3.66× |
 | D3 building size | AIRS 21,084 px vs Jaipur 913 px — **23× smaller** |
