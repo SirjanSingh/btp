@@ -1,0 +1,63 @@
+# experiments/ — the run log
+
+One folder per experiment, named `YYYY-MM-DD-<short-slug>`, each containing a `README.md`
+written from `TEMPLATE.md`. This is the project's memory: when the thesis asks "why did you
+choose 0.35?" or "did you ever try X?", the answer lives here, not in a terminal scrollback
+that is gone.
+
+**The rule: an experiment that is not written up did not happen.** A result nobody can
+reproduce or date is not usable in a report.
+
+## Index
+
+Newest first. Keep this table current — it is the first thing anyone reads.
+
+| ID | Date | Question | Headline result | Status |
+|---|---|---|---|---|
+| [`2026-09-09-d1-target-prior`](2026-09-09-d1-target-prior/) | 2026-09-09 | What fraction of Jaipur pixels are actually buildings? | **28.19 %** (23.06 % at conf ≥ 0.75) | ✅ |
+| [`2026-09-08-d6-seed-probe`](2026-09-08-d6-seed-probe/) | 2026-09-08 | What does the AIRS-trained seed predict on Jaipur? | **5.69 %** foreground — ~5× below the D1 prior | ✅ |
+
+> **The pair above is the project's motivating figure.** D1 measures what is there, D6
+> measures what the model sees, and the gap between them is what the adaptation must close.
+
+## Starting a new one
+
+```bash
+./scripts/new_experiment.sh <short-slug>      # scaffolds the folder + README from TEMPLATE
+```
+
+Then, in order:
+
+1. **Fill in Question and Prediction before you run anything.** Writing the expected number
+   first is the only way a surprising result stays visible as a surprise.
+2. Run it. Put the exact command in the doc, not a paraphrase of it.
+3. Record the commit SHA that produced the result (`git rev-parse --short HEAD`). A metric
+   without the code that made it cannot be reproduced.
+4. Fill in Results, Interpretation, Decision, Threats to validity.
+5. Add a row to the index above.
+6. Commit the write-up **together with** the outputs it describes, and push.
+
+## Where outputs live
+
+| kind | location | in git? |
+|---|---|---|
+| Diagnostics D1–D7 | `diagnostics/d<n>/` — where `MASTER_CONTEXT` §6.3 points | ✅ small JSON/CSV |
+| Training / eval runs | `experiments/<id>/outputs/` | ✅ metrics only |
+| Checkpoints (`.pth`) | `rooftop/checkpoints/`, `solar_panel/checkpoints/` | ❌ gitignored — record the path and epoch |
+| Qualitative overlays | alongside the outputs | ⚠️ a handful only, they are large |
+
+The write-up **links** to its raw output rather than restating it, so there is exactly one
+copy of every number. Diagnostics keep their existing home so the master context's
+cross-references stay valid.
+
+## What counts as an experiment
+
+Anything whose result could change a decision: diagnostics, training runs, ablations,
+hyperparameter sweeps, dataset-construction choices that affect a metric.
+
+Not: refactors, doc edits, dependency fixes. Those are ordinary commits.
+
+**Negative and abandoned results stay.** Mark them `❌ abandoned` with a reason and leave
+them in the index. Silently deleting a failed run is how a project ends up repeating it six
+weeks later — and the run table in `MASTER_CONTEXT` is built on exactly these kill/keep
+decisions.
