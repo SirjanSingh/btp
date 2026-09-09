@@ -52,13 +52,16 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-1. **Finish the AIRS restore** — 50/857 images down, only 3 matching image/label pairs.
-   Re-run `scripts/fetch_drive_folder.py <folder> data/airs` (resumable), then
-   `rooftop/tile_airs.py`. **No AIRS source link is recorded anywhere in the repo** —
-   capture it in `plan/01-situation-and-assets.md` §2, next to the Jaipur one.
-   Blocks D2, D3, D5 and every training run.
-2. Diagnostics D4 (Open Buildings half) and D7 (hand-inspection) are runnable now.
-3. Fix the BDAPPV zero-negatives bug (MASTER_CONTEXT C1) before quoting any Stage 2 number.
+1. **Decide the source domain — this is now a decision, not a download.** AIRS cannot be
+   restored from Drive: it holds 75 labelled pairs against `train.txt`'s 857 (`plan/01` §2).
+   Options: fetch real AIRS from airs-dataset.com (~28 GB), switch to Inria +
+   SpaceNet-Khartoum (MASTER_CONTEXT §333 argues this on morphology *and* licensing), or
+   commit to weak supervision on Open Buildings (`plan/` calls it the biggest win) where the
+   source set matters much less. Blocks D2, D3, D5 and every training run.
+2. **The 0.8784 baseline is not reproducible** — trained on 2,000 crops from a deleted
+   `/tmp`. Re-establish it once the source domain is settled, before it is quoted anywhere.
+3. Diagnostics D4 (Open Buildings half) and D7 (hand-inspection) are runnable now.
+4. Fix the BDAPPV zero-negatives bug (MASTER_CONTEXT C1) before quoting any Stage 2 number.
 
 ### Blockers/Concerns
 

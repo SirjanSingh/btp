@@ -42,7 +42,48 @@ repository** — see [`02-domain-gap-analysis.md`](02-domain-gap-analysis.md).
 ### The full dataset is 16 tiles, ~8.2 GB
 
 Source: [Google Drive `final_dataset`](https://drive.google.com/drive/folders/1CruuRQUNddyQYGrTWfZw3rsxl4iz3hVF).
-Only 2 of the 16 are downloaded locally so far (`map67_1-1`, `map67_1-2`).
+~~Only 2 of the 16 are downloaded locally so far~~ — **all 16 restored to the DGX at
+`data/jaipur/` on 2026-09-08** (8.0 GB).
+
+### The master Drive folder, enumerated 2026-09-09
+
+`final_dataset` is one subfolder of the project's master Drive folder:
+
+**`https://drive.google.com/drive/folders/1KUxrm799xf9KqEJCwTYbaHvrJlCa1_Rk`** — 574 files.
+
+| Path | Files | What it is |
+|---|---|---|
+| `DAtaset/dataset/{image,label}` | 50 + 50 | AIRS, top-level split |
+| `DAtaset/dataset/train/{image,label}` | 50 + 50 | AIRS train subset |
+| `DAtaset/dataset/val/{image,label}` | 50 + 50 | AIRS val subset |
+| `DAtaset/dataset/{train,val}.txt` | 2 | the official 857 / 94 split lists |
+| `DAtaset/final_dataset` | 16 | Jaipur mosaic ✅ restored |
+| `DAtaset/american house/{img,mask}` | 50 + 50 | US rooftop set + masks |
+| `DAtaset/american house/rooftop_results/` | 101 | inferred masks, overlays, `rooftop_areas.csv` |
+| `DAtaset/Solar_Panel.coco.zip` | 1 | COCO-format solar panel set |
+| `results , unet/` | 53 | roof/solar overlays, 9 manual Indian test screenshots |
+
+> ### ⚠ The full AIRS dataset is NOT in Drive, and never was
+>
+> **`train.txt` lists 857 images. Drive holds 75 unique labelled pairs, of which 25 appear
+> in `train.txt`.** The three AIRS folders hold 50 images each, and each `label/` folder is
+> **half `_vis` preview files** — so 50 label files means only **25 real masks**, and the
+> three folders do not overlap.
+>
+> This is not a truncated listing. gdown caps folder enumeration at 50 files
+> (`MAX_NUMBER_FILES`); the counts above were re-enumerated with that cap raised to 100,000
+> and did not change. The 50s are real.
+>
+> **Consequence:** the AIRS restore *cannot be completed from Drive.* Re-running
+> `scripts/fetch_drive_folder.py` will converge on 75 pairs and stop, no matter how many
+> times it is run. To get the real thing, download AIRS from its official source
+> (<https://www.airs-dataset.com/>, ~28 GB) — and record the link here when you do.
+>
+> **The baseline is currently not reproducible.** `logs/unet_resnet34_2000samples_100ep_20260330_125206.json`
+> shows the seed checkpoint was trained with `max_samples = 2000` crops read from
+> `/tmp/train_crops` and `/tmp/val_crops` — paths on a machine that no longer holds them.
+> Best val IoU **0.8784** @ epoch 90, against the PSPNet baseline of 0.899. That number
+> cannot presently be re-derived from anything on disk or in Drive.
 
 | | |
 |---|---|

@@ -35,7 +35,7 @@ Confidence tiers from the source doc are kept: **[MEASURED]** trust it ·
 | **C2** | `plan/` with `00-README … 08-sources.md` (8 docs), cited ~20× as `plan/02`, `plan/04`, `plan/07`, `plan/08-sources.md` | ~~No `plan/` directory.~~ **WITHDRAWN 2026-09-09 — this correction was itself wrong.** `plan/` exists with all 9 documents (3,655 lines, incl. a 1,941-line `06-implementation-plan.md`), committed in `db26b9e` on 2026-08-04. **The cited cross-references all resolve.** The original check was run against a local checkout that was 11 commits behind `origin/feat/init-project-setup` and never fetched. `.planning/` (GSD phase tracker) and `plan/` (the research plan) are two different things and both exist. | ~~HIGH~~ **withdrawn** |
 | **C3** | `daraset/*.tif` — 16 Jaipur tiles, ~8.2 GB, 2.48 gigapixels | ~~Not on this machine.~~ **RESOLVED 2026-09-08** — all 16 `map67_*.tif` restored to `data/jaipur/` (8.0 GB), EPSG:3857, GSD measured 0.26618 m/px by D6. | ~~HIGH~~ resolved |
 | **C4** | Phases A–F | `.planning/ROADMAP.md` has **Phases 1–5**, different decomposition. `STATE.md` says "Phase 1 of 5, Progress 0%" while checkpoints through epoch 050 exist. | MEDIUM |
-| **C5** | AIRS crops available for training | **STILL OPEN, partially restored.** `data/airs/image/` has **50 of 857** source `.tif`s (871 MB); `data/airs/label/` has 7 files of which 4 are `_vis` previews, so **3 real masks**. Only **3 image/label pairs actually match** (`christchurch_15`, `_48`, `_77`). `data/airs/train/`, `data/airs_crops/` and `rooftop/dataset_crops/` are still **empty**. The Drive fetch was interrupted mid-run on 2026-09-08. | **HIGH** |
+| **C5** | AIRS crops available for training | **STILL OPEN — and worse than "interrupted".** Local: 50 of 857 images, 3 matching pairs. **The Drive folder does not contain AIRS either** — enumerated 2026-09-09, it holds **75 unique labelled pairs**, 25 of which are in `train.txt`'s 857 (`plan/01` §2). Re-running the fetch converges on 75 and stops. AIRS must come from its **official source** (~28 GB), or the source domain must change. Knock-on: the seed checkpoint was trained on 2,000 crops from a since-deleted `/tmp`, so **the 0.8784 baseline is not currently reproducible.** | **CRITICAL** |
 | **C6** | *(new 2026-09-09)* Open Buildings weak labels unavailable | **Present** — `data/open_buildings/jaipur_open_buildings.csv`, **523,283 buildings** over the AOI, with `confidence` and `area_in_meters`. Enables D1 and the weak-label set (§12.5). | — |
 | ✅ | Hann-window blended sliding inference | **Confirmed** — `rooftop/infer.py:134`, `solar_panel/infer_solar.py:124` | — |
 | ✅ | `--simulate_low_res` exists | **Confirmed** — `rooftop/train.py:238`, flag at `:596` | — |
@@ -460,15 +460,17 @@ partially restored (C5), so the source-side ones are not.
 | **D6** | Jaipur tiles + ckpt | ✅ **run 2026-09-08** → `diagnostics/d6/d6_summary.json`, 640 crops |
 | **D7** | Jaipur tiles (manual) | 🟡 runnable, hand-inspection not started |
 
-Remaining blocker is therefore **AIRS only**: finish the interrupted
-`scripts/fetch_drive_folder.py` pull (it skips completed files, so it is safe to re-run),
-then tile with `rooftop/tile_airs.py`.
+Remaining blocker is therefore **AIRS only** — and it is not a download that can simply be
+resumed. See C5: Drive holds 75 labelled pairs against `train.txt`'s 857, so the source
+dataset has to be fetched from <https://www.airs-dataset.com/> (~28 GB) or the source domain
+has to change (§333 already argues for Inria + SpaceNet-Khartoum on morphology *and*
+licensing grounds). **That is a project decision, not a data-transfer task — make it before
+spending the network.**
 
-**Source-of-truth for the data locations** — the Jaipur mosaic comes from the Drive folder
-`final_dataset`, recorded in [`plan/01-situation-and-assets.md`](../plan/01-situation-and-assets.md)
-§2. **No equivalent link is recorded for AIRS anywhere in the repo.** Capture it in `plan/01`
-alongside the Jaipur one when you next run the fetch — that is where a future reader will
-look for it.
+**Source-of-truth for data locations:** the master Drive folder and its full contents are
+enumerated in [`plan/01-situation-and-assets.md`](../plan/01-situation-and-assets.md) §2,
+including two assets nothing else in the repo mentions — a 50-image **US "american house"**
+rooftop set with masks, and a **COCO-format solar panel** archive.
 
 ### 6.4 Evaluation protocol — non-negotiable
 
