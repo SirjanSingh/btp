@@ -1,0 +1,82 @@
+{
+  "source": "Google Open Buildings v3 (CC BY 4.0), S2 cell 397",
+  "caveat": "ground footprints, not roof outlines (Gap 4)",
+  "downscale": 8,
+  "by_confidence_cutoff": {
+    "0.0": {
+      "n_buildings": 523283,
+      "overall_fg_fraction": 0.28185,
+      "per_tile": {
+        "map67_1-1.tif": 0.35506,
+        "map67_1-2.tif": 0.35112,
+        "map67_1-3.tif": 0.24243,
+        "map67_1-4.tif": 0.10696,
+        "map67_2-1.tif": 0.26126,
+        "map67_2-2.tif": 0.27489,
+        "map67_2-3.tif": 0.34489,
+        "map67_2-4.tif": 0.26253,
+        "map67_3-1.tif": 0.33485,
+        "map67_3-2.tif": 0.29106,
+        "map67_3-3.tif": 0.37041,
+        "map67_3-4.tif": 0.24012,
+        "map67_4-1.tif": 0.28838,
+        "map67_4-2.tif": 0.41229,
+        "map67_4-3.tif": 0.12135,
+        "map67_4-4.tif": 0.25203
+      },
+      "tile_min": 0.10696,
+      "tile_max": 0.41229,
+      "tile_median": 0.28164
+    },
+    "0.6": {
+      "n_buildings": 523283,
+      "overall_fg_fraction": 0.28185,
+      "per_tile": {
+        "map67_1-1.tif": 0.35506,
+        "map67_1-2.tif": 0.35112,
+        "map67_1-3.tif": 0.24243,
+        "map67_1-4.tif": 0.10696,
+        "map67_2-1.tif": 0.26126,
+        "map67_2-2.tif": 0.27489,
+        "map67_2-3.tif": 0.34489,
+        "map67_2-4.tif": 0.26253,
+        "map67_3-1.tif": 0.33485,
+        "map67_3-2.tif": 0.29106,
+        "map67_3-3.tif": 0.37041,
+        "map67_3-4.tif": 0.24012,
+        "map67_4-1.tif": 0.28838,
+        "map67_4-2.tif": 0.41229,
+        "map67_4-3.tif": 0.12135,
+        "map67_4-4.tif": 0.25203
+      },
+      "tile_min": 0.10696,
+      "tile_max": 0.41229,
+      "tile_median": 0.28164
+    },
+    "0.75": {
+      "n_buildings": 318207,
+      "overall_fg_fraction": 0.23064,
+      "per_tile": {
+        "map67_1-1.tif": 0.30324,
+        "map67_1-2.tif": 0.30339,
+        "map67_1-3.tif": 0.21241,
+        "map67_1-4.tif": 0.09499,
+        "map67_2-1.tif": 0.22142,
+        "map67_2-2.tif": 0.21859,
+        "map67_2-3.tif": 0.27583,
+        "map67_2-4.tif": 0.2211,
+        "map67_3-1.tif": 0.25152,
+        "map67_3-2.tif": 0.23652,
+        "map67_3-3.tif": 0.31239,
+        "map67_3-4.tif": 0.2043,
+        "map67_4-1.tif": 0.22066,
+        "map67_4-2.tif": 0.31392,
+        "map67_4-3.tif": 0.0906,
+        "map67_4-4.tif": 0.20934
+      },
+      "tile_min": 0.0906,
+      "tile_max": 0.31392,
+      "tile_median": 0.22126
+    }
+  }
+}

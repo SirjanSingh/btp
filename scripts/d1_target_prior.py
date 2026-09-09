@@ -37,6 +37,7 @@ import rasterio
 from rasterio.features import rasterize
 from rasterio.warp import transform_geom
 from shapely import wkt
+from shapely.geometry import shape
 
 
 def main(a):
@@ -55,28 +56,37 @@ def main(a):
     )
     results = {}
 
+    # Reproject ONCE for the whole AOI, not once per (tile, polygon). Doing it
+    # per tile costs len(df) x len(tifs) transforms -- ~8.4M here -- and dominates
+    # runtime. Transform up front, cache each polygon's bbox, then per tile do a
+    # cheap numeric bbox test to pick the geometries that actually overlap.
+    # transform_geom takes a whole sequence and transforms it in one call, which
+    # is far cheaper than 523k Python-level round trips into GDAL.
+    print("\n[D1] reprojecting polygons 4326 -> 3857 (once)")
+    shp = [wkt.loads(g) for g in df.geometry]
+    geoms_m = transform_geom("EPSG:4326", "EPSG:3857",
+                             [s.__geo_interface__ for s in shp])
+    # Bounds come from shapely rather than by walking `coordinates` by hand: the
+    # AOI holds 2 MULTIPOLYGONs among 523,281 POLYGONs, and their coordinates are
+    # nested one level deeper, so a hand-rolled `for ring in coords for c in ring`
+    # yields coordinate pairs instead of scalars and the bbox array goes ragged.
+    bboxes = np.asarray([shape(g).bounds for g in geoms_m])  # minx, miny, maxx, maxy
+    conf = df.confidence.to_numpy()
+    print(f"[D1] reprojected {len(geoms_m):,} polygons")
+
     for cutoff in a.cutoffs:
-        sub = df[df.confidence >= cutoff]
-        geoms_ll = [wkt.loads(g) for g in sub.geometry]
-        print(f"\n[D1] confidence >= {cutoff}: {len(sub):,} buildings")
+        keep = conf >= cutoff
+        print(f"\n[D1] confidence >= {cutoff}: {int(keep.sum()):,} buildings")
 
         per_tile, tot_bld, tot_px = {}, 0, 0
         for path in tifs:
             with rasterio.open(path) as src:
-                # Polygons are lon/lat; the mosaic is EPSG:3857. Reproject each
-                # geometry into the raster CRS before burning it.
-                shapes = []
                 b = src.bounds
-                for g in geoms_ll:
-                    gj = transform_geom("EPSG:4326", src.crs.to_string(),
-                                        g.__geo_interface__)
-                    xs = [c[0] for ring in gj["coordinates"] for c in ring]
-                    ys = [c[1] for ring in gj["coordinates"] for c in ring]
-                    if max(xs) < b.left or min(xs) > b.right:
-                        continue
-                    if max(ys) < b.bottom or min(ys) > b.top:
-                        continue
-                    shapes.append((gj, 1))
+                sel = keep & (
+                    (bboxes[:, 0] <= b.right) & (bboxes[:, 2] >= b.left)
+                    & (bboxes[:, 1] <= b.top) & (bboxes[:, 3] >= b.bottom)
+                )
+                shapes = [(geoms_m[i], 1) for i in np.nonzero(sel)[0]]
 
                 # Rasterise at reduced resolution: the prior is a ratio, and a
                 # full 11168x13856 burn per tile per cutoff is needlessly slow.
@@ -98,7 +108,7 @@ def main(a):
         overall = float(tot_bld / tot_px)
         vals = np.array(list(per_tile.values()))
         results[str(cutoff)] = {
-            "n_buildings": int(len(sub)),
+            "n_buildings": int(keep.sum()),
             "overall_fg_fraction": round(overall, 5),
             "per_tile": per_tile,
             "tile_min": round(float(vals.min()), 5),

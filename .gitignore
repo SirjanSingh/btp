@@ -8,10 +8,26 @@ solar_panel/bdappv/
 solar_panel/bdappv_crops/
 airs/
 test_indian/
+# data/ is the canonical dataset dir on this server (~9 GB: AIRS, the Jaipur
+# mosaic, Open Buildings). Ignore its contents but keep the README that explains
+# what is supposed to live there — without this rule a `git add -A` stages 8 GB
+# of GeoTIFFs.
+data/*
+!data/README.md
 
 # ── Model weights (too large) ────────────────────────
+# Runs write into timestamped subdirectories, so match at any depth, not just
+# directly under checkpoints/.
+**/checkpoints/**/*.pth
 rooftop/checkpoints/*.pth
 solar_panel/checkpoints/*.pth
+
+# ── Container deps / scratch (live on /home, never in git) ───
+# See run_docker.sh: deps install into .pydeps as PYTHONUSERBASE and the
+# container's /tmp is bind-mounted to .tmp, because host / is full.
+.pydeps/
+.venv-docker/
+.tmp/
 
 # ── Generated outputs ────────────────────────────────
 rooftop/infer_results/

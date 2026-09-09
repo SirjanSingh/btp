@@ -23,9 +23,10 @@ Confidence tiers from the source doc are kept: **[MEASURED]** trust it ·
 |---|---|---|---|
 | **C1** | `train_solar.py` black-mask fallback "keeps ~12,232 negative crops (correct, non-obvious, **keep it**)" | The fallback **exists and is correct** (`train_solar.py:162-164`) but **never fires**. `prep_bdappv.py:85` prints `no mask for X, skipping` and drops negatives *upstream*. Sampled 400 train masks: **0 all-zero**. Images 16,763 = masks 16,763, 1:1, **zero negatives in the crop set.** | **CRITICAL** |
 | **C2** | `plan/` with `00-README … 08-sources.md` (8 docs), cited ~20× as `plan/02`, `plan/04`, `plan/07`, `plan/08-sources.md` | **No `plan/` directory.** Disk has `.planning/` with `PROJECT.md`, `REQUIREMENTS.md`, `ROADMAP.md`, `STATE.md`, `config.json`, `research/{ARCHITECTURE,FEATURES,PITFALLS,STACK,SUMMARY}.md`. **None of the cited section numbers resolve.** | **HIGH** |
-| **C3** | `daraset/*.tif` — 16 Jaipur tiles, ~8.2 GB, 2.48 gigapixels | **Not on this machine.** No `daraset/`, no `dataset/`, no `map67_*.tif`, **no `.tif` over 100 MB anywhere under `~`.** | **HIGH** |
+| **C3** | `daraset/*.tif` — 16 Jaipur tiles, ~8.2 GB, 2.48 gigapixels | ~~Not on this machine.~~ **RESOLVED 2026-09-08** — all 16 `map67_*.tif` restored to `data/jaipur/` (8.0 GB), EPSG:3857, GSD measured 0.26618 m/px by D6. | ~~HIGH~~ resolved |
 | **C4** | Phases A–F | `.planning/ROADMAP.md` has **Phases 1–5**, different decomposition. `STATE.md` says "Phase 1 of 5, Progress 0%" while checkpoints through epoch 050 exist. | MEDIUM |
-| **C5** | AIRS crops available for training | `data/airs/`, `data/airs_crops/`, `rooftop/dataset_crops/` **all empty** (0 bytes; only deleted `.gitkeep`s). | **HIGH** |
+| **C5** | AIRS crops available for training | **STILL OPEN, partially restored.** `data/airs/image/` has **50 of 857** source `.tif`s (871 MB); `data/airs/label/` has 7 files of which 4 are `_vis` previews, so **3 real masks**. Only **3 image/label pairs actually match** (`christchurch_15`, `_48`, `_77`). `data/airs/train/`, `data/airs_crops/` and `rooftop/dataset_crops/` are still **empty**. The Drive fetch was interrupted mid-run on 2026-09-08. | **HIGH** |
+| **C6** | *(new 2026-09-09)* Open Buildings weak labels unavailable | **Present** — `data/open_buildings/jaipur_open_buildings.csv`, **523,283 buildings** over the AOI, with `confidence` and `area_in_meters`. Enables D1 and the weak-label set (§12.5). | — |
 | ✅ | Hann-window blended sliding inference | **Confirmed** — `rooftop/infer.py:134`, `solar_panel/infer_solar.py:124` | — |
 | ✅ | `--simulate_low_res` exists | **Confirmed** — `rooftop/train.py:238`, flag at `:596` | — |
 | ✅ | BDAPPV `google_`/`ign_` provenance in filenames | **Confirmed** — sandbox needs only a filename filter | — |
@@ -194,9 +195,22 @@ must come from augmentation.
 
 **Five distinct failure modes, different fixes:**
 
-1. **Class-prior shift.** AIRS ~15% fg; Jaipur ~50% **[ASSUMED — D1/D2 replace this]**. A
-   model calibrated on 15% under-predicts. Self-training *amplifies* it: sparse predictions
-   → sparse pseudo-labels → sparser teacher → **foreground collapse**.
+1. **Class-prior shift. [MEASURED 2026-09-09 — D1 × D6]** Jaipur's true building-pixel prior
+   is **28.2%** over the 16 tiles (23.1% keeping only confidence ≥ 0.75), ranging 10.7%–41.2%
+   across tiles. The AIRS-trained seed checkpoint predicts only **5.7%** foreground on those
+   same tiles at its reference threshold 0.35 (D6, 640 crops).
+
+   > **The seed under-predicts target foreground by ~5× (28.2% → 5.7%). This is the
+   > motivating figure of the project** — the gap the adaptation has to close, measured
+   > rather than argued. Even against the conservative 23.1% prior it is ~4×.
+
+   Caveat carried from D1: Open Buildings marks **ground footprints**, not roof outlines
+   (Gap 4, §3.4), so 28.2% is a sound density estimate, not a pixel-exact roof prior. The
+   AIRS-side number (~15% fg) is **still [ASSUMED]** — D2 needs the AIRS crops (C5).
+
+   A model calibrated on 15% under-predicts. Self-training *amplifies* it: sparse predictions
+   → sparse pseudo-labels → sparser teacher → **foreground collapse**. With the prior now
+   measured, R10's kill-switch (§ run table) has a real number to compare against.
 2. **Instance merging.** No visible gap between party-wall units → whole blocks fuse into
    one component. **Invisible to pixel IoU and largely invisible to boundary IoU** (§6.2).
 3. **Vegetation-cue loss [ASSUMED].** A suburban-NZ model may have learned "green texture
@@ -422,9 +436,24 @@ Keep globally-accumulated IoU / F1 / precision / recall. **Add:**
 > is far below D1's measured prior, you have quantified the exact failure the project exists
 > to fix. **That is your motivating figure.**
 
-**[CORRECTED]** D2 and D5 both need AIRS crops, which are **absent** (C5). D1, D3, D4, D6, D7
-all need the Jaipur GeoTIFFs, which are **absent** (C3). **As of today, zero of D1–D7 can run
-on this machine.** Restoring those two datasets is the actual first task.
+**[UPDATED 2026-09-09 — supersedes the earlier "zero of D1–D7 can run" note]** The Jaipur
+GeoTIFFs are restored (C3), so the tile-side diagnostics are unblocked. AIRS is only
+partially restored (C5), so the source-side ones are not.
+
+| # | Needs | Status |
+|---|---|---|
+| **D1** | Jaipur tiles + Open Buildings | ✅ **run 2026-09-09** → `diagnostics/d1/d1_summary.json` |
+| **D2** | AIRS crops | ⛔ blocked on C5 |
+| **D3** | AIRS crops + OB | ⛔ AIRS half blocked on C5; OB half runnable |
+| **D4** | OB polygons (+ AIRS for comparison) | 🟡 OB half runnable today |
+| **D5** | AIRS crops + ckpt | ⛔ blocked on C5 |
+| **D6** | Jaipur tiles + ckpt | ✅ **run 2026-09-08** → `diagnostics/d6/d6_summary.json`, 640 crops |
+| **D7** | Jaipur tiles (manual) | 🟡 runnable, hand-inspection not started |
+
+Remaining blocker is therefore **AIRS only**: finish the interrupted
+`scripts/fetch_drive_folder.py` pull (it skips completed files, so it is safe to re-run),
+then tile with `rooftop/tile_airs.py`. **The Drive folder ID is not recorded anywhere in
+the repo — capture it in this file when you next run the fetch.**
 
 ### 6.4 Evaluation protocol — non-negotiable
 
@@ -682,9 +711,11 @@ RAMP · Google Maps Platform Service Specific Terms.
    images so the black-mask fallback actually fires. Every Stage 2 precision number produced
    before this measures the wrong task.
 1. Fix E1 and E2 — honest baseline, no threshold leakage onto test.
-2. **Restore the two missing datasets** (AIRS crops, Jaipur GeoTIFFs). Without them **zero of
-   D1–D7 can run**, and Phases A–E are all blocked. This is the real critical path today.
-3. Run diagnostics D1–D7 — two days, and every number replaces an assumption.
+2. **Finish restoring AIRS** — Jaipur GeoTIFFs and Open Buildings are now on disk (C3, C6),
+   but AIRS stopped at 50/857 images and 3 usable pairs (C5). It is the only dataset still
+   blocking D2/D3/D5 and all of Phases A–E. This is the real critical path today.
+3. Run the rest of D1–D7. **D1 and D6 are done** (§6.3); D4-on-OB and D7 are runnable now,
+   D2/D3/D5 wait on item 2. Every number replaces an assumption.
 4. Add merge rate + split rate to `evaluate.py`, **then** do the three-class relabel. Without
    the metric the fix is unmeasurable.
 5. Build the Open Buildings weak-label set. ★ highest-leverage single action.
