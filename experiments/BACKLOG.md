@@ -19,12 +19,6 @@ write the full entry under `experiments/<date>-<slug>/`.
 
 ## Queue — rooftop (Stage 1)
 
-### R3 · Label quantity vs quality
-Rebuild weak labels at confidence ≥ 0.0 (523k polygons) instead of ≥ 0.75 (318k) and
-retrain. Tests whether the 205k discarded low-confidence buildings are the *hard* ones.
-*Needs:* `make_weak_labels.py --min_conf 0.0` (~40 min CPU) + ~2 h GPU. **Predict: within
-±0.02 — noisier labels, but more of them.**
-
 ### R4 · Backbone: SegFormer vs ResNet-34
 DAFormer's central claim is architecture beats algorithm. `plan/03` §2.3 wants this table
 regardless of winner.
@@ -53,13 +47,6 @@ baseline is unreproducible precisely because that script never existed.
 ---
 
 ## Queue — solar (Stage 2)
-
-### S1 · google → ign source-only baseline ★ high value
-Train on `google_` crops, evaluate on `ign_`. **The only rung where target IoU is
-measurable**, because both domains have labels. Everything tuned here transfers to Jaipur,
-where nothing can be measured. `MASTER_CONTEXT`'s ordering principle says do this first.
-*Needs:* filename filter on `bdappv_crops` (10,665 google / 6,098 ign train). ~3 h GPU.
-**Predict: large google→ign drop; that drop is the thing to close.**
 
 ### S2 · google → ign with self-training
 The same CBST recipe as R5, tuned where the score is visible.
