@@ -89,8 +89,6 @@ non-zero, then re-run S1.
 
 - **D4 · adjacency rate** — do Jaipur footprints touch? Decides whether the three-class /
   instance-merge work is needed at all. Open Buildings only; runnable now.
-- **D2 · source foreground fraction** — needs AIRS labels (downloading, 400/857).
-- **D3 · building size distribution** — AIRS labels vs Open Buildings, in m².
 - **D7 · clutter inventory** — build a contact sheet of 20 tiles for manual tallying.
 
 ---
@@ -102,4 +100,6 @@ non-zero, then re-run S1.
 | D1 target prior | 28.19 % (23.06 % @ conf ≥ 0.75) |
 | D6 seed probe | 5.69 % predicted foreground — ~5× under |
 | Weak supervision | **IoU 0.6475** |
+| D2 source prior | **7.69 %** mean / 2.06 % median (assumed 15 %) — shift 3.66× |
+| D3 building size | AIRS 21,084 px vs Jaipur 913 px — **23× smaller** |
 | Method comparison | weak 0.65 ≫ adabn 0.25 > seed 0.14 > fda 0.09 > histmatch 0.03 |

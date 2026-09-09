@@ -14,6 +14,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
+| [`2026-09-09-d2-d3-source-stats`](2026-09-09-d2-d3-source-stats/) | 2026-09-09 | How sparse is AIRS, and how big are its buildings? | AIRS **7.69 %** fg (assumed 15 %); buildings **23× larger in pixels** | ✅ |
 | [`2026-09-09-method-comparison`](2026-09-09-method-comparison/) | 2026-09-09 | Which adaptation method actually wins on Jaipur? | **weak sup 0.65** vs seed 0.14; histmatch/FDA *harmful* | ✅ |
 | [`2026-09-09-weak-supervision-jaipur`](2026-09-09-weak-supervision-jaipur/) | 2026-09-09 | Can Open Buildings labels alone train a Jaipur model? | **IoU 0.6475** — 4.6× the unadapted seed | ✅ |
 | [`2026-09-09-d1-target-prior`](2026-09-09-d1-target-prior/) | 2026-09-09 | What fraction of Jaipur pixels are actually buildings? | **28.19 %** (23.06 % at conf ≥ 0.75) | ✅ |
