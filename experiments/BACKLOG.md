@@ -3,7 +3,7 @@
 Top unblocked item wins. Move an entry to `## Done` with its result when it lands, and
 write the full entry under `experiments/<date>-<slug>/`.
 
-**Launch rules**
+**Launch rules** (see [`docs/PITFALLS.md`](../docs/PITFALLS.md) for why each exists)
 - Only use a GPU whose **free VRAM ≥ job need + 2 GB margin**. Our runs take ~6 GB at
   batch 16, so ~8 GB free is the bar. Never evict or disrupt another student's job.
 - **Quota guard:** `/home` is a hard 40 GB. If free space < 3 GB, do not launch — delete
