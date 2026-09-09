@@ -13,17 +13,14 @@ write the full entry under `experiments/<date>-<slug>/`.
   are regenerable; the numbers inside them are what the paper needs. The ledger consolidates
   every run's config, hardware and full per-epoch curve into `experiments/RUN_LEDGER.{md,json}`
   so the stats outlive the `.pth`. Rebuild it after every run too.
+- **Two concurrent jobs, not three.** Measured twice on this box: at three jobs load average
+  sits above 300 on 80 cores and throughput collapses (~1 epoch per 29-min tick). Two runs
+  sustain roughly 5 epochs per tick. GPU VRAM is not the binding constraint; CPU is.
 - Every run: prediction written **before** launch, results after, index updated, pushed.
 
 ---
 
 ## Queue — rooftop (Stage 1)
-
-### R4 · Backbone: SegFormer vs ResNet-34
-DAFormer's central claim is architecture beats algorithm. `plan/03` §2.3 wants this table
-regardless of winner.
-*Needs:* `--arch segformer --encoder mit_b2`, verify smp support. ~3 h GPU.
-**Predict: +0.03–0.08 IoU.**
 
 ### R5 · Self-training / CBST on top of the weak model
 Pseudo-label Jaipur with the weak model, keep confident pixels using the **measured** 23 %
@@ -75,6 +72,7 @@ non-zero, then re-run S1.
 | D1 target prior | 28.19 % (23.06 % @ conf ≥ 0.75) |
 | D6 seed probe | 5.69 % predicted foreground — ~5× under |
 | Weak supervision | **IoU 0.6475** |
+| **R4 MiT-B2 backbone** | ✅ 0.6569 vs 0.6483 — +0.0086, 2x faster convergence, gain all precision |
 | **R1 boundary relax (4 px)** | ❌ 0.6366 vs 0.6475 — band removes signal, not just noise |
 | **R2 AIRS seed ablation** | **ImageNet init 0.6483 vs AIRS-seeded 0.6475 — seed worth nothing** |
 | D2 source prior | **7.69 %** mean / 2.06 % median (assumed 15 %) — shift 3.66× |

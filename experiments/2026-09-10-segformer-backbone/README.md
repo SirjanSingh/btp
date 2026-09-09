@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ✅ done — modest win |
 | **Date** | 2026-09-10 |
 
 ## Question
@@ -49,7 +49,60 @@ dilated mode`. FPN also works if U-Net disappoints.
 
 ## Results
 
-*pending*
+| | ResNet-34 (ImageNet) | **MiT-B2** | delta |
+|---|---|---|---|
+| best val IoU | 0.6483 @ep33 | **0.6569** @ep37 | **+0.0086** |
+| precision | 0.7363 | **0.7536** | **+0.0173** |
+| recall | 0.8443 | 0.8366 | −0.0077 |
+| F1 | 0.7866 | 0.7929 | +0.0063 |
+| **first epoch ≥ 0.64** | 16 | **8** | **2× faster** |
+
+For reference, the AIRS-seeded ResNet run scored 0.6475 — see
+[R2](../2026-09-09-does-the-airs-seed-help/), which showed that seed is worthless.
+
+**Predicted +0.03 to +0.08. Measured +0.0086** — right direction, 3–9× too optimistic.
+
+## Interpretation
+
+**The transformer wins, but modestly, and the interesting part is *how*.**
+
+The entire gain comes from **precision** (+0.017) at a small cost in recall (−0.008). That
+was the secondary prediction, and it held: a global receptive field should help most in
+telling adjacent buildings apart, and Jaipur's party-wall density is exactly where a
+convolutional model over-merges. This is weak evidence for the instance-merging concern being
+real and architecturally addressable — though pixel IoU cannot confirm that directly
+(`MASTER_CONTEXT` §6.2: **boundary IoU does not catch instance merging**; merge/split rate
+would).
+
+**The convergence speed is the more practical result.** MiT-B2 reached 0.64 at **epoch 8**
+versus ResNet's **16** — half the epochs for the same score. On a shared, heavily contended
+box that halves the wall-clock cost of every subsequent experiment, which may matter more
+than +0.0086 of IoU.
+
+**Against DAFormer's claim** that architecture beats adaptation algorithm: here architecture
+is worth +0.009 while *weak supervision* was worth **+0.51** (0.6483 vs the unadapted seed's
+0.1419). At this stage of the project the data dominates the architecture by roughly 60×.
+DAFormer's claim is about choices *within* an adaptation pipeline; it is not a licence to
+prefer model swaps over label work.
+
+## Decision
+
+- [x] **Adopt MiT-B2 as the default encoder** — it is better and converges twice as fast.
+- [ ] Re-run the method comparison with MiT-B2 to check the ranking is architecture-invariant.
+- [ ] If instance merging is to be claimed as improved, **implement merge/split rate first**.
+      Pixel IoU cannot support that claim.
+- [x] Do not treat architecture as the main lever. Label quality is worth far more here.
+
+## Threats to validity
+
+- **Batch size differs (12 vs 16)**, so this is not a pure encoder ablation. Batch size
+  affects normalisation statistics and effective learning rate. Stated up front rather than
+  buried — a clean re-run would match batch size.
+- Same LR and schedule as the ResNet run; transformers usually prefer lower LR with warmup,
+  so MiT-B2 is likely *under*-tuned here and the gap may be a floor.
+- Single seed. +0.0086 is small enough that seed variance could account for a fair share of
+  it; the 2× convergence difference is the more robust observation.
+- Footprint labels, not roof ground truth.
 
 ## Threats to validity
 
