@@ -468,6 +468,20 @@ def main(args):
         best_val_iou = ckpt.get("val_iou", 0.0)
         print(f"Resumed from {args.resume} (epoch {ckpt['epoch']}, IoU {best_val_iou:.4f})")
 
+    elif args.init_weights and Path(args.init_weights).exists():
+        # Weights only — NOT --resume. Resuming carries over epoch counter,
+        # optimizer state and best_val_iou, all of which are wrong when the new
+        # run trains on a different dataset: start_epoch would skip the run
+        # entirely, and inheriting a 0.8784 bar set on clean AIRS labels means no
+        # checkpoint ever gets written against noisier targets.
+        ckpt = torch.load(args.init_weights, map_location=device)
+        base_model = model.module if isinstance(model, nn.DataParallel) else model
+        base_model.load_state_dict(ckpt["model_state"])
+        print(f"Initialised weights from {args.init_weights} "
+              f"(source epoch {ckpt.get('epoch','?')}, source IoU "
+              f"{ckpt.get('val_iou', float('nan')):.4f}); "
+              f"optimizer and epoch counter reset")
+
     # ── Training loop ────────────────────────────────────────────────────────
     train_metrics = GlobalMetrics(args.threshold)
     val_metrics   = GlobalMetrics(args.threshold)
@@ -588,6 +602,10 @@ def parse_args():
     g5 = p.add_argument_group("Checkpoints")
     g5.add_argument("--ckpt_dir",   default="./checkpoints")
     g5.add_argument("--resume",     default=None,  help="Path to checkpoint to resume from")
+    g5.add_argument("--init_weights", default=None,
+                    help="Load model weights only from this checkpoint and reset "
+                         "optimizer/epoch/best-IoU. Use for fine-tuning onto a "
+                         "different dataset; --resume is for continuing a run.")
     g5.add_argument("--save_every", type=int, default=10,
                     help="Save a crash-recovery checkpoint every N epochs")
 

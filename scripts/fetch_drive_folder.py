@@ -15,6 +15,7 @@ Usage:
     python fetch_drive_folder.py <folder_url_or_id> <dest_dir> [--workers 8]
 """
 import argparse
+import json
 import os
 import random
 import sys
@@ -49,7 +50,7 @@ def enumerate_folder(url, dest):
     return [(r["id"], os.path.join(dest, r["path"])) for r in rows]
 
 
-def fetch(file_id, path, retries=5):
+def fetch(file_id, path, retries=8):
     """Download one file unless it already exists with non-zero size.
 
     Drive rate-limits concurrent access and answers with FileURLRetrievalError
@@ -76,12 +77,31 @@ def main():
     ap.add_argument("url")
     ap.add_argument("dest")
     # 8 workers trips Drive's rate limiter hard; 3 sustains throughput without
-    # burning most requests on retries.
+    # burning most requests on retries. On a 10k-file folder even 3 draws
+    # FileURLRetrievalError on most requests -- use 2 and --include a subtree.
     ap.add_argument("--workers", type=int, default=3)
+    ap.add_argument("--listing", default="",
+                    help="reuse a drive_list.py JSON instead of re-walking "
+                         "the folder (enumeration costs ~10 min)")
+    ap.add_argument("--include", default="",
+                    help="only fetch paths containing this substring, e.g. "
+                         "'dataset/train' to get AIRS without 5k of PNGs")
     args = ap.parse_args()
 
-    print(f"[fetch] enumerating {args.url} ...", flush=True)
-    files = enumerate_folder(args.url, args.dest)
+    if args.listing:
+        with open(args.listing) as fh:
+            rows = json.load(fh)
+        files = [(r["id"], os.path.join(args.dest, r["path"])) for r in rows]
+        print(f"[fetch] {len(files)} files from {args.listing}", flush=True)
+    else:
+        print(f"[fetch] enumerating {args.url} ...", flush=True)
+        files = enumerate_folder(args.url, args.dest)
+
+    if args.include:
+        before = len(files)
+        files = [f for f in files if args.include in f[1]]
+        print(f"[fetch] --include {args.include!r}: {len(files)} of {before}",
+              flush=True)
     print(f"[fetch] {len(files)} files, {args.workers} workers", flush=True)
 
     done = skipped = failed = 0
