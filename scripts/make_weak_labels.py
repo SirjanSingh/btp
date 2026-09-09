@@ -66,7 +66,9 @@ def main(a):
 
     for name in tifs:
         split = "val" if name in VAL_TILES else "train"
-        for sub in ("images", "masks"):
+        # Under --masks_only the images dir is a symlink into another label
+        # set; makedirs raises FileExistsError on it, so skip it entirely.
+        for sub in (("masks",) if a.masks_only else ("images", "masks")):
             os.makedirs(os.path.join(a.out_dir, split, sub), exist_ok=True)
 
         with rasterio.open(os.path.join(a.tiles, name)) as src:

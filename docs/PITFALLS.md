@@ -148,7 +148,22 @@ Several logs exist as genuine **copies** under both `logs/` and `<stage>/logs/`.
 dedup does not catch copies, only symlinks; the ledger reported 43 runs where there are 34.
 Collapse on run identity instead.
 
-### 3.10 Silent path mismatch skipped a whole comparison arm
+### 3.10 Absolute symlinks break under a bind mount ★
+Filtered dataset splits were built as symlink trees pointing at host-absolute paths
+(`/home/23ucs715/btp/...`). `run_docker.sh` bind-mounts the repo at **`/workspace`**, so every
+link dangled inside the container. Two failures, both misleading:
+
+- `cv2.imread` returns **`None`** for a dangling link rather than raising, so training died
+  20 frames deep in a dataloader worker with
+  `cvtColor: (-215) !_src.empty()` — nothing pointing at the real cause.
+- `os.makedirs(..., exist_ok=True)` **raises `FileExistsError`** on a dangling symlink,
+  because the path exists but is not a directory. The job crashed instantly, and the wrapper
+  still exited 0, so it looked like it had completed successfully and written nothing.
+
+> **Rule: symlinks that cross into a container must be relative** (`os.path.relpath`), and
+> verify one read *inside* the container before launching hours of work.
+
+### 3.11 Silent path mismatch skipped a whole comparison arm
 The method comparison ran without its most important row because checkpoints live in a
 *timestamped subdirectory* (`checkpoints/<run>/best.pth`) and the path given pointed one level
 too high. The script treated "file not found" as "method not requested" and printed a clean
