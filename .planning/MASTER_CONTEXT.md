@@ -19,10 +19,20 @@ Confidence tiers from the source doc are kept: **[MEASURED]** trust it ·
 
 ## 0. Reconciliation log — read this first
 
+> **Method note, added 2026-09-09.** This log was originally built by checking a *local
+> checkout* that was 11 commits behind the remote, and nobody ran `git fetch` first. That
+> produced C2, which confidently declared a 3,655-line planning folder non-existent. **Run
+> `git fetch` before reconciling anything against "disk" again** — "not on this machine" and
+> "does not exist" are different claims, and this document conflated them.
+>
+> Related: `plan/` (the 2026-08-04 research plan, 9 docs) and `.planning/` (the GSD phase
+> tracker) are **both real and are not the same thing**. This file supersedes neither; it
+> reconciles them against what is actually on disk.
+
 | # | Source doc claims | Disk reality | Severity |
 |---|---|---|---|
 | **C1** | `train_solar.py` black-mask fallback "keeps ~12,232 negative crops (correct, non-obvious, **keep it**)" | The fallback **exists and is correct** (`train_solar.py:162-164`) but **never fires**. `prep_bdappv.py:85` prints `no mask for X, skipping` and drops negatives *upstream*. Sampled 400 train masks: **0 all-zero**. Images 16,763 = masks 16,763, 1:1, **zero negatives in the crop set.** | **CRITICAL** |
-| **C2** | `plan/` with `00-README … 08-sources.md` (8 docs), cited ~20× as `plan/02`, `plan/04`, `plan/07`, `plan/08-sources.md` | **No `plan/` directory.** Disk has `.planning/` with `PROJECT.md`, `REQUIREMENTS.md`, `ROADMAP.md`, `STATE.md`, `config.json`, `research/{ARCHITECTURE,FEATURES,PITFALLS,STACK,SUMMARY}.md`. **None of the cited section numbers resolve.** | **HIGH** |
+| **C2** | `plan/` with `00-README … 08-sources.md` (8 docs), cited ~20× as `plan/02`, `plan/04`, `plan/07`, `plan/08-sources.md` | ~~No `plan/` directory.~~ **WITHDRAWN 2026-09-09 — this correction was itself wrong.** `plan/` exists with all 9 documents (3,655 lines, incl. a 1,941-line `06-implementation-plan.md`), committed in `db26b9e` on 2026-08-04. **The cited cross-references all resolve.** The original check was run against a local checkout that was 11 commits behind `origin/feat/init-project-setup` and never fetched. `.planning/` (GSD phase tracker) and `plan/` (the research plan) are two different things and both exist. | ~~HIGH~~ **withdrawn** |
 | **C3** | `daraset/*.tif` — 16 Jaipur tiles, ~8.2 GB, 2.48 gigapixels | ~~Not on this machine.~~ **RESOLVED 2026-09-08** — all 16 `map67_*.tif` restored to `data/jaipur/` (8.0 GB), EPSG:3857, GSD measured 0.26618 m/px by D6. | ~~HIGH~~ resolved |
 | **C4** | Phases A–F | `.planning/ROADMAP.md` has **Phases 1–5**, different decomposition. `STATE.md` says "Phase 1 of 5, Progress 0%" while checkpoints through epoch 050 exist. | MEDIUM |
 | **C5** | AIRS crops available for training | **STILL OPEN, partially restored.** `data/airs/image/` has **50 of 857** source `.tif`s (871 MB); `data/airs/label/` has 7 files of which 4 are `_vis` previews, so **3 real masks**. Only **3 image/label pairs actually match** (`christchurch_15`, `_48`, `_77`). `data/airs/train/`, `data/airs_crops/` and `rooftop/dataset_crops/` are still **empty**. The Drive fetch was interrupted mid-run on 2026-09-08. | **HIGH** |
@@ -452,8 +462,13 @@ partially restored (C5), so the source-side ones are not.
 
 Remaining blocker is therefore **AIRS only**: finish the interrupted
 `scripts/fetch_drive_folder.py` pull (it skips completed files, so it is safe to re-run),
-then tile with `rooftop/tile_airs.py`. **The Drive folder ID is not recorded anywhere in
-the repo — capture it in this file when you next run the fetch.**
+then tile with `rooftop/tile_airs.py`.
+
+**Source-of-truth for the data locations** — the Jaipur mosaic comes from the Drive folder
+`final_dataset`, recorded in [`plan/01-situation-and-assets.md`](../plan/01-situation-and-assets.md)
+§2. **No equivalent link is recorded for AIRS anywhere in the repo.** Capture it in `plan/01`
+alongside the Jaipur one when you next run the fetch — that is where a future reader will
+look for it.
 
 ### 6.4 Evaluation protocol — non-negotiable
 

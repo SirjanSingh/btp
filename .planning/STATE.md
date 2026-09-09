@@ -54,7 +54,8 @@ Recent decisions affecting current work:
 
 1. **Finish the AIRS restore** — 50/857 images down, only 3 matching image/label pairs.
    Re-run `scripts/fetch_drive_folder.py <folder> data/airs` (resumable), then
-   `rooftop/tile_airs.py`. **The Drive folder ID is recorded nowhere — capture it.**
+   `rooftop/tile_airs.py`. **No AIRS source link is recorded anywhere in the repo** —
+   capture it in `plan/01-situation-and-assets.md` §2, next to the Jaipur one.
    Blocks D2, D3, D5 and every training run.
 2. Diagnostics D4 (Open Buildings half) and D7 (hand-inspection) are runnable now.
 3. Fix the BDAPPV zero-negatives bug (MASTER_CONTEXT C1) before quoting any Stage 2 number.

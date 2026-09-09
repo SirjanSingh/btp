@@ -50,6 +50,18 @@ The write-up **links** to its raw output rather than restating it, so there is e
 copy of every number. Diagnostics keep their existing home so the master context's
 cross-references stay valid.
 
+## Relationship to `docs/sessions/`
+
+They answer different questions and both are worth keeping.
+
+| | records | indexed by |
+|---|---|---|
+| `docs/sessions/` | what happened on a working day — decisions, findings, handover | date |
+| `experiments/` | what a run measured, and what it decided | question |
+
+A session note links to the experiments it produced; an experiment write-up stands alone and
+is what the thesis cites.
+
 ## What counts as an experiment
 
 Anything whose result could change a decision: diagnostics, training runs, ablations,

@@ -24,4 +24,8 @@ data/
 interrupted; re-run `scripts/fetch_drive_folder.py <folder> data/airs` (it skips
 files that already completed), then tile.
 
+Provenance: the Jaipur mosaic is the Drive folder `final_dataset`, recorded in
+`plan/01-situation-and-assets.md` §2. **AIRS has no source link recorded anywhere
+in the repo** — add it there when you next fetch.
+
 Stage-2 (BDAPPV solar) data, when needed, goes in `data/bdappv/` and `data/bdappv_crops/`.
