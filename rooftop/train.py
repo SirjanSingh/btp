@@ -307,10 +307,46 @@ def build_model(arch: str, encoder: str, encoder_weights: str = "imagenet") -> n
 
 _bce  = smp.losses.SoftBCEWithLogitsLoss()
 _dice = smp.losses.DiceLoss(mode="binary", from_logits=True)
+_bce_px   = smp.losses.SoftBCEWithLogitsLoss(reduction="none")
+_dice_prob = smp.losses.DiceLoss(mode="binary", from_logits=False)
+
+# Set from --boundary_relax. 0 disables, restoring the original loss exactly.
+BOUNDARY_RELAX_PX = 0
+
+
+def _boundary_band(target, px):
+    """1 inside a ±px band around every label edge, 0 elsewhere.
+
+    Morphological gradient: max-pool dilates, negated max-pool erodes, and the
+    difference is the boundary ring.
+    """
+    k = 2 * px + 1
+    dil = torch.nn.functional.max_pool2d(target, k, stride=1, padding=px)
+    ero = -torch.nn.functional.max_pool2d(-target, k, stride=1, padding=px)
+    return dil - ero
 
 
 def combined_loss(pred, target, bce_w=0.5, dice_w=0.5):
-    return bce_w * _bce(pred, target) + dice_w * _dice(pred, target)
+    """Weighted BCE + Dice, optionally ignoring a band around label edges.
+
+    WHY the band: the weak labels are Open Buildings GROUND FOOTPRINTS while the
+    model predicts ROOF outlines, and off-nadir at 26.6 cm those disagree by
+    roughly 8 px (MASTER_CONTEXT Gap 4). Measured in the first weak-supervision
+    run: recall ran ~0.11 above precision for all 40 epochs, i.e. the model was
+    penalised for roof area that is genuinely there but sits outside the
+    footprint. Excluding the band stops the loss teaching the model to shrink
+    roofs to footprint size, which is a label artifact rather than the task.
+    """
+    px = BOUNDARY_RELAX_PX
+    if px <= 0:
+        return bce_w * _bce(pred, target) + dice_w * _dice(pred, target)
+
+    keep = 1.0 - _boundary_band(target, px)          # 0 inside the band
+    bce = (_bce_px(pred, target) * keep).sum() / keep.sum().clamp(min=1.0)
+    # Dice must be masked AFTER the sigmoid: scaling logits by 0 maps to 0.5,
+    # not to background, which would quietly poison the term.
+    dice = _dice_prob(torch.sigmoid(pred) * keep, target * keep)
+    return bce_w * bce + dice_w * dice
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -455,6 +491,12 @@ def main(args):
     writer    = SummaryWriter(log_dir=str(Path(args.log_dir) / run_logger.stem / "tb"))
 
     # ── Resume ───────────────────────────────────────────────────────────────
+    global BOUNDARY_RELAX_PX
+    BOUNDARY_RELAX_PX = args.boundary_relax
+    if BOUNDARY_RELAX_PX:
+        print(f"Boundary-relaxed loss: ignoring +/-{BOUNDARY_RELAX_PX} px "
+              f"around every label edge")
+
     start_epoch   = 1
     best_val_iou  = 0.0
     patience_left = args.patience
@@ -611,6 +653,10 @@ def parse_args():
 
     # ── Domain adaptation ────────────────────────────────────────────────────
     g6 = p.add_argument_group("Domain adaptation")
+    g6.add_argument("--boundary_relax", type=int, default=0,
+                    help="Ignore a +/-N px band around each label edge in the "
+                         "loss. Targets the roof-vs-footprint offset in weakly "
+                         "supervised runs (Gap 4). 0 = off.")
     g6.add_argument("--simulate_low_res", action="store_true",
                     help="Add resolution simulation augmentation (Downscale 25-50%%). "
                          "Use when target domain is ~30cm/px (e.g. Indian govt imagery) "
