@@ -24,6 +24,12 @@ IMAGE="nvcr.io/nvidia/pytorch:24.05-py3"
 # ships no python3-venv (ensurepip), and we cannot apt-install it while running as
 # the host uid. `pip install --user` layers cleanly on top of the image's system
 # site-packages, which is exactly the "inherit torch, add the rest" we want.
+# This node has 80 cores and 13 users. Torch defaults OMP_NUM_THREADS to the full
+# core count, so EVERY process spawns 80 CPU threads for intra-op work; two of our
+# training runs alone drove load average to 292 (3.7x oversubscribed) and slowed
+# each epoch ~8x. Cap it. Override per-run with OMP_THREADS=n ./run_docker.sh ...
+: "${OMP_THREADS:=4}"
+
 PYDEPS="${BTP_ROOT}/.pydeps"         # on /home, survives container restarts
 TMPDIR_HOST="${BTP_ROOT}/.tmp"       # container /tmp -> /home, because host /tmp is full
 
@@ -68,6 +74,9 @@ exec docker run "${TTY_FLAGS[@]}" \
   -e HOME=/workspace \
   -e TMPDIR=/tmp \
   -e PYTHONPYCACHEPREFIX=/tmp/pycache \
+  -e OMP_NUM_THREADS="${OMP_THREADS:-4}" \
+  -e MKL_NUM_THREADS="${OMP_THREADS:-4}" \
+  -e OPENBLAS_NUM_THREADS="${OMP_THREADS:-4}" \
   -e PYTHONUSERBASE=/workspace/.pydeps \
   -e PATH="/workspace/.pydeps/bin:/usr/local/bin:/usr/local/nvidia/bin:/usr/bin:/bin" \
   -w /workspace \

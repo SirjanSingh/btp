@@ -1,5 +1,5 @@
-Run: unet_resnet34_40ep_20260909_173038
-Date: 2026-09-09 17:30:38
+Run: unet_resnet34_40ep_20260909_173651
+Date: 2026-09-09 17:36:51
 Hardware: {'device': 'cuda', 'n_gpus': 1, 'gpu_name': 'Tesla V100-SXM2-32GB', 'cuda_version': '12.4'}
 Config: {
   "train_dir": "data/jaipur_weak/train",
@@ -17,7 +17,7 @@ Config: {
   "lr": 0.0001,
   "threshold": 0.5,
   "patience": 15,
-  "workers": 4,
+  "workers": 3,
   "seed": 42,
   "ckpt_dir": "experiments/2026-09-09-boundary-relaxed-loss/checkpoints",
   "resume": null,
@@ -30,4 +30,3 @@ Config: {
 
  Epoch    TrLoss    VaLoss      IoU       F1     Prec      Rec         LR   Time(s)  Note
 ────────────────────────────────────────────────────────────────────────────────
-     1    0.2809    0.2310   0.5823   0.7360   0.7091   0.7651   9.98e-05     297.7  ← best
