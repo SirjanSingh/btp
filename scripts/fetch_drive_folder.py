@@ -86,6 +86,10 @@ def main():
     ap.add_argument("--include", default="",
                     help="only fetch paths containing this substring, e.g. "
                          "'dataset/train' to get AIRS without 5k of PNGs")
+    ap.add_argument("--exclude", default="",
+                    help="skip paths containing this substring, e.g. '_vis' to "
+                         "drop AIRS's RGB preview masks (half of label/ and "
+                         "much larger than the binary masks they preview)")
     args = ap.parse_args()
 
     if args.listing:
@@ -101,6 +105,11 @@ def main():
         before = len(files)
         files = [f for f in files if args.include in f[1]]
         print(f"[fetch] --include {args.include!r}: {len(files)} of {before}",
+              flush=True)
+    if args.exclude:
+        before = len(files)
+        files = [f for f in files if args.exclude not in f[1]]
+        print(f"[fetch] --exclude {args.exclude!r}: {len(files)} of {before}",
               flush=True)
     print(f"[fetch] {len(files)} files, {args.workers} workers", flush=True)
 

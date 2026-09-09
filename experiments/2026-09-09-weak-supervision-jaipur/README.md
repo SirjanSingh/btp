@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ✅ done |
 | **Date** | 2026-09-09 |
 | **Commit** | `2fcfef0` on `feat/init-project-setup` |
 | **Supersedes** | — |
@@ -55,11 +55,34 @@ an independent check that the rasterisation is geometrically aligned with the im
 
 ## Results
 
-*pending*
+Raw: `outputs/unet_resnet34_40ep_20260909_152425.json`
+
+**Best val IoU 0.6475** (40 epochs, plateaued from epoch ~24; LR decayed to 2e-5).
+Head-to-head against every alternative on the same eval set:
+[`2026-09-09-method-comparison`](../2026-09-09-method-comparison/) — weak 0.6476,
+weak+TTA **0.6534**, unadapted seed 0.1419.
+
+| | prediction | measured |
+|---|---|---|
+| Val IoU | 0.60 – 0.72 | **0.6475** ✅ in band |
+| Predicted fg moves 5.7 % → 23 % | yes | yes — recall 0.84 |
+| Precision > recall | **yes** | **NO — recall exceeded precision by ~0.11** ❌ |
 
 ## Interpretation
 
-*pending*
+Weak supervision works, and it is not close: **4.6× the unadapted seed** (0.6476 vs
+0.1419 at threshold 0.5). One evening, zero manual labels, data already on disk.
+
+**The failed prediction is the informative one.** I expected precision > recall, reasoning
+that footprint labels are shrunken versions of roofs. The opposite held all through
+training — recall ran ~0.11 above precision. The model predicts *more* area than the
+footprints mark, which is the Gap-4 label-semantics mismatch appearing directly in the
+metrics: it was initialised on AIRS roof *outlines*, and off-nadir at 26.6 cm those sit
+larger than and offset from the ground footprints it is now scored against.
+
+Consequence: **this IoU understates true roof accuracy**, and the precision-recall gap is
+a rough proxy for the footprint-vs-roof offset. That argues for the boundary-relaxed loss
+(ignore a 4 px band) in `plan/03` §Tier 4, which exists precisely for this.
 
 ## Decision
 
