@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 11:08 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 11:09 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -247,10 +247,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-87 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+88 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  26 commits
+### 2026-09-10  ·  27 commits
 
+- `11:08` **7f62d77** docs: group the mistakes into three root patterns, and relax the quota rule
 - `10:45` **2248231** fix: split metric now sees fragmentation; ledger glob missed two whole runs
 - `10:38` **4913d59** fix: split-rate metric was blind to fragmentation; queue hand-labelling as R12
 - `10:22` **97b8734** result: 0.8 m over-erodes -- and my split-rate metric is blind to it
