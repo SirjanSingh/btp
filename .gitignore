@@ -16,8 +16,12 @@ data/*
 !data/README.md
 
 # ── Model weights (too large) ────────────────────────
-# Runs write into timestamped subdirectories, so match at any depth, not just
-# directly under checkpoints/.
+# Blanket rule. The previous pattern was `**/checkpoints/**/*.pth`, which only
+# matches directories named EXACTLY "checkpoints" -- an experiment writing to
+# `checkpoints_mit/` slipped two 280 MB files into git and GitHub rejected the
+# push (100 MB file limit, GH001). Weights are never worth committing: they are
+# regenerable, and their statistics live in experiments/RUN_LEDGER.json.
+*.pth
 **/checkpoints/**/*.pth
 rooftop/checkpoints/*.pth
 solar_panel/checkpoints/*.pth
