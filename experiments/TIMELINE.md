@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 16:01 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 16:32 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -152,7 +152,7 @@ destroyed two checkpoints, every metric survived because the ledger had been wri
 | 2026-09-10 | [`2026-09-10-d4-adjacency`](2026-09-10-d4-adjacency/) | ✅ done | **78 %** do — instance-merging workstream justified |
 | 2026-09-10 | [`2026-09-10-eroded-labels`](2026-09-10-eroded-labels/) | ✅ done | **Yes** — merge 0.46→0.33, count 0.76→**0.97** per building, −0.016 IoU |
 | 2026-09-10 | [`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/) | ✅ done — reproduced | **0.6393** (orig 0.6405); pred/label **0.9914**, split 0.084 |
-| 2026-09-10 | [`2026-09-10-erosion-02`](2026-09-10-erosion-02/) | running | — |
+| 2026-09-10 | [`2026-09-10-erosion-02`](2026-09-10-erosion-02/) | ✅ done — completes the sweep | **No** — monotonic curve; 0.4 m is the only point with pred/label ≈ 1 |
 | 2026-09-10 | [`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/) | ✅ done — **0.8 m over-erodes** | **0.8 m over-erodes** — merge 0.13 but pred/label 1.47; 0.4 m is the optimum |
 | 2026-09-10 | [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | ✅ done — **confounded; see cross-eval** | **Unresolved** — each model wins on its own labels; needs ground truth |
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
@@ -213,7 +213,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** should reproduce **0.6395–0.6415** — the same recipe, same data, differing only by seed noise. If it lands outside that, something is non-deterministic that I have not accounted for, which would itself be worth knowing. Expect merge ≈ 0.33, `pred/label` ≈ 0.97 as before, plus a split rate that is now *visible* (the old run reported 0.0 under the strict definition; the true value is probably a few 
 
-**[`2026-09-10-erosion-02`](2026-09-10-erosion-02/)** — running
+**[`2026-09-10-erosion-02`](2026-09-10-erosion-02/)** — ✅ done — completes the sweep
 > **Why:** 0.4 m already achieves `pred/label` **0.9914** — within 0.9 % of one prediction per building — but costs 0.018 IoU and 8.4 % split rate. If 0.2 m gets most of the count benefit for half the cost, it is the better default. If it barely moves, 0.4 m is confirmed as a genuine threshold rather than an arbitrary point on a slope.
 >
 > **Expected:** everything should land **between** the un-eroded and 0.4 m values, since the sweep has been monotonic in every metric so far.
@@ -259,10 +259,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-104 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+105 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  43 commits
+### 2026-09-10  ·  44 commits
 
+- `16:01` **418386d** chore: queue S5 -- port --cache_ram to train_solar.py
 - `15:58` **dcd7239** chore: regenerate ledger and timeline
 - `15:30` **9808420** chore: regenerate ledger and timeline
 - `15:01` **5282e4e** chore: regenerate ledger and timeline

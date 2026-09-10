@@ -454,7 +454,73 @@
       "lr": 4.767963140691305e-06,
       "elapsed_s": 146.3,
       "note": ""
+    },
+    {
+      "epoch": 36,
+      "tr_loss": 0.249356,
+      "va_loss": 0.247961,
+      "iou": 0.649871,
+      "f1": 0.787784,
+      "precision": 0.777532,
+      "recall": 0.79831,
+      "lr": 3.4227024433898994e-06,
+      "elapsed_s": 146.8,
+      "note": ""
+    },
+    {
+      "epoch": 37,
+      "tr_loss": 0.249078,
+      "va_loss": 0.247384,
+      "iou": 0.650193,
+      "f1": 0.788021,
+      "precision": 0.777026,
+      "recall": 0.799332,
+      "lr": 2.36768894031501e-06,
+      "elapsed_s": 146.2,
+      "note": ""
+    },
+    {
+      "epoch": 38,
+      "tr_loss": 0.248716,
+      "va_loss": 0.247206,
+      "iou": 0.650318,
+      "f1": 0.788112,
+      "precision": 0.776534,
+      "recall": 0.800041,
+      "lr": 1.6094271405406857e-06,
+      "elapsed_s": 146.3,
+      "note": ""
+    },
+    {
+      "epoch": 39,
+      "tr_loss": 0.248846,
+      "va_loss": 0.24645,
+      "iou": 0.652133,
+      "f1": 0.789443,
+      "precision": 0.773138,
+      "recall": 0.806452,
+      "lr": 1.1525919802101657e-06,
+      "elapsed_s": 146.7,
+      "note": ""
+    },
+    {
+      "epoch": 40,
+      "tr_loss": 0.248454,
+      "va_loss": 0.246692,
+      "iou": 0.651113,
+      "f1": 0.788696,
+      "precision": 0.775631,
+      "recall": 0.802209,
+      "lr": 1e-06,
+      "elapsed_s": 146.4,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.653981,
+    "best_epoch": 26,
+    "checkpoint": "experiments/2026-09-10-erosion-02/checkpoints/unet_mit_b2_40ep_20260910_090326/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.245019
+  }
 }

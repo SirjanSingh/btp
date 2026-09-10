@@ -117,6 +117,7 @@ first. Until then every Stage-2 precision number, S1's included, measures the wr
 | D1 target prior | 28.19 % (23.06 % @ conf ≥ 0.75) |
 | D6 seed probe | 5.69 % predicted foreground — ~5× under |
 | Weak supervision | **IoU 0.6475** |
+| **Erosion sweep complete (0 / 0.2 / 0.4 / 0.8 m)** | monotonic in every metric; **0.4 m** the only point with pred/label ≈ 1.0 |
 | **Erosion sweep (0.8 m)** | over-erodes: merge 0.1339 but pred/label **1.47**, missed 0.47 — 0.4 m is the optimum |
 | **Eroded labels (0.4 m)** | merge 0.4615→**0.3256**, pred/label 0.760→**0.9745**, −0.016 IoU; synergistic with MiT |
 | **S1 solar google→ign** | source 0.8723 → **target 0.5611**; best thr 0.5 on both, so not calibration |

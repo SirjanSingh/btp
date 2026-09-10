@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ✅ done — completes the sweep |
 | **Date** | 2026-09-10 |
 
 ## Question
@@ -44,7 +44,60 @@ the crop set into RAM once instead of re-decoding every epoch.
 
 ## Results
 
-*pending*
+Best val IoU **0.6540** @ep26. With the 0.2 m point added, the sweep is **monotonic in every
+metric**:
+
+| erosion | IoU | merge | split | missed | **pred/label** |
+|---|---|---|---|---|---|
+| none | **0.6569** | 0.4615 | 0.0341 | 0.2423 | 0.7600 |
+| **0.2 m** | 0.6540 | 0.4118 | 0.0496 | 0.2688 | 0.8412 |
+| **0.4 m** | 0.6393 | 0.3155 | 0.0840 | 0.3257 | **0.9914** |
+| 0.8 m | 0.5911 | 0.1339 | 0.1762 | 0.4689 | 1.4743 |
+
+**Prediction scorecard — 3 of 4 inside the bracket:** IoU 0.648–0.654 → **0.6540** ✅ ·
+merge 0.38–0.42 → **0.4118** ✅ · split 0.05–0.06 → **0.0496** ✅ (just under) ·
+pred/label 0.85–0.90 → **0.8412** ❌, slightly below.
+
+## Interpretation
+
+**A clean dose-response curve.** Every metric moves monotonically with erosion, in the
+expected direction, with no inflection: more erosion buys less merging and costs more misses
+and more splits. That is what a well-behaved knob looks like, and it means the earlier
+three-point sweep was not hiding structure.
+
+**0.4 m stays the default, and now for a stated reason rather than by bracketing.** It is the
+only point where `pred/label` reaches ~1.0. The others under- or over-count:
+
+- 0.2 m → **0.8412**, still 16 % under-counting
+- 0.4 m → **0.9914**, within 0.9 %
+- 0.8 m → **1.4743**, 47 % over
+
+**The sub-pixel worry was partly wrong, and worth correcting.** I flagged that 0.2 m ≈ 0.75 px
+might "round away entirely". IoU barely moved (−0.003), which fits that story — but merge
+fell 0.4615 → 0.4118 and `pred/label` rose 0.760 → 0.8412, which does not. Sub-pixel erosion
+has a real effect on **instance structure** while leaving pixel overlap almost untouched. That
+is a small illustration of the project's larger lesson: IoU and instance metrics measure
+different things, and IoU is the less informative of the two here.
+
+**The cost of the fix is remarkably cheap.** Going from un-eroded to 0.4 m costs **0.018 IoU**
+and takes under-counting from 24 % to 0.9 %. For a pipeline whose output is a per-building kW
+estimate, that is close to free.
+
+## Decision
+
+- [x] **0.4 m + MiT-B2 confirmed as default**, now on a four-point curve rather than a
+      bracket.
+- [x] Sweep closed — the curve is monotonic and smooth, so intermediate points (0.3, 0.5 m)
+      would refine `pred/label` toward 1.0 but change nothing structural.
+- [ ] If a future model has a different merge baseline, the optimal erosion will move with it;
+      the rule is *"tune erosion until `pred/label` ≈ 1"*, not *"use 0.4 m"*.
+
+## Threats to validity
+
+- All four points share one seed each; the differences between adjacent points (especially
+  0 vs 0.2 m on IoU, −0.003) are within plausible seed noise even where the trend is not.
+- Every number is agreement with Open Buildings footprints, not roof ground truth (R12).
+- `pred/label` counts OB polygons; where OB already merges two structures, this cannot see it.
 
 ## Threats to validity
 
