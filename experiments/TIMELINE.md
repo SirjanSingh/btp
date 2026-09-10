@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 03:29 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 03:58 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -327,10 +327,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-138 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+139 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  4 commits
+### 2026-09-11  ·  5 commits
 
+- `03:29` **149f128** Regenerate ledger and timeline (R5b E04 ep20, E02 ep13)
 - `03:00` **f39e677** Regenerate ledger and timeline (R5b E04 ep8, E02 ep5)
 - `02:58` **e71d07a** Regenerate ledger and timeline (R5b E04 ep7, E02 ep5)
 - `02:36` **a8e52e5** R5 rejected: self-training discards the label erosion. R5b launched as the repair
