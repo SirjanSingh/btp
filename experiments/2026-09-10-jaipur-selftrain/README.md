@@ -84,10 +84,19 @@ against a 23–28 % truth, a 5× under-prediction. The weakly-supervised model h
 
 Because the threshold is no longer obviously choosable, this brackets it:
 
-| arm | threshold | pseudo-label fg | rationale |
+| arm | threshold | pseudo-label fg (measured, full set) | rationale |
 |---|---|---|---|
-| **A** | **0.80** | ≈ 23 % | high-confidence; coincides with the measured OB prior |
-| **B** | **0.50** | ≈ 31 % | the model's own default operating point, more inclusive |
+| **A** | **0.80** | **17.2 %** | high-confidence |
+| **B** | **0.50** | pending (~31 % expected) | the model's own default operating point |
+
+**Correction to the arm-A rationale.** I chose 0.80 because the 600-crop probe said ratio
+0.231 → threshold 0.8138, so 0.80 should land near the 23.1 % OB prior. Run over all 7,371
+crops, threshold 0.80 actually selects **17.2 %** — the 600-crop probe was not representative
+of the full set, and matching the prior would need roughly 0.70. So arm A is *more*
+conservative than intended: it discards a quarter of the foreground OB claims. That makes it a
+cleaner test of "high confidence only" and a worse test of "match the prior", and the
+comparison against arm B is unaffected. Noted rather than re-run — an unrepresentative probe
+is exactly the kind of thing that should be visible in the record.
 
 **Prediction:** arm A ≥ arm B on `pred/label` and merge rate, because B's extra 8 % of
 foreground is exactly the low-confidence margin where buildings fuse. If B wins, the model's
