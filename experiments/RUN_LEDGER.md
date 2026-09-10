@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-10 09:05 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-10 10:16 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**47 runs · 28 checkpoints currently on disk**
+**49 runs · 27 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -31,6 +31,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `unet_mit_b2_40ep_20260909_201300` | rooftop | train | 40 | **0.6569** | 37 | 0.7929 | 0.7536 | 0.8366 |
 | `unet_resnet34_40ep_20260909_204035` | solar | train | 40 | **0.8723** | 40 | 0.9318 | 0.9308 | 0.9328 |
 | `unet_resnet34_40ep_20260909_210501` | rooftop | train | 40 | **0.6281** | 36 | 0.7716 | 0.6771 | 0.8967 |
+| `unet_mit_b2_40ep_20260910_033956` | rooftop | train | 25 | **0.5911** | 10 | 0.7430 | 0.7978 | 0.6952 |
 | `d1_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d4_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -39,6 +40,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `method_comparison` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `mit_b2` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `mit_b2_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `mit_b2_eroded_dilate2` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `r3_cross_eval` | diagnostic | eval | 0 | — | — | — | — | — |
 | `resnet34` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `resnet34_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -74,6 +76,7 @@ Kept deliberately — a crashed configuration is evidence too.
 - `method_comparison` (diagnostics/method_comparison.json)
 - `mit_b2` (diagnostics/merge_split/mit_b2.json)
 - `mit_b2_eroded` (diagnostics/merge_split/mit_b2_eroded.json)
+- `mit_b2_eroded_dilate2` (diagnostics/merge_split/mit_b2_eroded_dilate2.json)
 - `r3_cross_eval` (diagnostics/r3_cross_eval.json)
 - `resnet34` (diagnostics/merge_split/resnet34.json)
 - `resnet34_eroded` (diagnostics/merge_split/resnet34_eroded.json)
