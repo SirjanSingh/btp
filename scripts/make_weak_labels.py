@@ -39,7 +39,7 @@ from shapely.geometry import shape
 VAL_TILES = {"map67_1-1.tif", "map67_2-2.tif", "map67_4-3.tif"}
 
 
-def load_polygons(csv_path, min_conf):
+def load_polygons(csv_path, min_conf, erode_m=0.0):
     import pandas as pd
 
     df = pd.read_csv(csv_path)
@@ -48,6 +48,19 @@ def load_polygons(csv_path, min_conf):
     print(f"[weak] {len(df):,} polygons at confidence >= {min_conf}")
     # One batched transform, not one call per polygon — see d1_target_prior.py.
     shp = [wkt.loads(g) for g in df.geometry]
+    if erode_m:
+        # Shrink every footprint before rasterising so that touching buildings
+        # get a visible gap. R8 measured a 50% merge rate with a 0% split rate:
+        # the model fuses neighbours and never over-segments, so pushing the
+        # labels apart is the cheapest way to teach separation. Buffer works in
+        # the CRS's units and this CSV is EPSG:4326, so convert metres to
+        # degrees via the latitude scale at Jaipur (~110.9 km/deg).
+        d = erode_m / 110_900.0
+        shp = [g.buffer(-d) for g in shp]
+        before = len(shp)
+        shp = [g for g in shp if not g.is_empty and g.is_valid]
+        print(f"[weak] eroded {erode_m} m; {before - len(shp):,} polygons "
+              f"vanished entirely (too small to survive)")
     geoms = transform_geom("EPSG:4326", "EPSG:3857",
                            [s.__geo_interface__ for s in shp])
     # shapely bounds rather than walking `coordinates`: the AOI holds a couple of
@@ -57,7 +70,7 @@ def load_polygons(csv_path, min_conf):
 
 
 def main(a):
-    geoms, bboxes = load_polygons(a.csv, a.min_conf)
+    geoms, bboxes = load_polygons(a.csv, a.min_conf, a.erode_m)
 
     tifs = sorted(f for f in os.listdir(a.tiles) if f.endswith(".tif"))
     stats = {"train": 0, "val": 0}
@@ -149,6 +162,10 @@ if __name__ == "__main__":
     p.add_argument("--crop", type=int, default=512)
     p.add_argument("--stride", type=int, default=512)
     p.add_argument("--min_conf", type=float, default=0.75)
+    p.add_argument("--erode_m", type=float, default=0.0,
+                   help="shrink each footprint by N metres before rasterising, "
+                        "to open a gap between touching buildings (targets the "
+                        "50%% merge rate measured in R8)")
     p.add_argument("--masks_only", action="store_true",
                    help="write masks but not images (symlink images from an "
                         "existing set; they are identical across cutoffs)")
