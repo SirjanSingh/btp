@@ -430,7 +430,97 @@
       "lr": 8.294311864472434e-06,
       "elapsed_s": 147.2,
       "note": ""
+    },
+    {
+      "epoch": 34,
+      "tr_loss": 0.071989,
+      "va_loss": 0.454493,
+      "iou": 0.604996,
+      "f1": 0.753891,
+      "precision": 0.805942,
+      "recall": 0.708155,
+      "lr": 6.395177052675792e-06,
+      "elapsed_s": 147.1,
+      "note": ""
+    },
+    {
+      "epoch": 35,
+      "tr_loss": 0.071501,
+      "va_loss": 0.462207,
+      "iou": 0.60415,
+      "f1": 0.753234,
+      "precision": 0.805862,
+      "recall": 0.707058,
+      "lr": 4.767963140691305e-06,
+      "elapsed_s": 147.0,
+      "note": ""
+    },
+    {
+      "epoch": 36,
+      "tr_loss": 0.07182,
+      "va_loss": 0.455932,
+      "iou": 0.604276,
+      "f1": 0.753332,
+      "precision": 0.805526,
+      "recall": 0.707491,
+      "lr": 3.4227024433898994e-06,
+      "elapsed_s": 147.2,
+      "note": ""
+    },
+    {
+      "epoch": 37,
+      "tr_loss": 0.071476,
+      "va_loss": 0.457028,
+      "iou": 0.604416,
+      "f1": 0.75344,
+      "precision": 0.807184,
+      "recall": 0.706406,
+      "lr": 2.36768894031501e-06,
+      "elapsed_s": 147.0,
+      "note": ""
+    },
+    {
+      "epoch": 38,
+      "tr_loss": 0.070847,
+      "va_loss": 0.461081,
+      "iou": 0.601573,
+      "f1": 0.751228,
+      "precision": 0.809567,
+      "recall": 0.700731,
+      "lr": 1.6094271405406857e-06,
+      "elapsed_s": 147.6,
+      "note": ""
+    },
+    {
+      "epoch": 39,
+      "tr_loss": 0.071006,
+      "va_loss": 0.466135,
+      "iou": 0.602506,
+      "f1": 0.751954,
+      "precision": 0.807649,
+      "recall": 0.703446,
+      "lr": 1.1525919802101657e-06,
+      "elapsed_s": 147.6,
+      "note": ""
+    },
+    {
+      "epoch": 40,
+      "tr_loss": 0.070849,
+      "va_loss": 0.458109,
+      "iou": 0.603305,
+      "f1": 0.752577,
+      "precision": 0.808072,
+      "recall": 0.704214,
+      "lr": 1e-06,
+      "elapsed_s": 146.9,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.606819,
+    "best_epoch": 28,
+    "checkpoint": "experiments/2026-09-11-selftrain-eroded-pseudo/ckpt_e04/unet_mit_b2_40ep_20260910_210834/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.292181
+  }
 }

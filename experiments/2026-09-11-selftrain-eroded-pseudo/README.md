@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | E04 done · E02 running |
 | **Date** | 2026-09-11 |
 
 ## Question
@@ -64,7 +64,66 @@ baked into the pseudo-masks before erosion ever ran.
 
 ## Results
 
-*pending*
+**E04 complete; E02 still training.** Scored on the same 1,701-crop held-out OB val tiles.
+
+| | val IoU | merge | split | frag/label | missed | **pred/label** |
+|---|---|---|---|---|---|---|
+| **teacher** (no self-training) | **0.6393** | 0.3155 | 0.0840 | 0.9203 | **0.3257** | **0.9914** |
+| R5 arm B (raw pseudo) | 0.6432 | 0.3371 | 0.0787 | 0.9159 | 0.3156 | 0.9134 |
+| **R5b E04 (0.4 m eroded pseudo)** | 0.6068 | **0.2666** | 0.0885 | 0.9030 | 0.3974 | **0.9672** |
+| R5b E02 (0.2 m eroded pseudo) | *pending* | | | | | |
+
+**Prediction scorecard for E04 — one hit, two misses, both misses in the same direction.**
+
+| prediction | outcome |
+|---|---|
+| `pred/label` 0.95–1.02 | ✅ **0.9672** |
+| merge 0.30–0.34 | ❌ **0.2666** — better than the range |
+| IoU 0.625–0.645 | ❌ **0.6068** — worse than the range |
+
+## Interpretation
+
+**The diagnosis was right.** Eroding the pseudo-labels recovers most of what raw self-training
+threw away: `pred/label` **0.9134 → 0.9672** (under-counting 8.7 % → 3.3 %) and merge
+**0.3371 → 0.2666**, now *better* than the teacher's 0.3155. The mechanism proposed in R5 —
+that self-training discards the label erosion — is confirmed by repairing exactly that and
+watching both metrics move back.
+
+**But my pre-registered criterion was badly written, and I am not going to hide behind it.**
+I said *"E04 reaches `pred/label` ≥ 0.95 and merge ≤ 0.3155 → the diagnosis was right, R5's
+rejection was premature."* Both thresholds are met. The second half does not follow, because I
+bundled two different claims into one test and included no condition on **recall**:
+
+- missed rate **0.3257 → 0.3974** — E04 misses **40 %** of buildings against the teacher's 33 %.
+- `pred/label` 0.9672 is still short of the teacher's **0.9914**.
+- IoU is down 0.033.
+
+**E04 beats the teacher on merging alone and loses on everything else.** Erosion shrinks the
+training target, so the model learns systematically smaller footprints: fewer fusions, more
+buildings missed entirely. That is the same recall/fusion trade the original erosion sweep
+measured on the labels — and here it is being paid *twice*, once in the teacher's labels and
+again in the pseudo-labels. Double erosion is over-erosion.
+
+**So R5's rejection stands, on better evidence than before.** Self-training with eroded
+pseudo-labels is a real improvement over self-training with raw ones, and still not an
+improvement over not self-training. The teacher remains the deliverable.
+
+**A lesson about pre-registration itself.** A criterion that names two metrics can be satisfied
+while the model gets worse on a third. The fix is not to abandon pre-registration but to state
+the *decision rule* over the full metric set — here it should have been "beats the teacher on
+`pred/label` **and** does not lose recall", which E04 fails. Recorded in PITFALLS.
+
+## Decision
+
+- [x] **R5's rejection of self-training for Stage 1 stands.** The teacher (0.9914, 0.3155,
+      0.6393) is still the best model on the deciding metric.
+- [x] **The R5 diagnosis is confirmed** — pseudo-label erosion recovers 0.9134 → 0.9672. Worth
+      reporting as mechanism even though the method is rejected.
+- [x] **Double erosion is over-erosion.** If self-training is ever revisited, erode the
+      pseudo-labels *less* than the labels, not equally — E02 (0.2 m) is the running test of
+      exactly that.
+- [ ] Await E02. If it beats E04 on missed rate while holding `pred/label` ≥ 0.95, the
+      "erode less on the second pass" rule is confirmed rather than merely argued.
 
 ## Threats to validity
 

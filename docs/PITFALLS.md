@@ -434,6 +434,30 @@ how many parent tiles it touched. Fixed in `self_train_pseudolabel.py`.
 **Cost.** Two committed claims retracted (the "over-predicts" finding and the "weak supervision
 overcorrected D6" follow-on), plus one arm launched at a threshold chosen from the bad number.
 
+### 3.22 A pre-registered criterion that named two metrics and ignored a third ★
+
+**What happened.** Before running R5b I wrote the decision rule: *"E04 reaches `pred/label`
+≥ 0.95 and merge ≤ 0.3155 → the diagnosis was right, R5's rejection was premature."* E04
+returned `pred/label` 0.9672 and merge 0.2666 — both satisfied. Mechanically following the
+rule would have reversed R5 and adopted self-training. But E04's **missed rate** went
+0.3257 → 0.3974: it misses 40 % of buildings against the teacher's 33 %, and its `pred/label`
+is still below the teacher's 0.9914. The method is worse; the criterion said adopt.
+
+**Why.** Two errors compounded. (1) The criterion named the two metrics I expected to *move*
+and omitted the one I expected to stay put — so it could not detect the failure that actually
+occurred. (2) It bundled two independent claims, "the diagnosis was right" and "the rejection
+was premature", into a single test. The first is true and the second is false, and no single
+threshold pair can separate them.
+
+**Shape.** Pattern A, applied to my own experimental design rather than to a tool: a check that
+could not fail in the way the experiment actually failed.
+
+**Rule.** A pre-registered decision rule must be stated over the **full metric set that would
+change the decision**, and must name a **comparison target**, not absolute thresholds. Here it
+should have read: *"beats the teacher on `pred/label` AND does not lose recall"* — which E04
+fails cleanly. Pre-registration is still right; a rule that only lists the metrics you expect to
+improve is advocacy with a timestamp.
+
 ## 4. Pre-existing, still open
 
 - **BDAPPV has zero negative crops** (`MASTER_CONTEXT` C1). `prep_bdappv.py:85` drops

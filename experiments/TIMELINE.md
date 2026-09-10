@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 04:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 04:19 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -204,7 +204,7 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | ✅ done — **strong negative result** | **No — it destroys it.** 0.5611 → **0.3752** on target |
 | 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
 | 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
-| 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | running | — |
+| 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | E04 done · E02 running | — |
 
 ### Why each was run, and what was expected
 
@@ -317,8 +317,10 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** the published split rates are wrong and will move once recomputed with the loose (≥ 10 %) definition.
 
-**[`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/)** — running
+**[`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/)** — E04 done · E02 running
 > **Why:** it decides whether "self-training fails on Stage 1" is a fact about the method or an artefact of one fixable implementation detail. R5's conclusion is currently the stronger claim and this is the test that could weaken it.
+>
+> **Expected:** Eroding the pseudo-labels recovers most of what raw self-training threw away: `pred/label` **0.9134 → 0.9672** (under-counting 8.7 % → 3.3 %) and merge **0.3371 → 0.2666**, now *better* than the teacher's 0.3155. The mechanism proposed in R5 — that self-training discards the label erosion — is confirmed by repairing exactly that and watching both metrics move back.
 
 
 **23 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
@@ -327,10 +329,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-140 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+141 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  6 commits
+### 2026-09-11  ·  7 commits
 
+- `04:00` **e11d62d** Regenerate ledger and timeline (R5b E04 ep33, E02 ep21)
 - `03:58` **942a661** Regenerate ledger and timeline (R5b E04 ep32, E02 ep20)
 - `03:29` **149f128** Regenerate ledger and timeline (R5b E04 ep20, E02 ep13)
 - `03:00` **f39e677** Regenerate ledger and timeline (R5b E04 ep8, E02 ep5)
