@@ -478,7 +478,49 @@
       "lr": 2.36768894031501e-06,
       "elapsed_s": 225.6,
       "note": ""
+    },
+    {
+      "epoch": 38,
+      "tr_loss": 0.069053,
+      "va_loss": 0.437428,
+      "iou": 0.626144,
+      "f1": 0.770097,
+      "precision": 0.796479,
+      "recall": 0.745406,
+      "lr": 1.6094271405406857e-06,
+      "elapsed_s": 251.3,
+      "note": ""
+    },
+    {
+      "epoch": 39,
+      "tr_loss": 0.06927,
+      "va_loss": 0.442679,
+      "iou": 0.626469,
+      "f1": 0.770342,
+      "precision": 0.794781,
+      "recall": 0.747362,
+      "lr": 1.1525919802101657e-06,
+      "elapsed_s": 219.6,
+      "note": ""
+    },
+    {
+      "epoch": 40,
+      "tr_loss": 0.068983,
+      "va_loss": 0.436661,
+      "iou": 0.626993,
+      "f1": 0.770739,
+      "precision": 0.79507,
+      "recall": 0.747852,
+      "lr": 1e-06,
+      "elapsed_s": 216.2,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.629947,
+    "best_epoch": 28,
+    "checkpoint": "experiments/2026-09-11-selftrain-eroded-pseudo/ckpt_e02/unet_mit_b2_40ep_20260910_210840/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.269053
+  }
 }

@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 05:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 05:13 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -205,7 +205,7 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
 | 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
 | 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Partly — same merge/missed curve as erosion**, but erosion wins `pred/label` by 0.086 at a matched operating point |
-| 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | E04 done · E02 running | — |
+| 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | ❌ negative — diagnosis confirmed, teacher still wins | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins |
 
 ### Why each was run, and what was expected
 
@@ -323,7 +323,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** I expected thresholding to trace a *worse* merge/missed trade than erosion. Matched at equal merge rate, the two curves are nearly the same:
 
-**[`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/)** — E04 done · E02 running
+**[`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/)** — ❌ negative — diagnosis confirmed, teacher still wins
 > **Why:** it decides whether "self-training fails on Stage 1" is a fact about the method or an artefact of one fixable implementation detail. R5's conclusion is currently the stronger claim and this is the test that could weaken it.
 >
 > **Expected:** Eroding the pseudo-labels recovers most of what raw self-training threw away: `pred/label` **0.9134 → 0.9672** (under-counting 8.7 % → 3.3 %) and merge **0.3371 → 0.2666**, now *better* than the teacher's 0.3155. The mechanism proposed in R5 — that self-training discards the label erosion — is confirmed by repairing exactly that and watching both metrics move back.
@@ -335,10 +335,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-144 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+145 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  10 commits
+### 2026-09-11  ·  11 commits
 
+- `05:00` **39b28ee** Regenerate ledger and timeline (E02 ep37, un-eroded ep7)
 - `04:58` **bad1a07** Regenerate ledger and timeline (E02 ep36, un-eroded retrain ep6 at 0.6408)
 - `04:39` **7702f09** Inference threshold traces the same merge curve as erosion -- but erosion wins on counting
 - `04:19` **48fe3f5** R5b E04: diagnosis confirmed, method still rejected
@@ -527,7 +528,6 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 The half of the record that is normally lost. An idea absent from this repo was either never had, or was had and forgotten — and there is no way to tell later.
 
 - queued — R12 · Hand-label ~30 Jaipur tiles ★★★ nothing else can be validated without it
-- queued — R5b · Self-training with ERODED pseudo-labels
 - queued — R6 · Multi-source co-training
 - queued — R7 · Low-resolution simulation
 - ⛔ **blocked** — S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent

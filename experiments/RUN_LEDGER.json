@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-11T05:00:52",
- "n_runs": 78,
+ "generated": "2026-09-11T05:13:52",
+ "n_runs": 79,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
   "experiments/2026-09-09-does-the-airs-seed-help/checkpoints/unet_resnet34_40ep_20260909_171814/best.pth",
@@ -11631,6 +11631,25 @@
   {
    "run_name": "r5_t080",
    "log": "diagnostics/r5_t080.json",
+   "stage": "diagnostic",
+   "kind": "diagnostic",
+   "timestamp": "",
+   "config": {},
+   "hardware": {},
+   "n_epochs": 0,
+   "best_epoch": null,
+   "best_iou": null,
+   "best_f1": null,
+   "best_precision": null,
+   "best_recall": null,
+   "summary": {},
+   "threshold_sweep": null,
+   "results": null,
+   "epochs": []
+  },
+  {
+   "run_name": "r5b_e02",
+   "log": "diagnostics/r5b_e02.json",
    "stage": "diagnostic",
    "kind": "diagnostic",
    "timestamp": "",

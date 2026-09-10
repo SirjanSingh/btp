@@ -51,15 +51,6 @@ first honest number** and calibrate how far the OB proxy sits from reality.
 *Needs:* a labelling setup (browser tool writing masks, or QGIS-ready GeoTIFF + shapefile).
 
 
-### R5b · Self-training with ERODED pseudo-labels
-R5 failed for a diagnosed reason: pseudo-labels are the teacher's raw output, which contains
-the fused blobs, while the teacher itself was trained on 0.4 m **eroded** labels. Self-training
-therefore discards the erosion that made the teacher good (`pred/label` 0.9914 → 0.9134).
-Repair: apply the same 0.4 m erosion to the teacher's pseudo-masks before retraining.
-*Needs:* one erosion pass over the pseudo-masks + one training run. ~3 h GPU.
-**Predict: `pred/label` back to 0.95-1.02; merge at or below the teacher's 0.3155. If it still
-merges more, the problem is self-training itself, not the missing erosion.**
-
 ### R6 · Multi-source co-training
 Add the 2,326 labelled American-house pairs sitting unused in Drive. Tests `plan/03` §2.2
 (a second source domain) with data we already have rather than downloading Inria.
@@ -105,6 +96,7 @@ first. Until then every Stage-2 precision number, S1's included, measures the wr
 | **S1 solar google→ign** | source 0.8723 → **target 0.5611**; best thr 0.5 on both, so not calibration |
 | **R8 merge/split rate** | **50 % of buildings merged** at IoU 0.648; MiT-B2 4.3 pts better; split rate 0 |
 | **S5 solar RAM cache** | ported; solar runs no longer dataloader-bound at ~340 s/epoch |
+| **R5b eroded pseudo-labels** | Diagnosis confirmed (`pred/label` 0.9134→0.9672) but recall falls; teacher wins. Erosion strength is a smooth monotone dial |
 | **R5 Jaipur self-training** | ❌ **Teacher wins.** +0.004 IoU but `pred/label` 0.9914→0.9134 and merge 0.3155→0.3371; pseudo-labels discard the label erosion |
 | **R11 split-metric audit** | Metric sound; `split_strict` 0.0 at every level. 0.8 m over-erosion **hallucinates** buildings (30 % of preds touch no label), not fragments |
 | **S7 multi-round self-training** | **Saturates after one round** — 0.6135 → 0.6104; rounds and ratio are not independent levers |

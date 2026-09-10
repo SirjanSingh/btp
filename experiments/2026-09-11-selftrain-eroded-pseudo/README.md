@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | E04 done · E02 running |
+| **Status** | ❌ negative — diagnosis confirmed, teacher still wins |
 | **Date** | 2026-09-11 |
 
 ## Question
@@ -71,7 +71,7 @@ baked into the pseudo-masks before erosion ever ran.
 | **teacher** (no self-training) | **0.6393** | 0.3155 | 0.0840 | 0.9203 | **0.3257** | **0.9914** |
 | R5 arm B (raw pseudo) | 0.6432 | 0.3371 | 0.0787 | 0.9159 | 0.3156 | 0.9134 |
 | **R5b E04 (0.4 m eroded pseudo)** | 0.6068 | **0.2666** | 0.0885 | 0.9030 | 0.3974 | **0.9672** |
-| R5b E02 (0.2 m eroded pseudo) | *pending* | | | | | |
+| **R5b E02 (0.2 m eroded pseudo)** | 0.6299 | 0.3051 | 0.0857 | 0.9136 | 0.3477 | **0.9447** |
 
 **Prediction scorecard for E04 — one hit, two misses, both misses in the same direction.**
 
@@ -133,3 +133,53 @@ the *decision rule* over the full metric set — here it should have been "beats
   failure was foreground starvation rather than missing erosion.
 - Erosion strength is confounded with kernel rounding (E04 removes ~2.0 px where 0.4 m is
   1.5 px), so E04 is slightly stronger than the label pipeline's 0.4 m.
+
+---
+
+## E02 result — erosion strength is a smooth dial, and neither end wins
+
+**Prediction hit.** I said E02 would land *between* arm B and E04 on every metric, with
+`pred/label` 0.93–0.97 and merge 0.33–0.35. It is between on **all four** metrics, and
+`pred/label` 0.9447 is inside the range. Merge came in at **0.3051**, below the predicted
+0.33–0.35 — the one miss, and in the favourable direction.
+
+| | IoU | merge | missed | **pred/label** |
+|---|---|---|---|---|
+| **teacher** | **0.6393** | 0.3155 | **0.3257** | **0.9914** |
+| R5 arm B — raw pseudo | 0.6432 | 0.3371 | 0.3156 | 0.9134 |
+| **E02** — 0.2 m | 0.6299 | 0.3051 | 0.3477 | 0.9447 |
+| **E04** — 0.4 m | 0.6068 | 0.2666 | 0.3974 | 0.9672 |
+
+Pseudo-label erosion behaves as a continuous knob: more erosion → less merging, better
+counting, worse recall, lower IoU, monotonically. No inflection, no sweet spot.
+
+**Applying the decision rule I should have written the first time** — *beats the teacher on
+`pred/label` **and** does not lose recall* — **both arms fail.** E02 and E04 lose recall
+(0.3477 and 0.3974 against 0.3257) and neither reaches `pred/label` 0.9914.
+
+**The sharper question: is any of this better than just turning the inference threshold?**
+Comparing at matched merge rate against the teacher's threshold curve:
+
+| at merge ≈ 0.2666 | missed | pred/label |
+|---|---|---|
+| teacher @ thr ≈ 0.565 | **0.3646** | 1.0501 |
+| E04 (retrained) | 0.3974 | **0.9672** |
+
+**Neither dominates.** Thresholding gives better recall; eroded-pseudo self-training gives
+better counting (0.9672 is nearer 1.0 than 1.0501). But the teacher at its own default 0.5
+beats *both* R5b arms on recall **and** counting simultaneously, giving up only 0.01–0.05 of
+merge rate. Two hours of GPU per arm bought a worse point on a curve a threshold reaches for
+free.
+
+## Final decision
+
+- [x] **Self-training rejected for Stage 1**, now on four arms (raw ×2, eroded ×2) rather than
+      two, with the mechanism identified and repaired and *still* no win.
+- [x] **The R5 diagnosis is confirmed and worth keeping** — pseudo-label erosion moves
+      `pred/label` 0.9134 → 0.9447 → 0.9672 as strength rises. The explanation was right even
+      though the method loses.
+- [x] **Double erosion is over-erosion**, and E02 vs E04 quantifies it: halving the second-pass
+      erosion recovers 0.05 of recall for 0.02 of counting.
+- [x] Anything reached by moving along the fusion/recall curve should be tried at **inference
+      first** — it costs minutes instead of hours, and the retrain has to beat it to justify
+      itself.
