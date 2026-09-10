@@ -369,6 +369,29 @@ BDAPPV turned out to be uniformly 400×400.
 > **Rule: when wall-clock and instrumented time disagree, the gap is the bug.** Per-epoch
 > timers only measure what you wrapped; compare against `timestamp` and the clock.
 
+### 3.19 Judging a label-space knob by label statistics ★
+
+**What happened.** Rendered the Open Buildings footprints at four erosion levels and counted
+connected components in the *labels*. 0.2 m separated +98 % more buildings for −7.2 % area;
+0.4 m added only 7 more points for another 7 % of area. The obvious reading: 0.2 m is the
+efficient choice and 0.4 m overpays. I reported that reading to Sirjan before checking the
+model-side sweep, which had already been run and had already answered it.
+
+**Why it was wrong.** The model trained on 0.2 m labels still under-counts buildings by 16 %
+(`pred/label` 0.8412); only 0.4 m reaches 0.9914. At 26.6 cm/px a 0.2 m erosion is ~0.75 px —
+the gap exists in the label but is too thin to survive the encoder's downsampling. It takes
+~1.5 px before the model reliably emits two components.
+
+**Shape.** A variant of pattern A: the label-component count *cannot* detect whether the model
+learns the gap, so it could not have contradicted the conclusion I drew from it. It is also a
+plain failure to check the experiment index before claiming something was untested — the
+answer was already in `experiments/2026-09-10-erosion-02/`.
+
+**Rule.** Never choose a label-space parameter from label statistics. The label is the input;
+`pred/label` on a trained model is the output, and only the output is the deliverable. And
+before proposing an experiment, grep `experiments/` for it — this sweep was closed hours
+earlier.
+
 ## 4. Pre-existing, still open
 
 - **BDAPPV has zero negative crops** (`MASTER_CONTEXT` C1). `prep_bdappv.py:85` drops

@@ -106,3 +106,36 @@ estimate, that is close to free.
   make this arm behave more like un-eroded than the interpolation suggests.
 - Same footprint-not-roof caveat as everything else (R12).
 - Single seed.
+
+---
+
+## Addendum (2026-09-10 evening) — the labels were inspected visually
+
+`scripts/viz_label_levels.py` renders the footprints over the imagery at all four levels for
+8 stratified crops, with connected-component counts **on the label side**:
+
+| erosion | label components | vs 0 m | label area |
+|---|---|---|---|
+| 0 m | 182 | — | — |
+| 0.2 m | 360 | **+98 %** | −7.2 % |
+| 0.4 m | 374 | +105 % | −14.4 % |
+| 0.8 m | 384 | +111 % | −28.5 % |
+
+**Read alone, this argues for 0.2 m** — it separates nearly twice as many buildings for half
+the area cost, and 0.2 → 0.4 m adds only 7 points of separation for another 7 % of area.
+
+**That reading is wrong, and the disagreement is the useful part.** Labels separate readily at
+0.2 m, but the *model trained on them* still under-counts by 16 % (`pred/label` 0.8412). Only
+at 0.4 m does it reach 0.9914. A gap the labels contain is not automatically a gap the model
+learns — at 0.75 px the separation is too thin to survive the encoder's downsampling, and it
+takes ~1.5 px before the model reliably emits two components.
+
+**Rule this establishes:** never pick an erosion level (or any label-space knob) from label
+statistics alone. The label is the input; `pred/label` is the output, and only the output is
+the deliverable. Recorded in `docs/PITFALLS.md`.
+
+Also refuted: **no polygon vanished entirely at any level**, including 0.8 m — the
+small-building wipe-out predicted above does not occur. The 0.8 m damage is area loss and
+over-fragmentation, not disappearance.
+
+Visual review page built by `scripts/viz_build_page.py`.
