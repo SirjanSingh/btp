@@ -135,7 +135,14 @@ statistics alone. The label is the input; `pred/label` is the output, and only t
 the deliverable. Recorded in `docs/PITFALLS.md`.
 
 Also refuted: **no polygon vanished entirely at any level**, including 0.8 m — the
-small-building wipe-out predicted above does not occur. The 0.8 m damage is area loss and
-over-fragmentation, not disappearance.
+small-building wipe-out predicted above does not occur.
+
+**Correction (same day, from the split-metric audit):** I wrote here that the 0.8 m damage is
+"area loss and over-fragmentation". The fragmentation half is wrong. `fragments_per_label` at
+0.8 m is **1.0354** — labels that get hit are hit by about one component, so buildings are not
+shattering. But `pred/label` is **1.4743**, which means ~30 % of predicted components touch no
+label at all. **Over-erosion makes the model hallucinate buildings into the gaps it was taught
+to expect, rather than fragment real ones.** See
+[`../2026-09-10-split-metric-audit/`](../2026-09-10-split-metric-audit/).
 
 Visual review page built by `scripts/viz_build_page.py`.

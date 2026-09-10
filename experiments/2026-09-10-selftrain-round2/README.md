@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ❌ negative — one round is the recipe |
 | **Date** | 2026-09-10 |
 
 ## Question
@@ -58,7 +58,55 @@ python solar_panel/train_solar.py --train_dir data/bdappv_st_r2/train \
 
 ## Results
 
-*pending*
+Checkpoint selected on **source** val, target reported at a fixed 0.5 operating point.
+
+| | pseudo-label thr | source @0.5 | **target @0.5** | target P | target R | target best |
+|---|---|---|---|---|---|---|
+| S1 source-only | — | 0.8723 | 0.5611 | 0.741 | 0.698 | 0.5611 |
+| **S4 round 1** | 0.4563 | 0.8745 | **0.6135** | 0.819 | 0.710 | 0.6165 @0.1 |
+| **S7 round 2** | 0.45 (fixed) | 0.8708 | **0.6104** | 0.819 | 0.706 | 0.6134 @0.1 |
+
+**Round 2 changed nothing: −0.0031 IoU, precision identical to three decimals.**
+
+**Prediction scorecard — missed, and in the direction that matters.** Predicted 0.615–0.645
+(+0.00 to +0.03); actual **0.6104**, just below the range and marginally below round 1. I also
+predicted precision would *rise* and recall stay flat; precision was **unchanged** (0.819 →
+0.819) and recall moved −0.004. The pre-registered failure mode — round 2 landing below round
+1 through error amplification — did not occur either: this is not drift, it is a null result.
+
+## Interpretation
+
+**Self-training saturates after one round here. It does not compound.** The −0.0031 gap is far
+inside seed noise, so the honest statement is *no measurable change*, not *worse*.
+
+**The mechanism is visible in the pseudo-labels, and it was the leading indicator I set in
+advance.** Round 1's teacher selected ~0.0059 of target pixels as foreground; round 2's teacher,
+at essentially the same threshold, selected **0.00574**. Nearly the same pixels, so nearly the
+same training set, so nearly the same model. A better teacher did not produce a *different*
+pseudo-label set — it produced the same one.
+
+**Why that is not surprising in hindsight.** A fixed threshold selects what the model is
+already confident about. Round 1 improved the model mostly on examples it was *already* getting
+right, which does not move the confident set. The pixels that would add information are exactly
+the ones both rounds are confidently wrong about, and no amount of self-labelling reaches them —
+the method cannot teach itself what it does not already suspect.
+
+**This contradicts the CBST literature's reported compounding gains**, and the S6 result
+suggests why: those gains are usually reported with a *ratio* policy that forcibly injects new
+foreground each round. That policy is precisely what S6 measured as harmful here (crossover
+between ratio 0.008 and 0.012). So the mechanism that generates multi-round gains in the
+literature is the same one that destroys performance on this domain gap. **Rounds and ratio
+are not independent choices** — taking the safe threshold policy also forfeits compounding.
+
+**Budget consequence.** Round 2 cost ~2.6 GPU-hours for zero gain. On Jaipur, where nothing can
+be measured, running extra rounds would have felt like diligence and produced nothing.
+
+## Decision
+
+- [x] **One round. Fixed threshold ~0.45.** That is the Stage-2 self-training recipe.
+- [x] **Do not run round 3.** Two consecutive rounds with a flat result is enough.
+- [ ] If multi-round is ever revisited, the lever must be *diversity* of the pseudo-label set
+      (augmentation-consistency, or a second teacher), not another pass at the same threshold.
 
 ## Threats to validity
 

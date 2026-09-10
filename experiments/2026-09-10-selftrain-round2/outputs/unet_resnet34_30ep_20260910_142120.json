@@ -352,7 +352,47 @@
       "lr": 3.4227024433898994e-06,
       "elapsed_s": 315.2,
       "note": ""
+    },
+    {
+      "epoch": 28,
+      "tr_loss": 0.039988,
+      "va_loss": 0.042687,
+      "iou": 0.869989,
+      "f1": 0.930475,
+      "precision": 0.928695,
+      "recall": 0.932261,
+      "lr": 2.0816937636766182e-06,
+      "elapsed_s": 318.9,
+      "note": ""
+    },
+    {
+      "epoch": 29,
+      "tr_loss": 0.040505,
+      "va_loss": 0.042706,
+      "iou": 0.869876,
+      "f1": 0.93041,
+      "precision": 0.928538,
+      "recall": 0.93229,
+      "lr": 1.2711661792704665e-06,
+      "elapsed_s": 318.2,
+      "note": ""
+    },
+    {
+      "epoch": 30,
+      "tr_loss": 0.040307,
+      "va_loss": 0.042743,
+      "iou": 0.870115,
+      "f1": 0.930547,
+      "precision": 0.929118,
+      "recall": 0.931981,
+      "lr": 1e-06,
+      "elapsed_s": 319.1,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.870818,
+    "best_epoch": 26,
+    "checkpoint": "experiments/2026-09-10-selftrain-round2/ckpt/unet_resnet34_30ep_20260910_142120/best.pth"
+  }
 }

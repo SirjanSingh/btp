@@ -51,18 +51,6 @@ first honest number** and calibrate how far the OB proxy sits from reality.
 *Needs:* a labelling setup (browser tool writing masks, or QGIS-ready GeoTIFF + shapefile).
 
 
-### R11 · Fix the split-rate metric ★★ it is silently blind
-A label counts as "split" only if >= 2 predictions each cover >= 50 % of it, so fragments
-smaller than half a building never qualify. At 0.8 m erosion the model shattered buildings
-badly enough to reach pred/label 1.4743 while split rate read **0.0**. Every split rate in
-this repo is suspect. Count a label as split if >= 2 predictions overlap it at all, and
-report fragments-per-label alongside.
-*Needs:* small change in `scripts/merge_split_rate.py`, then re-run the four saved
-checkpoints. CPU + brief GPU.
-
-
-
-
 ### R5 · Self-training / CBST on top of the weak model
 Pseudo-label Jaipur with the weak model, keep confident pixels using the **measured** 23 %
 class ratio (not a fixed 0.95), retrain. This is the Tier-3 UDA arm the supervisor's
@@ -85,15 +73,6 @@ baseline is unreproducible precisely because that script never existed.
 ---
 
 ## Queue — solar (Stage 2)
-
-### S7 · Multi-round confidence self-training — ⏳ RUNNING (round 2, GPU 2)
-S4 was one round. Round 2 launched 2026-09-10 using a **fixed 0.45 threshold** rather than a
-ratio policy, per the S6 decision. Write-up and prediction:
-`experiments/2026-09-10-selftrain-round2/`. **Predict 0.615-0.645** (+0.00 to +0.03).
-Round-2 teacher selects 0.00574 of pixels vs S4's ~0.0059 — confidence did not inflate.
-
-
-
 
 ### S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
 `prep_bdappv.py:85` drops mask-less images, so **every** training crop contains a panel and
@@ -123,6 +102,8 @@ first. Until then every Stage-2 precision number, S1's included, measures the wr
 | **S1 solar google→ign** | source 0.8723 → **target 0.5611**; best thr 0.5 on both, so not calibration |
 | **R8 merge/split rate** | **50 % of buildings merged** at IoU 0.648; MiT-B2 4.3 pts better; split rate 0 |
 | **S5 solar RAM cache** | ported; solar runs no longer dataloader-bound at ~340 s/epoch |
+| **R11 split-metric audit** | Metric sound; `split_strict` 0.0 at every level. 0.8 m over-erosion **hallucinates** buildings (30 % of preds touch no label), not fragments |
+| **S7 multi-round self-training** | **Saturates after one round** — 0.6135 → 0.6104; rounds and ratio are not independent levers |
 | **S6 threshold cliff** | **No cliff — a plateau.** thr 0.01-0.46 all within 0.023 IoU; CBST crossover between ratio 0.008 and 0.012 |
 | **S4 confidence self-training** | **0.5611 → 0.6165** on target, beats baseline; CBST ratio-matching was the problem |
 | **D4 adjacency** | **78 %** of buildings touch a neighbour — merging workstream justified |

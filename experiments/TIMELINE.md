@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 22:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 22:23 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -197,11 +197,12 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | ✅ done — **confounded; see cross-eval** | **Unresolved** — each model wins on its own labels; needs ground truth |
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
 | 2026-09-10 | [`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/) | ✅ done — modest win | **+0.0086** (0.6569) and **2× faster convergence**; gain is all precision |
-| 2026-09-10 | [`2026-09-10-selftrain-round2`](2026-09-10-selftrain-round2/) | running | — |
+| 2026-09-10 | [`2026-09-10-selftrain-round2`](2026-09-10-selftrain-round2/) | ❌ negative — one round is the recipe | **No — it saturates.** 0.6135 → 0.6104; teacher selects the same pixels |
 | 2026-09-10 | [`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/) | ✅ done — cliff located; stated mechanism refuted | **No cliff — a plateau.** thr 0.01–0.46 all within 0.023 IoU; collapse only below 0.01 |
 | 2026-09-10 | [`2026-09-10-solar-google-to-ign`](2026-09-10-solar-google-to-ign/) | ✅ done | **0.8723 → 0.5611** (−31 pts); a capability drop, not miscalibration |
 | 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | ✅ done — **strong negative result** | **No — it destroys it.** 0.5611 → **0.3752** on target |
 | 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
+| 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
 
 ### Why each was run, and what was expected
 
@@ -280,8 +281,10 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** **+0.03 to +0.08 IoU** (so ~0.68–0.73). A transformer's global receptive field should help most where buildings are dense and share walls — exactly Jaipur, and exactly the instance-merging failure the project worries about. Risk: 7,371 crops is small for a transformer, which may underperform at this data scale.
 
-**[`2026-09-10-selftrain-round2`](2026-09-10-selftrain-round2/)** — running
+**[`2026-09-10-selftrain-round2`](2026-09-10-selftrain-round2/)** — ❌ negative — one round is the recipe
 > **Why:** rounds are the cheapest remaining lever — no new data, no new architecture, just another pass. If they compound, the Jaipur transfer should run 2–3 rounds. If they saturate or degrade, one round is the recipe and the extra compute goes elsewhere.
+>
+> **Expected:** (0.819 → 0.819) and recall moved −0.004. The pre-registered failure mode — round 2 landing below round 1 through error amplification — did not occur either: this is not drift, it is a null result.
 
 **[`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/)** — ✅ done — cliff located; stated mechanism refuted
 > **Why:** a Jaipur transfer has no labels, so the threshold must be chosen blind. Knowing *where* the cliff is — and how sharp — determines how much margin to leave.
@@ -302,17 +305,23 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** **0.50–0.58** — recovering most of the loss but landing at or slightly below the 0.5611 source-only baseline. Reasoning: a sane threshold stops the noise-labelling, but self-training can still only reinforce what the model already believes, and the source-only model is wrong about 44 % of the target. Precision should recover to ~0.65–0.75.
 
+**[`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/)** — ✅ done — metric vindicated, interpretation corrected
+> **Why:** merge and split rates are the metrics this project reports *instead of* IoU, on the grounds that IoU cannot see instance errors. If they are themselves blind, the argument collapses.
+>
+> **Expected:** the published split rates are wrong and will move once recomputed with the loose (≥ 10 %) definition.
 
-**20 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+
+**21 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-125 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+126 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  64 commits
+### 2026-09-10  ·  65 commits
 
+- `22:00` **44d03f8** Regenerate ledger and timeline (round2 ep27, r010 ep22)
 - `21:58` **5224391** Regenerate ledger and timeline (round2 ep27, r010 ep21)
 - `21:30` **efe1381** Regenerate ledger and timeline (round2 ep21, r010 ep17)
 - `21:00` **ebea40c** Regenerate ledger and timeline (round2 ep15, r010 ep12)
@@ -479,11 +488,9 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 The half of the record that is normally lost. An idea absent from this repo was either never had, or was had and forgotten — and there is no way to tell later.
 
 - queued — R12 · Hand-label ~30 Jaipur tiles ★★★ nothing else can be validated without it
-- queued — R11 · Fix the split-rate metric ★★ it is silently blind
 - queued — R5 · Self-training / CBST on top of the weak model
 - queued — R6 · Multi-source co-training
 - queued — R7 · Low-resolution simulation
-- queued — S7 · Multi-round confidence self-training — ⏳ RUNNING (round 2, GPU 2)
 - ⛔ **blocked** — S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
 
 ---

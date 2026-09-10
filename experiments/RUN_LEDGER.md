@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-10 22:00 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-10 22:23 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**64 runs · 36 checkpoints currently on disk**
+**68 runs · 36 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -38,7 +38,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `unet_mit_b2_40ep_20260910_053557` | rooftop | train | 34 | **0.6393** | 19 | 0.7799 | 0.7823 | 0.7776 |
 | `unet_resnet34_30ep_20260910_083614` | solar | train | 30 | **0.8745** | 30 | 0.9331 | 0.9301 | 0.9360 |
 | `unet_mit_b2_40ep_20260910_090326` | rooftop | train | 40 | **0.6540** | 26 | 0.7908 | 0.7647 | 0.8188 |
-| `unet_resnet34_30ep_20260910_142120` | rooftop | train | 27 | **0.8708** | 26 | 0.9309 | 0.9321 | 0.9298 |
+| `unet_resnet34_30ep_20260910_142120` | rooftop | train | 30 | **0.8708** | 26 | 0.9309 | 0.9321 | 0.9298 |
 | `d1_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d4_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -52,6 +52,9 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `mit_b2_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `mit_b2_eroded_dilate2` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `mit_b2_eroded_rerun` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `r11_split_e02` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `r11_split_e04` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `r11_split_e08` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `r3_cross_eval` | diagnostic | eval | 0 | — | — | — | — | — |
 | `resnet34` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `resnet34_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -60,6 +63,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `s4_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s6_r008_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s6_r012_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `s7_round2_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_111230` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_112025` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_115938` | rooftop | train (txt only) | 0 | — | — | — | — | — |
@@ -96,6 +100,9 @@ Kept deliberately — a crashed configuration is evidence too.
 - `mit_b2_eroded` (diagnostics/merge_split/mit_b2_eroded.json)
 - `mit_b2_eroded_dilate2` (diagnostics/merge_split/mit_b2_eroded_dilate2.json)
 - `mit_b2_eroded_rerun` (diagnostics/merge_split/mit_b2_eroded_rerun.json)
+- `r11_split_e02` (diagnostics/r11_split_e02.json)
+- `r11_split_e04` (diagnostics/r11_split_e04.json)
+- `r11_split_e08` (diagnostics/r11_split_e08.json)
 - `r3_cross_eval` (diagnostics/r3_cross_eval.json)
 - `resnet34` (diagnostics/merge_split/resnet34.json)
 - `resnet34_eroded` (diagnostics/merge_split/resnet34_eroded.json)
@@ -104,6 +111,7 @@ Kept deliberately — a crashed configuration is evidence too.
 - `s4_crossdomain` (diagnostics/s4_crossdomain.json)
 - `s6_r008_crossdomain` (diagnostics/s6_r008_crossdomain.json)
 - `s6_r012_crossdomain` (diagnostics/s6_r012_crossdomain.json)
+- `s7_round2_crossdomain` (diagnostics/s7_round2_crossdomain.json)
 - `unet_resnet34_100ep_20260330_111230` (logs/unet_resnet34_100ep_20260330_111230.txt)
 - `unet_resnet34_100ep_20260330_112025` (logs/unet_resnet34_100ep_20260330_112025.txt)
 - `unet_resnet34_100ep_20260330_115938` (logs/unet_resnet34_100ep_20260330_115938.txt)
