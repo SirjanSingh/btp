@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-10 22:23 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-10 22:41 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**68 runs · 36 checkpoints currently on disk**
+**69 runs · 36 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -62,6 +62,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `s2_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s4_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s6_r008_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `s6_r010_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s6_r012_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s7_round2_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_111230` | rooftop | train (txt only) | 0 | — | — | — | — | — |
@@ -110,6 +111,7 @@ Kept deliberately — a crashed configuration is evidence too.
 - `s2_crossdomain` (diagnostics/s2_crossdomain.json)
 - `s4_crossdomain` (diagnostics/s4_crossdomain.json)
 - `s6_r008_crossdomain` (diagnostics/s6_r008_crossdomain.json)
+- `s6_r010_crossdomain` (diagnostics/s6_r010_crossdomain.json)
 - `s6_r012_crossdomain` (diagnostics/s6_r012_crossdomain.json)
 - `s7_round2_crossdomain` (diagnostics/s7_round2_crossdomain.json)
 - `unet_resnet34_100ep_20260330_111230` (logs/unet_resnet34_100ep_20260330_111230.txt)

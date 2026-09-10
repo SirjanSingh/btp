@@ -146,3 +146,37 @@ knee rather than a slope. Precision ~0.60–0.65, recall ~0.83–0.85 by the sam
 If it lands **above 0.5611**, the usable ratio range extends further than the two-point
 bracket suggested and CBST is less dangerous than S6 concluded — the honest test of that
 conclusion.
+
+### Result — ratio 0.010
+
+**Target @0.5 = 0.5377** (best 0.5523 @thr 0.8), P **0.622**, R **0.832**; source 0.8727.
+
+**Prediction hit on all three counts** — 0.53–0.57 → 0.5377; P 0.60–0.65 → 0.622;
+R 0.83–0.85 → 0.832. Linear interpolation had said 0.539 and the arm returned 0.5377.
+
+**The decline is linear in ratio, with a knee at ~0.008.** Slope per unit ratio:
+
+| interval | ΔIoU / Δratio |
+|---|---|
+| 0.0059 → 0.008 | −11.0 |
+| 0.008 → 0.010 | −26.4 |
+| 0.010 → 0.012 | −24.7 |
+| 0.012 → 0.0183 | −20.8 |
+
+Flat-ish below 0.008, then a steady ~−25 per unit. Full curve, target @0.5:
+
+| ratio | 0.0059 | 0.008 | **0.010** | 0.012 | 0.0183 |
+|---|---|---|---|---|---|
+| target IoU | 0.6135 | 0.5904 | **0.5377** | 0.4884 | 0.3576 |
+| precision | 0.819 | 0.695 | **0.622** | 0.525 | 0.371 |
+| recall | 0.710 | 0.797 | **0.832** | 0.875 | 0.908 |
+
+**Crossover located: ratio ≈ 0.0091.** Between 0.008 (0.5904, above the 0.5611 baseline) and
+0.010 (0.5377, below it); interpolating on the measured −26.4 slope gives **0.0091**. The
+earlier 0.008–0.012 bracket is now 0.008–0.010.
+
+**The headline this buys.** The source foreground prior is **0.0183** — and CBST prescribes
+matching it. That is **2× past the ratio where self-training stops helping at all**. The
+prescribed setting is not merely suboptimal; it sits at double the break-even point, which is
+why S2 landed at 0.3576 rather than somewhere near baseline.
+

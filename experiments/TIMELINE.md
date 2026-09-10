@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 22:23 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 22:41 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -194,11 +194,12 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/) | ✅ done — reproduced | **0.6393** (orig 0.6405); pred/label **0.9914**, split 0.084 |
 | 2026-09-10 | [`2026-09-10-erosion-02`](2026-09-10-erosion-02/) | ✅ done — completes the sweep | **No** — monotonic curve; 0.4 m is the only point with pred/label ≈ 1 |
 | 2026-09-10 | [`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/) | ✅ done — **0.8 m over-erodes** | **0.8 m over-erodes** — merge 0.13 but pred/label 1.47; 0.4 m is the optimum |
+| 2026-09-10 | [`2026-09-10-jaipur-selftrain`](2026-09-10-jaipur-selftrain/) | running | — |
 | 2026-09-10 | [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | ✅ done — **confounded; see cross-eval** | **Unresolved** — each model wins on its own labels; needs ground truth |
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
 | 2026-09-10 | [`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/) | ✅ done — modest win | **+0.0086** (0.6569) and **2× faster convergence**; gain is all precision |
 | 2026-09-10 | [`2026-09-10-selftrain-round2`](2026-09-10-selftrain-round2/) | ❌ negative — one round is the recipe | **No — it saturates.** 0.6135 → 0.6104; teacher selects the same pixels |
-| 2026-09-10 | [`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/) | ✅ done — cliff located; stated mechanism refuted | **No cliff — a plateau.** thr 0.01–0.46 all within 0.023 IoU; collapse only below 0.01 |
+| 2026-09-10 | [`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/) | ✅ done — cliff located; stated mechanism refuted | **No cliff — a plateau.** thr 0.01–0.46 within 0.023 IoU; CBST's prescribed ratio is **2× past break-even** (0.0091) |
 | 2026-09-10 | [`2026-09-10-solar-google-to-ign`](2026-09-10-solar-google-to-ign/) | ✅ done | **0.8723 → 0.5611** (−31 pts); a capability drop, not miscalibration |
 | 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | ✅ done — **strong negative result** | **No — it destroys it.** 0.5611 → **0.3752** on target |
 | 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
@@ -266,6 +267,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** - **merge rate below 0.25**, down from 0.3256. - **split rate finally rises above 0** — somewhere around 0.02–0.08. If it stays at exactly 0.0 again, that is a real surprise and means the model simply never over-segments at any erosion this side of destroying the labels. - **missed rate rises further**, ~0.36–0.42; more erosion means more conservatism. - **IoU 0.61–0.63**, below 0.6405. - **`pred/
 
+**[`2026-09-10-jaipur-selftrain`](2026-09-10-jaipur-selftrain/)** — running
+> **Why:** this is the first UDA method in the project applied to the actual target with evidence behind its hyperparameters rather than a guess. `MASTER_CONTEXT`'s ordering principle in full: settle where measurable, freeze, transfer blind.
+>
+> **Expected:** 1. **The ratio→threshold map will be far flatter than solar's.** Selecting 23 % of pixels should land at a threshold of order **0.2–0.5**, not 0.0004. If it lands below 0.05, the rooftop model is as poorly calibrated on Jaipur as the solar model was on IGN, and the S6 warning transfers intact. 2. **Self-training will help, modestly: `pred/label` stays within 0.95–1.05 and merge rate improves by 0.
+
 **[`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/)** — ✅ done — **confounded; see cross-eval**
 > **Why:** the baseline discards **205,076 buildings** — 39% of the dataset — on a confidence threshold nobody has justified with a measurement. Open Buildings is least confident about buildings that are small, irregular, or densely packed, which in Jaipur are plausibly the **hard and important** ones. If discarding them costs accuracy, the threshold is throwing away exactly the signal the project needs; if 
 >
@@ -311,16 +317,17 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 > **Expected:** the published split rates are wrong and will move once recomputed with the loose (≥ 10 %) definition.
 
 
-**21 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+**22 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-126 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+127 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  65 commits
+### 2026-09-10  ·  66 commits
 
+- `22:23` **df8097b** S7 round 2 saturates; R11 audit corrects the 0.8 m diagnosis
 - `22:00` **44d03f8** Regenerate ledger and timeline (round2 ep27, r010 ep22)
 - `21:58` **5224391** Regenerate ledger and timeline (round2 ep27, r010 ep21)
 - `21:30` **efe1381** Regenerate ledger and timeline (round2 ep21, r010 ep17)
