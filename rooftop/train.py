@@ -166,7 +166,8 @@ class RunLogger:
 class FolderDataset(Dataset):
     """Load pre-tiled crops from images/ + masks/ subdirectories."""
 
-    def __init__(self, data_dir: str, transform=None, max_samples: int = None):
+    def __init__(self, data_dir: str, transform=None, max_samples: int = None,
+                 cache_ram: bool = False):
         self.img_dir  = Path(data_dir) / "images"
         self.msk_dir  = Path(data_dir) / "masks"
         self.paths    = sorted(self.img_dir.glob("*.png"))
@@ -176,6 +177,30 @@ class FolderDataset(Dataset):
         if not self.paths:
             raise FileNotFoundError(f"No .png files found in {self.img_dir}")
 
+        # Measured on this node: PNG decode costs 11.6 ms/image, so one worker
+        # sustains ~86 img/s and three sustain far less under a load average of
+        # 200+. GPU utilisation was a 0->97->0 sawtooth: the GPU idles waiting
+        # for the dataloader. Decoding once into RAM removes that entirely --
+        # 7,371 crops is 7.7 GB against ~397 GB free, and DataLoader workers are
+        # forked, so the arrays are copy-on-write shared rather than duplicated.
+        self.cache = None
+        if cache_ram:
+            n = len(self.paths)
+            print(f"Caching {n} crops into RAM "
+                  f"(~{n * 512 * 512 * 4 / 1e9:.1f} GB) ...", flush=True)
+            imgs = np.empty((n, 512, 512, 3), np.uint8)
+            msks = np.empty((n, 512, 512), np.uint8)
+            for i, ip in enumerate(self.paths):
+                im = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
+                mk = cv2.imread(str(self.msk_dir / ip.name), cv2.IMREAD_GRAYSCALE)
+                imgs[i] = im if im.shape[:2] == (512, 512) else cv2.resize(im, (512, 512))
+                msks[i] = mk if mk.shape[:2] == (512, 512) else cv2.resize(
+                    mk, (512, 512), interpolation=cv2.INTER_NEAREST)
+                if (i + 1) % 2000 == 0:
+                    print(f"  cached {i+1}/{n}", flush=True)
+            self.cache = (imgs, msks)
+            print("Cache ready.", flush=True)
+
     def __len__(self):
         return len(self.paths)
 
@@ -183,8 +208,11 @@ class FolderDataset(Dataset):
         ip = self.paths[idx]
         mp = self.msk_dir / ip.name
 
-        img  = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
-        mask = cv2.imread(str(mp), cv2.IMREAD_GRAYSCALE)
+        if self.cache is not None:
+            img, mask = self.cache[0][idx], self.cache[1][idx]
+        else:
+            img  = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
+            mask = cv2.imread(str(mp), cv2.IMREAD_GRAYSCALE)
         # Handle both 0/1 masks (AIRS default) and 0/255 masks
         if mask.max() <= 1:
             mask = (mask > 0).astype(np.float32)
@@ -444,15 +472,18 @@ def main(args):
         train_ds = CSVDataset(args.train_csv, args.image_dir, args.mask_dir, train_aug())
         val_ds   = CSVDataset(args.val_csv,   args.image_dir, args.mask_dir, val_aug())
     else:
-        train_ds = FolderDataset(args.train_dir, train_aug(simulate_low_res=args.simulate_low_res), max_samples=args.max_samples)
-        val_ds   = FolderDataset(args.val_dir,   val_aug(),   max_samples=val_cap)
+        train_ds = FolderDataset(args.train_dir, train_aug(simulate_low_res=args.simulate_low_res), max_samples=args.max_samples, cache_ram=args.cache_ram)
+        val_ds   = FolderDataset(args.val_dir,   val_aug(),   max_samples=val_cap, cache_ram=args.cache_ram)
 
+    # persistent_workers avoids tearing down and re-forking the worker pool every
+    # epoch; with a RAM cache that re-fork would also re-touch the shared pages.
+    _extra = dict(persistent_workers=True, prefetch_factor=4) if args.workers else {}
     train_loader = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True,
-        num_workers=args.workers, pin_memory=True, drop_last=True)
+        num_workers=args.workers, pin_memory=True, drop_last=True, **_extra)
     val_loader = DataLoader(
         val_ds, batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, pin_memory=True)
+        num_workers=args.workers, pin_memory=True, **_extra)
 
     print(f"Train   : {len(train_ds)} crops  ({len(train_loader)} batches)")
     print(f"Val     : {len(val_ds)} crops  ({len(val_loader)} batches)")
@@ -613,6 +644,10 @@ def parse_args():
     g = p.add_argument_group("Data — folder mode (pre-tiled crops)")
     g.add_argument("--train_dir",    default=None, help="Dir with images/ masks/ for training")
     g.add_argument("--val_dir",      default=None, help="Dir with images/ masks/ for validation")
+    g.add_argument("--cache_ram", action="store_true",
+                   help="decode the whole crop set into RAM once. Measured: PNG "
+                        "decode is 11.6 ms/image on this node and the GPU idles "
+                        "in a 0->97%% sawtooth waiting for it")
     g.add_argument("--max_samples",  type=int, default=None,
                    help="Cap training samples (val capped proportionally). E.g. 2000 for quick test")
 

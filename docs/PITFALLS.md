@@ -307,6 +307,29 @@ rather than by my applying it deliberately.
 > A pattern that assumes an exact directory name fails silently and looks like absence of
 > data rather than a bug.
 
+### 3.16 Training was dataloader-bound, not GPU-bound — 3.7× left on the table
+Sampling `utilization.gpu` every 2 s during two live runs gave a **0 → 97 → 0 sawtooth**
+(means ~44 % and ~67 %). That pattern is not a busy GPU; it is a GPU idling between batches.
+
+Measured cause: **PNG decode costs 11.6 ms/image** on this node, so one worker sustains ~86
+img/s and three sustain far less at a load average of 200+. CPU is the contended resource on
+this box, and every crop was being decoded again on every epoch.
+
+The machine has **397 GB RAM free** and the whole crop set is **7.7 GB**. Decoding once into
+RAM at startup removes the bottleneck outright; DataLoader workers are forked, so the arrays
+are copy-on-write shared rather than duplicated per worker.
+
+| 1,600 crops, batch 16, 3 workers | epoch time |
+|---|---|
+| default | 74.4 s |
+| `--cache_ram` | **20.2 s** |
+
+**3.68× on identical config under the same contention.** Also added
+`persistent_workers=True` and `prefetch_factor=4`.
+
+> **Rule: before tuning a model, sample GPU utilisation. A sawtooth means the bottleneck is
+> upstream, and no amount of batch-size or architecture work will fix it.**
+
 ## 4. Pre-existing, still open
 
 - **BDAPPV has zero negative crops** (`MASTER_CONTEXT` C1). `prep_bdappv.py:85` drops
