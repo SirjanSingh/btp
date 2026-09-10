@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-10T19:30:09",
- "n_runs": 61,
+ "generated": "2026-09-10T19:55:03",
+ "n_runs": 64,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
   "experiments/2026-09-09-does-the-airs-seed-help/checkpoints/unet_resnet34_40ep_20260909_171814/best.pth",
@@ -10,6 +10,7 @@
   "experiments/2026-09-10-erosion-sweep/checkpoints/unet_mit_b2_40ep_20260910_033956/best.pth",
   "experiments/2026-09-10-label-quantity-vs-quality/checkpoints/unet_resnet34_40ep_20260909_210501/best.pth",
   "experiments/2026-09-10-segformer-backbone/checkpoints/unet_mit_b2_40ep_20260909_201300/best.pth",
+  "experiments/2026-09-10-selftrain-round2/ckpt/unet_resnet34_30ep_20260910_142120/best.pth",
   "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r008/unet_resnet34_30ep_20260910_114523/best.pth",
   "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r008/unet_resnet34_30ep_20260910_123658/best.pth",
   "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r012/unet_resnet34_30ep_20260910_114531/best.pth",
@@ -10309,6 +10310,63 @@
    ]
   },
   {
+   "run_name": "unet_resnet34_30ep_20260910_142120",
+   "log": "experiments/2026-09-10-selftrain-round2/outputs/unet_resnet34_30ep_20260910_142120.json",
+   "stage": "rooftop",
+   "kind": "train",
+   "timestamp": "2026-09-10T14:21:20.014599",
+   "config": {
+    "cache_ram": true,
+    "max_samples": null,
+    "train_dir": "data/bdappv_st_r2/train",
+    "val_dir": "data/bdappv_split/google_val",
+    "arch": "unet",
+    "encoder": "resnet34",
+    "encoder_weights": "imagenet",
+    "epochs": 30,
+    "batch_size": 16,
+    "crop_size": 512,
+    "lr": 0.0001,
+    "threshold": 0.5,
+    "patience": 15,
+    "workers": 3,
+    "seed": 42,
+    "ckpt_dir": "experiments/2026-09-10-selftrain-round2/ckpt",
+    "log_dir": "experiments/2026-09-10-selftrain-round2/outputs",
+    "resume": null,
+    "save_every": 999
+   },
+   "hardware": {
+    "device": "cuda",
+    "n_gpus": 1,
+    "gpu_name": "Tesla V100-SXM2-32GB",
+    "cuda_version": "12.4"
+   },
+   "n_epochs": 1,
+   "best_epoch": 1,
+   "best_iou": 0.778894,
+   "best_f1": 0.875706,
+   "best_precision": 0.827226,
+   "best_recall": 0.930222,
+   "summary": {},
+   "threshold_sweep": null,
+   "results": null,
+   "epochs": [
+    {
+     "epoch": 1,
+     "tr_loss": 0.406231,
+     "va_loss": 0.118282,
+     "iou": 0.778894,
+     "f1": 0.875706,
+     "precision": 0.827226,
+     "recall": 0.930222,
+     "lr": 9.972883382072954e-05,
+     "elapsed_s": 193.5,
+     "note": "\u2190 best"
+    }
+   ]
+  },
+  {
    "run_name": "d1_summary",
    "log": "diagnostics/d1/d1_summary.json",
    "stage": "diagnostic",
@@ -11481,6 +11539,214 @@
       "iou": 0.6083,
       "precision": 0.8345,
       "recall": 0.6918
+     }
+    }
+   },
+   "epochs": []
+  },
+  {
+   "run_name": "s6_r008_crossdomain",
+   "log": "diagnostics/s6_r008_crossdomain.json",
+   "stage": "diagnostic",
+   "kind": "diagnostic",
+   "timestamp": "",
+   "config": {},
+   "hardware": {},
+   "n_epochs": 0,
+   "best_epoch": null,
+   "best_iou": null,
+   "best_f1": null,
+   "best_precision": null,
+   "best_recall": null,
+   "summary": {},
+   "threshold_sweep": null,
+   "results": {
+    "google_val (source)": {
+     "0.1": {
+      "iou": 0.8674,
+      "precision": 0.9118,
+      "recall": 0.9468
+     },
+     "0.2": {
+      "iou": 0.8698,
+      "precision": 0.9194,
+      "recall": 0.9417
+     },
+     "0.3": {
+      "iou": 0.8709,
+      "precision": 0.9239,
+      "recall": 0.9382
+     },
+     "0.4": {
+      "iou": 0.8714,
+      "precision": 0.9275,
+      "recall": 0.9352
+     },
+     "0.5": {
+      "iou": 0.8717,
+      "precision": 0.9306,
+      "recall": 0.9324
+     },
+     "0.6": {
+      "iou": 0.8717,
+      "precision": 0.9335,
+      "recall": 0.9294
+     },
+     "0.7": {
+      "iou": 0.8715,
+      "precision": 0.9367,
+      "recall": 0.9261
+     },
+     "0.8": {
+      "iou": 0.871,
+      "precision": 0.9405,
+      "recall": 0.9217
+     }
+    },
+    "ign_val (TARGET)": {
+     "0.1": {
+      "iou": 0.5715,
+      "precision": 0.6553,
+      "recall": 0.817
+     },
+     "0.2": {
+      "iou": 0.5797,
+      "precision": 0.6714,
+      "recall": 0.8093
+     },
+     "0.3": {
+      "iou": 0.5843,
+      "precision": 0.6809,
+      "recall": 0.8046
+     },
+     "0.4": {
+      "iou": 0.5875,
+      "precision": 0.6882,
+      "recall": 0.8007
+     },
+     "0.5": {
+      "iou": 0.5904,
+      "precision": 0.6948,
+      "recall": 0.7971
+     },
+     "0.6": {
+      "iou": 0.5929,
+      "precision": 0.7012,
+      "recall": 0.7934
+     },
+     "0.7": {
+      "iou": 0.5955,
+      "precision": 0.7082,
+      "recall": 0.7891
+     },
+     "0.8": {
+      "iou": 0.5982,
+      "precision": 0.7167,
+      "recall": 0.7834
+     }
+    }
+   },
+   "epochs": []
+  },
+  {
+   "run_name": "s6_r012_crossdomain",
+   "log": "diagnostics/s6_r012_crossdomain.json",
+   "stage": "diagnostic",
+   "kind": "diagnostic",
+   "timestamp": "",
+   "config": {},
+   "hardware": {},
+   "n_epochs": 0,
+   "best_epoch": null,
+   "best_iou": null,
+   "best_f1": null,
+   "best_precision": null,
+   "best_recall": null,
+   "summary": {},
+   "threshold_sweep": null,
+   "results": {
+    "google_val (source)": {
+     "0.1": {
+      "iou": 0.8668,
+      "precision": 0.9104,
+      "recall": 0.9477
+     },
+     "0.2": {
+      "iou": 0.8691,
+      "precision": 0.9178,
+      "recall": 0.9424
+     },
+     "0.3": {
+      "iou": 0.87,
+      "precision": 0.9223,
+      "recall": 0.9389
+     },
+     "0.4": {
+      "iou": 0.8705,
+      "precision": 0.9258,
+      "recall": 0.9359
+     },
+     "0.5": {
+      "iou": 0.8708,
+      "precision": 0.9288,
+      "recall": 0.933
+     },
+     "0.6": {
+      "iou": 0.8708,
+      "precision": 0.9319,
+      "recall": 0.93
+     },
+     "0.7": {
+      "iou": 0.8706,
+      "precision": 0.935,
+      "recall": 0.9266
+     },
+     "0.8": {
+      "iou": 0.8699,
+      "precision": 0.9388,
+      "recall": 0.9222
+     }
+    },
+    "ign_val (TARGET)": {
+     "0.1": {
+      "iou": 0.4573,
+      "precision": 0.4852,
+      "recall": 0.8883
+     },
+     "0.2": {
+      "iou": 0.4697,
+      "precision": 0.5009,
+      "recall": 0.8829
+     },
+     "0.3": {
+      "iou": 0.4772,
+      "precision": 0.5106,
+      "recall": 0.8796
+     },
+     "0.4": {
+      "iou": 0.4832,
+      "precision": 0.5183,
+      "recall": 0.8769
+     },
+     "0.5": {
+      "iou": 0.4884,
+      "precision": 0.5252,
+      "recall": 0.8745
+     },
+     "0.6": {
+      "iou": 0.4934,
+      "precision": 0.532,
+      "recall": 0.8719
+     },
+     "0.7": {
+      "iou": 0.499,
+      "precision": 0.5395,
+      "recall": 0.8691
+     },
+     "0.8": {
+      "iou": 0.5056,
+      "precision": 0.5487,
+      "recall": 0.8656
      }
     }
    },

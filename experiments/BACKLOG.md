@@ -86,9 +86,11 @@ baseline is unreproducible precisely because that script never existed.
 
 ## Queue — solar (Stage 2)
 
-### S7 · Multi-round confidence self-training
-S4 was one round. CBST literature reports compounding gains over 2-3 rounds; re-pseudo-label
-with the S4 model and repeat. **Predict: +0.02-0.04 more, with diminishing returns.**
+### S7 · Multi-round confidence self-training — ⏳ RUNNING (round 2, GPU 2)
+S4 was one round. Round 2 launched 2026-09-10 using a **fixed 0.45 threshold** rather than a
+ratio policy, per the S6 decision. Write-up and prediction:
+`experiments/2026-09-10-selftrain-round2/`. **Predict 0.615-0.645** (+0.00 to +0.03).
+Round-2 teacher selects 0.00574 of pixels vs S4's ~0.0059 — confidence did not inflate.
 
 
 
@@ -121,6 +123,7 @@ first. Until then every Stage-2 precision number, S1's included, measures the wr
 | **S1 solar google→ign** | source 0.8723 → **target 0.5611**; best thr 0.5 on both, so not calibration |
 | **R8 merge/split rate** | **50 % of buildings merged** at IoU 0.648; MiT-B2 4.3 pts better; split rate 0 |
 | **S5 solar RAM cache** | ported; solar runs no longer dataloader-bound at ~340 s/epoch |
+| **S6 threshold cliff** | **No cliff — a plateau.** thr 0.01-0.46 all within 0.023 IoU; CBST crossover between ratio 0.008 and 0.012 |
 | **S4 confidence self-training** | **0.5611 → 0.6165** on target, beats baseline; CBST ratio-matching was the problem |
 | **D4 adjacency** | **78 %** of buildings touch a neighbour — merging workstream justified |
 | **R3 label confidence** | ⚠️ confounded — 0.6281 vs 0.6483 on shared val, but each model wins on its own labels |

@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 19:30 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 19:55 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -197,7 +197,8 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | ✅ done — **confounded; see cross-eval** | **Unresolved** — each model wins on its own labels; needs ground truth |
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
 | 2026-09-10 | [`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/) | ✅ done — modest win | **+0.0086** (0.6569) and **2× faster convergence**; gain is all precision |
-| 2026-09-10 | [`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/) | running | — |
+| 2026-09-10 | [`2026-09-10-selftrain-round2`](2026-09-10-selftrain-round2/) | running | — |
+| 2026-09-10 | [`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/) | ✅ done — cliff located; stated mechanism refuted | **No cliff — a plateau.** thr 0.01–0.46 all within 0.023 IoU; collapse only below 0.01 |
 | 2026-09-10 | [`2026-09-10-solar-google-to-ign`](2026-09-10-solar-google-to-ign/) | ✅ done | **0.8723 → 0.5611** (−31 pts); a capability drop, not miscalibration |
 | 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | ✅ done — **strong negative result** | **No — it destroys it.** 0.5611 → **0.3752** on target |
 | 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
@@ -279,7 +280,10 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** **+0.03 to +0.08 IoU** (so ~0.68–0.73). A transformer's global receptive field should help most where buildings are dense and share walls — exactly Jaipur, and exactly the instance-merging failure the project worries about. Risk: 7,371 crops is small for a transformer, which may underperform at this data scale.
 
-**[`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/)** — running
+**[`2026-09-10-selftrain-round2`](2026-09-10-selftrain-round2/)** — running
+> **Why:** rounds are the cheapest remaining lever — no new data, no new architecture, just another pass. If they compound, the Jaipur transfer should run 2–3 rounds. If they saturate or degrade, one round is the recipe and the extra compute goes elsewhere.
+
+**[`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/)** — ✅ done — cliff located; stated mechanism refuted
 > **Why:** a Jaipur transfer has no labels, so the threshold must be chosen blind. Knowing *where* the cliff is — and how sharp — determines how much margin to leave.
 >
 > **Expected:** thr **0.0100** → **0.42–0.52** (already deep in the noise floor, so most of the damage should already be done); thr **0.0015** → **0.37–0.45** (essentially S2). If 0.0100 lands near 0.6 instead, the cliff is sharper and further down than the distribution suggests, and threshold choice is safer than I think.
@@ -299,16 +303,17 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 > **Expected:** **0.50–0.58** — recovering most of the loss but landing at or slightly below the 0.5611 source-only baseline. Reasoning: a sane threshold stops the noise-labelling, but self-training can still only reinforce what the model already believes, and the source-only model is wrong about 44 % of the target. Precision should recover to ~0.65–0.75.
 
 
-**19 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+**20 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-116 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+117 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  55 commits
+### 2026-09-10  ·  56 commits
 
+- `19:30` **afc8b68** Regenerate ledger and timeline (S6 arms at ep29/ep27 of 30)
 - `19:01` **2144180** Regenerate ledger and timeline (S6 arms mid-flight: r008 ep18, r012 ep17)
 - `19:00` **56d831a** Visual label review, and the wrong conclusion it nearly produced
 - `18:34` **2df17c6** R12: stratified hand-labelling package for 30 Jaipur crops
@@ -470,7 +475,7 @@ The half of the record that is normally lost. An idea absent from this repo was 
 - queued — R5 · Self-training / CBST on top of the weak model
 - queued — R6 · Multi-source co-training
 - queued — R7 · Low-resolution simulation
-- queued — S7 · Multi-round confidence self-training
+- queued — S7 · Multi-round confidence self-training — ⏳ RUNNING (round 2, GPU 2)
 - ⛔ **blocked** — S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
 
 ---

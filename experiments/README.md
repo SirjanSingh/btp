@@ -14,6 +14,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
+| [`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/) | 2026-09-10 | Where does self-training flip from helping to destroying? | **No cliff — a plateau.** thr 0.01–0.46 all within 0.023 IoU; collapse only below 0.01 | ✅ |
 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | 2026-09-10 | Was it CBST's ratio policy or self-training itself? | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline | ✅ |
 | [`2026-09-10-erosion-02`](2026-09-10-erosion-02/) | 2026-09-10 | Is the erosion optimum finer than 0.4 m? | **No** — monotonic curve; 0.4 m is the only point with pred/label ≈ 1 | ✅ |
 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | 2026-09-10 | Does CBST self-training close the solar domain gap? | **No — it destroys it.** 0.5611 → **0.3752** on target | ❌ |

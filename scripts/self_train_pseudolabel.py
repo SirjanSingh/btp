@@ -69,12 +69,24 @@ def main(a):
         probs.append(p[:, ::4, ::4].reshape(-1).cpu().numpy())
     allp = np.concatenate(probs)
 
-    # CBST: the threshold is the (1 - ratio) quantile, so exactly `ratio` of
-    # pixels are labelled foreground. That pins the pseudo-label class balance
-    # to the source prior instead of letting it drift down each round.
-    thr = float(np.quantile(allp, 1.0 - a.class_ratio))
-    print(f"[st] class-ratio {a.class_ratio}: threshold = {thr:.4f}  "
-          f"(a fixed 0.5 would select {float((allp > 0.5).mean()):.4f})")
+    if a.threshold is not None:
+        # Fixed threshold, the S6 decision. Measured on google->ign: any value
+        # in 0.01-0.46 lands within 0.023 IoU of the best, whereas performance
+        # falls roughly linearly in the *ratio*. A blind pick cannot land badly
+        # on a plateau, and on Jaipur every pick is blind.
+        thr = float(a.threshold)
+        sel = float((allp > thr).mean())
+        print(f"[st] FIXED threshold {thr:.4f} -> selects {sel:.5f} of pixels "
+              f"(ratio policy is not in use)")
+    else:
+        # CBST: the threshold is the (1 - ratio) quantile, so exactly `ratio` of
+        # pixels are labelled foreground. That pins the pseudo-label class balance
+        # to the source prior instead of letting it drift down each round.
+        # S6 rejected this for the Jaipur transfer -- kept so the arms remain
+        # reproducible, not because it is recommended.
+        thr = float(np.quantile(allp, 1.0 - a.class_ratio))
+        print(f"[st] class-ratio {a.class_ratio}: threshold = {thr:.4f}  "
+              f"(a fixed 0.5 would select {float((allp > 0.5).mean()):.4f})")
 
     # Pass 2 — write pseudo-masks. Pixels between the two bands are ambiguous;
     # with a binary mask they must fall somewhere, so they go to background,
@@ -105,7 +117,9 @@ def main(a):
 
     summary = {
         "checkpoint": a.ckpt, "source_dir": a.src_dir, "n_images": len(names),
-        "class_ratio_target": a.class_ratio, "threshold_chosen": round(thr, 5),
+        "policy": "fixed_threshold" if a.threshold is not None else "class_ratio",
+        "class_ratio_target": None if a.threshold is not None else a.class_ratio,
+        "threshold_chosen": round(thr, 5),
         "pseudo_fg_fraction": round(kept_fg / max(total, 1), 5),
         "note": "target labels never read; used at evaluation only",
     }
@@ -121,6 +135,10 @@ if __name__ == "__main__":
     p.add_argument("--encoder", default="resnet34")
     p.add_argument("--src_dir", default="data/bdappv_split/ign_train")
     p.add_argument("--out_dir", default="data/bdappv_pseudo/ign_train")
+    p.add_argument("--threshold", type=float, default=None,
+                   help="fixed confidence threshold; overrides --class_ratio. "
+                        "This is the S6-recommended policy -- 0.01-0.46 is a "
+                        "plateau, so a blind pick is safe")
     p.add_argument("--class_ratio", type=float, default=0.06,
                    help="fraction of pixels to label foreground; set from the "
                         "SOURCE prior, not guessed")

@@ -392,6 +392,22 @@ answer was already in `experiments/2026-09-10-erosion-02/`.
 before proposing an experiment, grep `experiments/` for it — this sweep was closed hours
 earlier.
 
+### 3.20 `&&` after a command in `run_docker.sh` never runs
+
+**What happened.** Launched pseudo-labelling and set assembly as one call:
+`./run_docker.sh 2 "python a.py && python b.py"`. The first ran, the second silently did not,
+and the wrapper exited 0. Only noticed because the output directory was missing.
+
+**Why.** `run_docker.sh` ends its inner script with `exec python -u ...`. `exec` *replaces* the
+shell process, so nothing after it can run — the `&& python b.py` is never reached. There is no
+error because the first command genuinely succeeded.
+
+**Shape.** Pattern A again: exit status could not detect the second command's absence, because
+the second command was never a process that could fail.
+
+**Rule.** One command per `run_docker.sh` call. To chain, either make separate calls or pass
+`bash -c "a && b"` as the single command so the chain is inside one process.
+
 ## 4. Pre-existing, still open
 
 - **BDAPPV has zero negative crops** (`MASTER_CONTEXT` C1). `prep_bdappv.py:85` drops

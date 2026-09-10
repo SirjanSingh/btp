@@ -376,7 +376,23 @@
       "lr": 1.2711661792704665e-06,
       "elapsed_s": 170.3,
       "note": ""
+    },
+    {
+      "epoch": 30,
+      "tr_loss": 0.047095,
+      "va_loss": 0.042343,
+      "iou": 0.87045,
+      "f1": 0.930739,
+      "precision": 0.928899,
+      "recall": 0.932586,
+      "lr": 1e-06,
+      "elapsed_s": 170.3,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.871719,
+    "best_epoch": 27,
+    "checkpoint": "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r008/unet_resnet34_30ep_20260910_123658/best.pth"
+  }
 }
