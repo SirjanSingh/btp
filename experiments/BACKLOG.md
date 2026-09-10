@@ -22,6 +22,15 @@ write the full entry under `experiments/<date>-<slug>/`.
 
 ## Queue — rooftop (Stage 1)
 
+### R8 · Merge rate + split rate metrics ★★ now a prerequisite
+D4 measured 78 % adjacency, so instance merging affects most buildings — and neither pixel
+IoU nor boundary IoU detects it (`MASTER_CONTEXT` §6.2). Every IoU in this repo is silent
+about it. Implement connected-component matching between prediction and label, and report
+merge rate (one prediction covering N>1 labels) and split rate (N>1 predictions covering one
+label).
+*Needs:* new code in `evaluate.py`. CPU. **Blocks attributing R4's precision gain.**
+
+
 ### R5 · Self-training / CBST on top of the weak model
 Pseudo-label Jaipur with the weak model, keep confident pixels using the **measured** 23 %
 class ratio (not a fixed 0.95), retrain. This is the Tier-3 UDA arm the supervisor's
@@ -60,8 +69,6 @@ first. Until then every Stage-2 precision number, S1's included, measures the wr
 
 ## Queue — diagnostics (CPU, cheap)
 
-- **D4 · adjacency rate** — do Jaipur footprints touch? Decides whether the three-class /
-  instance-merge work is needed at all. Open Buildings only; runnable now.
 - **D7 · clutter inventory** — build a contact sheet of 20 tiles for manual tallying.
 
 ---
@@ -73,6 +80,7 @@ first. Until then every Stage-2 precision number, S1's included, measures the wr
 | D1 target prior | 28.19 % (23.06 % @ conf ≥ 0.75) |
 | D6 seed probe | 5.69 % predicted foreground — ~5× under |
 | Weak supervision | **IoU 0.6475** |
+| **D4 adjacency** | **78 %** of buildings touch a neighbour — merging workstream justified |
 | **R3 label confidence** | ⚠️ confounded — 0.6281 vs 0.6483 on shared val, but each model wins on its own labels |
 | **R4 MiT-B2 backbone** | ✅ 0.6569 vs 0.6483 — +0.0086, 2x faster convergence, gain all precision |
 | **R1 boundary relax (4 px)** | ❌ 0.6366 vs 0.6475 — band removes signal, not just noise |
