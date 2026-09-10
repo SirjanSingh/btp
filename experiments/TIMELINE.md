@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 14:08 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 14:09 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -253,10 +253,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-97 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+98 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  36 commits
+### 2026-09-10  ·  37 commits
 
+- `14:08` **f3814ec** result: CBST self-training destroys the solar domain gap -- 0.5611 -> 0.3752
 - `13:32` **cb82ec6** result: 0.4 m arm reproduced and measured honestly -- pred/label 0.9914
 - `13:00` **550ed79** chore: regenerate ledger and timeline
 - `12:58` **5dcc98d** chore: regenerate ledger and timeline
