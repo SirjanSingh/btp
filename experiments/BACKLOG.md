@@ -22,12 +22,15 @@ write the full entry under `experiments/<date>-<slug>/`.
 
 ## Queue — rooftop (Stage 1)
 
-### R10 · Erosion sweep + inference-time dilation ★ next
-Split rate stayed at **exactly 0.0** at 0.4 m, so the overshoot bound has not been found —
-try 0.8 / 1.2 m. And dilate predictions back by the erosion amount at inference: predictions
-are shrunk by construction, so the +8 pt missed rate and −0.016 IoU are likely recoverable.
-*Needs:* mask regeneration (~40 min CPU) + training; dilation is a few lines in eval.
-**Predict: 0.8 m pushes merge below 0.25; dilation recovers most of the IoU.**
+### R11 · Fix the split-rate metric ★★ it is silently blind
+A label counts as "split" only if >= 2 predictions each cover >= 50 % of it, so fragments
+smaller than half a building never qualify. At 0.8 m erosion the model shattered buildings
+badly enough to reach pred/label 1.4743 while split rate read **0.0**. Every split rate in
+this repo is suspect. Count a label as split if >= 2 predictions overlap it at all, and
+report fragments-per-label alongside.
+*Needs:* small change in `scripts/merge_split_rate.py`, then re-run the four saved
+checkpoints. CPU + brief GPU.
+
 
 
 
@@ -80,6 +83,7 @@ first. Until then every Stage-2 precision number, S1's included, measures the wr
 | D1 target prior | 28.19 % (23.06 % @ conf ≥ 0.75) |
 | D6 seed probe | 5.69 % predicted foreground — ~5× under |
 | Weak supervision | **IoU 0.6475** |
+| **Erosion sweep (0.8 m)** | over-erodes: merge 0.1339 but pred/label **1.47**, missed 0.47 — 0.4 m is the optimum |
 | **Eroded labels (0.4 m)** | merge 0.4615→**0.3256**, pred/label 0.760→**0.9745**, −0.016 IoU; synergistic with MiT |
 | **S1 solar google→ign** | source 0.8723 → **target 0.5611**; best thr 0.5 on both, so not calibration |
 | **R8 merge/split rate** | **50 % of buildings merged** at IoU 0.648; MiT-B2 4.3 pts better; split rate 0 |

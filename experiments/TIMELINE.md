@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 10:16 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 10:22 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -70,6 +70,12 @@ exist before that experiment could be interpreted at all.**
 - **"Erosion helps ResNet more than MiT"** — reasoning that MiT already merged less so had
   less to gain. Wrong by 2×: −0.064 vs **−0.136**. The two are *synergistic*; a global
   receptive field can exploit a label gap that convolutions cannot.
+- **"Split rate staying at 0.0 is a real surprise"** — I said that three times across three
+  runs. It was partly **my own metric being blind**: a label counts as split only if two
+  predictions each cover half of it, so a model shattering buildings into thirds scores 0.0.
+  At 0.8 m erosion `pred/label` hit **1.4743** while split rate still read 0.0. The lesson is
+  sharper than the bug: I trusted a metric I had written that morning, and reported its
+  silence as evidence. **A metric with no failing case in your data is not validated.**
 - **"Dilating predictions back will recover the misses"** — I wrote that into a code comment
   and the next run refuted it. Merge went 0.3256 → **0.4163**. Two components 3 px apart are
   closed by a 2 px dilation from each side. The geometry was checkable in advance and I did
@@ -120,7 +126,7 @@ exist before that experiment could be interpreted at all.**
 | 2026-09-09 | [`2026-09-09-weak-supervision-jaipur`](2026-09-09-weak-supervision-jaipur/) | ✅ done | **IoU 0.6475** — 4.6× the unadapted seed |
 | 2026-09-10 | [`2026-09-10-d4-adjacency`](2026-09-10-d4-adjacency/) | ✅ done | **78 %** do — instance-merging workstream justified |
 | 2026-09-10 | [`2026-09-10-eroded-labels`](2026-09-10-eroded-labels/) | ✅ done | **Yes** — merge 0.46→0.33, count 0.76→**0.97** per building, −0.016 IoU |
-| 2026-09-10 | [`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/) | running | — |
+| 2026-09-10 | [`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/) | ✅ done — **0.8 m over-erodes** | **0.8 m over-erodes** — merge 0.13 but pred/label 1.47; 0.4 m is the optimum |
 | 2026-09-10 | [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | ✅ done — **confounded; see cross-eval** | **Unresolved** — each model wins on its own labels; needs ground truth |
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
 | 2026-09-10 | [`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/) | ✅ done — modest win | **+0.0086** (0.6569) and **2× faster convergence**; gain is all precision |
@@ -174,7 +180,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** - **Merge rate 0.30–0.40**, down from 0.5040. This is the number the experiment lives or dies by. - **IoU 0.60–0.64**, i.e. slightly *worse* than 0.6483 — predictions will be systematically smaller than the un-eroded val targets. An IoU drop is an acceptable price and is expected. - **Split rate rises above 0**, possibly to a few percent. If erosion overshoots it will start cutting single building
 
-**[`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/)** — running
+**[`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/)** — ✅ done — **0.8 m over-erodes**
 > **Why:** [eroded-labels](../2026-09-10-eroded-labels/) cut merging 29 % and took `pred/label` from 0.760 to 0.9745 — but **split rate stayed at exactly 0.0**, in all four cells of the 2 × 2. The failure mode erosion is supposed to risk has not appeared at all, which means the useful range has not been explored to its end. If 0.8 m keeps split at 0 while cutting merges further, 0.4 m was simply too timid.
 >
 > **Expected:** - **merge rate below 0.25**, down from 0.3256. - **split rate finally rises above 0** — somewhere around 0.02–0.08. If it stays at exactly 0.0 again, that is a real surprise and means the model simply never over-segments at any erosion this side of destroying the labels. - **missed rate rises further**, ~0.36–0.42; more erosion means more conservatism. - **IoU 0.61–0.63**, below 0.6405. - **`pred/
@@ -210,10 +216,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-83 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+84 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  22 commits
+### 2026-09-10  ·  23 commits
 
+- `10:17` **4e35d43** feat: CBST self-training on google->ign, plus a finding that arrived before it ran
 - `09:40` **0a28fb9** docs: put the reasoning in the timeline, not just the results
 - `09:38` **48c2ad4** feat: generated TIMELINE.md -- what was run, what wasn't, in order
 - `09:20` **e00f501** docs: the push failure was a 280 MB file, not the network
@@ -337,7 +344,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 The half of the record that is normally lost. An idea absent from this repo was either never had, or was had and forgotten — and there is no way to tell later.
 
-- queued — R10 · Erosion sweep + inference-time dilation ★ next
+- queued — R11 · Fix the split-rate metric ★★ it is silently blind
 - queued — R5 · Self-training / CBST on top of the weak model
 - queued — R6 · Multi-source co-training
 - queued — R7 · Low-resolution simulation

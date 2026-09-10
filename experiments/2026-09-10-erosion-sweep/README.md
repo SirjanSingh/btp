@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ✅ done — **0.8 m over-erodes** |
 | **Date** | 2026-09-10 |
 
 ## Question
@@ -46,7 +46,62 @@ arm.
 
 ## Results
 
-*pending — IoU, then merge/split at dilate 0 and 3 px*
+Best val IoU **0.5911** @ep10 (early-stopped ep25). Merge/split on the full val set:
+
+| erosion | IoU | **merge** | split | missed | **pred/label** |
+|---|---|---|---|---|---|
+| none | 0.6569 | 0.4615 | 0.0 | 0.2423 | 0.760 |
+| **0.4 m** | 0.6405 | 0.3256 | 0.0 | 0.3223 | **0.9745** |
+| 0.8 m | 0.5911 | **0.1339** | 0.0 | **0.4689** | **1.4743** |
+| 0.8 m + dilate 3 px | — | 0.3562 | 0.0 | 0.2744 | 0.9288 |
+
+**Predictions vs measured:** merge below 0.25 → **0.1339** ✅ · split above 0 → **still exactly
+0.0**, wrong for the third time ❌ · missed 0.36–0.42 → **0.4689**, worse than predicted ❌ ·
+IoU 0.61–0.63 → 0.5911, worse ❌ · pred/label near 1.0 → **1.4743**, badly over ❌ · dilation
+helps → **partially**, see below.
+
+## Interpretation
+
+**0.8 m over-erodes, and `pred/label` is what reveals it.** Merge rate looks spectacular —
+0.4615 → 0.1339, a 71 % reduction — and taken alone it would read as a triumph. But the model
+now emits **47 % more components than there are buildings** and misses nearly half of them.
+It is not separating buildings; it is **fragmenting** them.
+
+**★ My split-rate definition cannot see that, and that is a flaw in the metric.** A label is
+"split" only when ≥ 2 predictions each cover ≥ 50 % of it. Fragments smaller than half a
+building never qualify, so a model shattering buildings into thirds scores **split = 0.0**
+while `pred/label` climbs past 1.4. The three consecutive "split stayed at 0" results I kept
+reporting as surprising were partly an artifact of my own threshold. **`pred/label` is the
+honest over/under-segmentation signal; split rate as defined here is not.**
+
+**0.4 m remains the best operating point.** `pred/label` of 0.9745 is nearest 1.0 from either
+side, with the least damage to IoU and missed rate. The sweep found the optimum by bracketing
+it: 0.760 under, 0.9745 near-perfect, 1.4743 over.
+
+**Dilation at 0.8 m works better than at 0.4 m — but is still a trade, not a fix.** It pulls
+`pred/label` from 1.4743 to 0.9288 and cuts missed from 0.4689 to 0.2744, exactly as the
+geometry predicted with a ~6 px gap. But merge climbs back 0.1339 → 0.3562. So dilation
+reliably converts merges into misses and back; it never produces a configuration better than
+plain 0.4 m erosion on any axis.
+
+## Decision
+
+- [x] **Adopt 0.4 m erosion.** The sweep brackets it as the optimum.
+- [x] **Drop inference-time dilation.** Tested at both erosion levels; always a trade, never
+      a win.
+- [ ] ★ **Fix the split-rate metric** — count a label as split if ≥ 2 predictions overlap it
+      at all, or report fragment count per label. As defined it has been silently blind.
+- [ ] Re-check the 0.4 m and un-eroded numbers once the metric is fixed; their split rates of
+      0.0 may also be artifacts.
+
+## Threats to validity
+
+- The metric flaw above affects **every split rate in this repo**.
+- Three erosion points plus dilation is still a coarse sweep; the optimum is bracketed, not
+  located precisely.
+- 123 of 318,207 polygons vanish entirely at 0.8 m (vs 6 at 0.4 m) — a 20× rise, though still
+  0.04 %, so shrinkage rather than deletion remains dominant.
+- Single seed throughout.
 
 ## Threats to validity
 

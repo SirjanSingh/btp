@@ -57,6 +57,12 @@ exist before that experiment could be interpreted at all.**
 - **"Erosion helps ResNet more than MiT"** — reasoning that MiT already merged less so had
   less to gain. Wrong by 2×: −0.064 vs **−0.136**. The two are *synergistic*; a global
   receptive field can exploit a label gap that convolutions cannot.
+- **"Split rate staying at 0.0 is a real surprise"** — I said that three times across three
+  runs. It was partly **my own metric being blind**: a label counts as split only if two
+  predictions each cover half of it, so a model shattering buildings into thirds scores 0.0.
+  At 0.8 m erosion `pred/label` hit **1.4743** while split rate still read 0.0. The lesson is
+  sharper than the bug: I trusted a metric I had written that morning, and reported its
+  silence as evidence. **A metric with no failing case in your data is not validated.**
 - **"Dilating predictions back will recover the misses"** — I wrote that into a code comment
   and the next run refuted it. Merge went 0.3256 → **0.4163**. Two components 3 px apart are
   closed by a 2 px dilation from each side. The geometry was checkable in advance and I did

@@ -14,6 +14,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
+| [`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/) | 2026-09-10 | How far can erosion go before it hurts? | **0.8 m over-erodes** — merge 0.13 but pred/label 1.47; 0.4 m is the optimum |
 | [`2026-09-10-eroded-labels`](2026-09-10-eroded-labels/) | 2026-09-10 | Can shrinking labels stop the model fusing buildings? | **Yes** — merge 0.46→0.33, count 0.76→**0.97** per building, −0.016 IoU | ✅ |
 | [`2026-09-10-solar-google-to-ign`](2026-09-10-solar-google-to-ign/) | 2026-09-10 | How big is the solar domain gap where it can be measured? | **0.8723 → 0.5611** (−31 pts); a capability drop, not miscalibration | ✅ |
 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | 2026-09-10 | How many buildings does the model fuse together? | **50 % merged**, 21 % under-counted — invisible to IoU | ✅ |
