@@ -173,6 +173,36 @@ table with the key row missing.
 
 ---
 
+### 3.12b The real cause was a 280 MB file, not the network ★
+The 408s below were a **symptom**, and I chased the symptom for four ticks. The actual error
+was visible only in the full push output:
+
+```
+remote: error: File .../best.pth is 279.90 MB; this exceeds GitHub's file size limit of 100.00 MB
+remote: error: GH001: Large files detected.
+```
+
+The pending pack was **546 MB**. GitHub's pre-receive hook rejects it, and pushing half a
+gigabyte over a throttled uplink also produces timeouts — so the network symptoms were real
+but secondary, and "fixing" them with `http.postBuffer` and `http.lowSpeedLimit` could never
+have worked.
+
+**Why the files were tracked at all:** `.gitignore` had `**/checkpoints/**/*.pth`, which
+matches only directories named *exactly* `checkpoints`. An experiment writing to
+`checkpoints_mit/` and `checkpoints_resnet34/` slipped straight through. Now `*.pth` outright
+— weights are regenerable and their statistics live in `RUN_LEDGER.json`.
+
+**Fix for the already-committed files** (unpushed, so rewriting is safe):
+`git filter-branch -f --index-filter 'git rm --cached --ignore-unmatch "*.pth"' origin/<branch>..HEAD`
+Pack fell 546.74 MB → **0.07 MB** and the push went through instantly.
+
+Two snags worth knowing: `filter-branch` refuses to run with **any** unstaged change, and a
+*live training run* keeps rewriting its own tracked log files, so the tree is never clean —
+`git checkout -- <logdir>` immediately before the rewrite is what got a clean window.
+
+> **Rule: read the whole push output, not the last line.** The decisive error was four lines
+> above `fatal:`, and every tail-based check I ran hid it.
+
 ### 3.12 `git push` fails with HTTP 408 on this network
 Pushes to GitHub began failing with `error: RPC failed; result=22, HTTP code = 408` followed
 by `fatal: The remote end hung up unexpectedly` — while *reads* (`git ls-remote`, `curl
