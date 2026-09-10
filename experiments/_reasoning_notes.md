@@ -68,6 +68,30 @@ exist before that experiment could be interpreted at all.**
   closed by a 2 px dilation from each side. The geometry was checkable in advance and I did
   not check it.
 
+### The self-training arc — the clearest thing the bench bought
+
+Three runs, one variable, and the plan turned out to be wrong about its own recommendation.
+
+`MASTER_CONTEXT` prescribes **CBST class-ratio thresholding** over a fixed high threshold,
+because a fixed threshold causes *foreground collapse*. Before running anything I measured
+what the ratio policy implied: to select the source's 1.83 % of target pixels, the threshold
+had to fall to **0.0004** — essentially zero. I wrote "at 0.0004 nearly any activation counts
+as a panel" into the experiment and predicted it would fail.
+
+It failed harder than predicted: **0.5611 → 0.3752**, precision collapsing 0.741 → 0.391.
+
+Then the same pipeline with a plain confidence threshold (0.4563): **0.5611 → 0.6165**,
+*beating* the source-only baseline, with **both** precision and recall up. I predicted
+0.50–0.58 and it beat that too.
+
+So the prescribed fix was the entire cause of the failure. CBST has an unstated precondition —
+**it is safe only while the model retains calibrated confidence on the target** — and a
+31-point domain gap is precisely what destroys that. On Jaipur, where nothing can be measured,
+following the plan faithfully would have degraded the model by a third with no way to notice:
+S2's *source* score barely moved (0.8723 → 0.8678) and would have looked healthy.
+
+That is the whole argument for the ordering principle, demonstrated rather than asserted.
+
 ### The pattern behind the mistakes
 
 Individually the errors above look unrelated. They are not — `docs/PITFALLS.md` §0 groups all

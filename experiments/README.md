@@ -14,6 +14,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
+| [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | 2026-09-10 | Was it CBST's ratio policy or self-training itself? | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline | ✅ |
 | [`2026-09-10-erosion-02`](2026-09-10-erosion-02/) | 2026-09-10 | Is the erosion optimum finer than 0.4 m? | **No** — monotonic curve; 0.4 m is the only point with pred/label ≈ 1 | ✅ |
 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | 2026-09-10 | Does CBST self-training close the solar domain gap? | **No — it destroys it.** 0.5611 → **0.3752** on target | ❌ |
 | [`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/) | 2026-09-10 | Reproduce the destroyed default, measure it honestly | **0.6393** (orig 0.6405); pred/label **0.9914**, split 0.084 | ✅ |

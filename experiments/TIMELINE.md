@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 16:32 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 17:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -81,6 +81,30 @@ exist before that experiment could be interpreted at all.**
   closed by a 2 px dilation from each side. The geometry was checkable in advance and I did
   not check it.
 
+### The self-training arc — the clearest thing the bench bought
+
+Three runs, one variable, and the plan turned out to be wrong about its own recommendation.
+
+`MASTER_CONTEXT` prescribes **CBST class-ratio thresholding** over a fixed high threshold,
+because a fixed threshold causes *foreground collapse*. Before running anything I measured
+what the ratio policy implied: to select the source's 1.83 % of target pixels, the threshold
+had to fall to **0.0004** — essentially zero. I wrote "at 0.0004 nearly any activation counts
+as a panel" into the experiment and predicted it would fail.
+
+It failed harder than predicted: **0.5611 → 0.3752**, precision collapsing 0.741 → 0.391.
+
+Then the same pipeline with a plain confidence threshold (0.4563): **0.5611 → 0.6165**,
+*beating* the source-only baseline, with **both** precision and recall up. I predicted
+0.50–0.58 and it beat that too.
+
+So the prescribed fix was the entire cause of the failure. CBST has an unstated precondition —
+**it is safe only while the model retains calibrated confidence on the target** — and a
+31-point domain gap is precisely what destroys that. On Jaipur, where nothing can be measured,
+following the plan faithfully would have degraded the model by a third with no way to notice:
+S2's *source* score barely moved (0.8723 → 0.8678) and would have looked healthy.
+
+That is the whole argument for the ordering principle, demonstrated rather than asserted.
+
 ### The pattern behind the mistakes
 
 Individually the errors above look unrelated. They are not — `docs/PITFALLS.md` §0 groups all
@@ -159,7 +183,7 @@ destroyed two checkpoints, every metric survived because the ledger had been wri
 | 2026-09-10 | [`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/) | ✅ done — modest win | **+0.0086** (0.6569) and **2× faster convergence**; gain is all precision |
 | 2026-09-10 | [`2026-09-10-solar-google-to-ign`](2026-09-10-solar-google-to-ign/) | ✅ done | **0.8723 → 0.5611** (−31 pts); a capability drop, not miscalibration |
 | 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | ✅ done — **strong negative result** | **No — it destroys it.** 0.5611 → **0.3752** on target |
-| 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | running | — |
+| 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
 
 ### Why each was run, and what was expected
 
@@ -247,7 +271,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** I expect this to **fail or barely move** — IGN IoU **0.52–0.60**, i.e. plausibly *below* the 0.5611 source-only baseline. Pseudo-labels drawn at a 0.0004 threshold are close to noise-shaped, and training on them should teach over-prediction. If it lands above 0.60 I will have badly misread the threshold evidence.
 
-**[`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/)** — running
+**[`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/)** — ✅ done — **self-training works; CBST was the problem**
 > **Why:** S2 cost **18.6 points** of target IoU (0.5611 → 0.3752) with precision falling 0.741 → 0.391. The suspected cause is CBST's ratio policy: forcing the source's 1.83 % foreground on a target whose confidence distribution is crushed drove the threshold to **0.0004**, so pseudo-labels were largely noise.
 >
 > **Expected:** **0.50–0.58** — recovering most of the loss but landing at or slightly below the 0.5611 source-only baseline. Reasoning: a sane threshold stops the noise-labelling, but self-training can still only reinforce what the model already believes, and the source-only model is wrong about 44 % of the target. Precision should recover to ~0.65–0.75.
@@ -259,10 +283,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-105 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+106 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  44 commits
+### 2026-09-10  ·  45 commits
 
+- `16:32` **aee4f5b** result: erosion sweep complete -- monotonic curve, 0.4 m is the only pred/label ~ 1
 - `16:01` **418386d** chore: queue S5 -- port --cache_ram to train_solar.py
 - `15:58` **dcd7239** chore: regenerate ledger and timeline
 - `15:30` **9808420** chore: regenerate ledger and timeline
@@ -413,8 +438,9 @@ The half of the record that is normally lost. An idea absent from this repo was 
 - queued — R5 · Self-training / CBST on top of the weak model
 - queued — R6 · Multi-source co-training
 - queued — R7 · Low-resolution simulation
+- queued — S6 · Map the threshold cliff between 0.4563 and 0.0004 ★
+- queued — S7 · Multi-round confidence self-training
 - queued — S5 · Port `--cache_ram` to `train_solar.py` — solar runs are 2.3× slower than they need to be
-- queued — S4 · Self-training with a fixed confidence threshold ★ next, isolates S2's cause
 - ⛔ **blocked** — S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
 
 ---

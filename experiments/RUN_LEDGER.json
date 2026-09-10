@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-10T16:32:33",
- "n_runs": 60,
+ "generated": "2026-09-10T17:00:13",
+ "n_runs": 61,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173038/best.pth",
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
@@ -9392,13 +9392,17 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 27,
-   "best_epoch": 26,
-   "best_iou": 0.873889,
-   "best_f1": 0.932701,
-   "best_precision": 0.932913,
-   "best_recall": 0.932489,
-   "summary": {},
+   "n_epochs": 30,
+   "best_epoch": 30,
+   "best_iou": 0.874523,
+   "best_f1": 0.933062,
+   "best_precision": 0.930149,
+   "best_recall": 0.935994,
+   "summary": {
+    "best_val_iou": 0.874523,
+    "best_epoch": 30,
+    "checkpoint": "experiments/2026-09-10-solar-selftrain-conf/checkpoints/unet_resnet34_30ep_20260910_083614/best.pth"
+   },
    "threshold_sweep": null,
    "results": null,
    "epochs": [
@@ -9725,6 +9729,42 @@
      "lr": 3.4227024433898994e-06,
      "elapsed_s": 285.9,
      "note": ""
+    },
+    {
+     "epoch": 28,
+     "tr_loss": 0.043302,
+     "va_loss": 0.041697,
+     "iou": 0.87264,
+     "f1": 0.931989,
+     "precision": 0.928306,
+     "recall": 0.935701,
+     "lr": 2.0816937636766182e-06,
+     "elapsed_s": 300.4,
+     "note": ""
+    },
+    {
+     "epoch": 29,
+     "tr_loss": 0.043049,
+     "va_loss": 0.041253,
+     "iou": 0.873922,
+     "f1": 0.93272,
+     "precision": 0.929968,
+     "recall": 0.935487,
+     "lr": 1.2711661792704665e-06,
+     "elapsed_s": 282.9,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 30,
+     "tr_loss": 0.042869,
+     "va_loss": 0.041087,
+     "iou": 0.874523,
+     "f1": 0.933062,
+     "precision": 0.930149,
+     "recall": 0.935994,
+     "lr": 1e-06,
+     "elapsed_s": 289.6,
+     "note": "\u2190 best"
     }
    ]
   },
@@ -11334,6 +11374,110 @@
       "iou": 0.3752,
       "precision": 0.391,
       "recall": 0.9023
+     }
+    }
+   },
+   "epochs": []
+  },
+  {
+   "run_name": "s4_crossdomain",
+   "log": "diagnostics/s4_crossdomain.json",
+   "stage": "diagnostic",
+   "kind": "diagnostic",
+   "timestamp": "",
+   "config": {},
+   "hardware": {},
+   "n_epochs": 0,
+   "best_epoch": null,
+   "best_iou": null,
+   "best_f1": null,
+   "best_precision": null,
+   "best_recall": null,
+   "summary": {},
+   "threshold_sweep": null,
+   "results": {
+    "google_val (source)": {
+     "0.1": {
+      "iou": 0.8701,
+      "precision": 0.9121,
+      "recall": 0.9498
+     },
+     "0.2": {
+      "iou": 0.8726,
+      "precision": 0.9194,
+      "recall": 0.9449
+     },
+     "0.3": {
+      "iou": 0.8736,
+      "precision": 0.9237,
+      "recall": 0.9416
+     },
+     "0.4": {
+      "iou": 0.8742,
+      "precision": 0.9271,
+      "recall": 0.9387
+     },
+     "0.5": {
+      "iou": 0.8745,
+      "precision": 0.9301,
+      "recall": 0.936
+     },
+     "0.6": {
+      "iou": 0.8747,
+      "precision": 0.9331,
+      "recall": 0.9333
+     },
+     "0.7": {
+      "iou": 0.8747,
+      "precision": 0.9362,
+      "recall": 0.9302
+     },
+     "0.8": {
+      "iou": 0.8743,
+      "precision": 0.9399,
+      "recall": 0.9261
+     }
+    },
+    "ign_val (TARGET)": {
+     "0.1": {
+      "iou": 0.6165,
+      "precision": 0.789,
+      "recall": 0.7382
+     },
+     "0.2": {
+      "iou": 0.6162,
+      "precision": 0.8011,
+      "recall": 0.7275
+     },
+     "0.3": {
+      "iou": 0.6155,
+      "precision": 0.8082,
+      "recall": 0.7208
+     },
+     "0.4": {
+      "iou": 0.6146,
+      "precision": 0.8137,
+      "recall": 0.7152
+     },
+     "0.5": {
+      "iou": 0.6135,
+      "precision": 0.8185,
+      "recall": 0.7102
+     },
+     "0.6": {
+      "iou": 0.6122,
+      "precision": 0.8232,
+      "recall": 0.7049
+     },
+     "0.7": {
+      "iou": 0.6106,
+      "precision": 0.8282,
+      "recall": 0.6991
+     },
+     "0.8": {
+      "iou": 0.6083,
+      "precision": 0.8345,
+      "recall": 0.6918
      }
     }
    },

@@ -351,7 +351,47 @@
       "lr": 3.4227024433898994e-06,
       "elapsed_s": 285.9,
       "note": ""
+    },
+    {
+      "epoch": 28,
+      "tr_loss": 0.043302,
+      "va_loss": 0.041697,
+      "iou": 0.87264,
+      "f1": 0.931989,
+      "precision": 0.928306,
+      "recall": 0.935701,
+      "lr": 2.0816937636766182e-06,
+      "elapsed_s": 300.4,
+      "note": ""
+    },
+    {
+      "epoch": 29,
+      "tr_loss": 0.043049,
+      "va_loss": 0.041253,
+      "iou": 0.873922,
+      "f1": 0.93272,
+      "precision": 0.929968,
+      "recall": 0.935487,
+      "lr": 1.2711661792704665e-06,
+      "elapsed_s": 282.9,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 30,
+      "tr_loss": 0.042869,
+      "va_loss": 0.041087,
+      "iou": 0.874523,
+      "f1": 0.933062,
+      "precision": 0.930149,
+      "recall": 0.935994,
+      "lr": 1e-06,
+      "elapsed_s": 289.6,
+      "note": "\u2190 best"
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.874523,
+    "best_epoch": 30,
+    "checkpoint": "experiments/2026-09-10-solar-selftrain-conf/checkpoints/unet_resnet34_30ep_20260910_083614/best.pth"
+  }
 }

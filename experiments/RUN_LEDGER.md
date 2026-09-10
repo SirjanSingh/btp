@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-10 16:32 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-10 17:00 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**60 runs · 31 checkpoints currently on disk**
+**61 runs · 31 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -36,7 +36,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `unet_mit_b2_40ep_20260910_033956` | rooftop | train | 25 | **0.5911** | 10 | 0.7430 | 0.7978 | 0.6952 |
 | `unet_resnet34_30ep_20260910_044423` | solar | train | 30 | **0.8678** | 26 | 0.9292 | 0.9260 | 0.9324 |
 | `unet_mit_b2_40ep_20260910_053557` | rooftop | train | 34 | **0.6393** | 19 | 0.7799 | 0.7823 | 0.7776 |
-| `unet_resnet34_30ep_20260910_083614` | solar | train | 27 | **0.8739** | 26 | 0.9327 | 0.9329 | 0.9325 |
+| `unet_resnet34_30ep_20260910_083614` | solar | train | 30 | **0.8745** | 30 | 0.9331 | 0.9301 | 0.9360 |
 | `unet_mit_b2_40ep_20260910_090326` | rooftop | train | 40 | **0.6540** | 26 | 0.7908 | 0.7647 | 0.8188 |
 | `d1_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -56,6 +56,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `resnet34_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s1_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s2_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `s4_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_111230` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_112025` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_115938` | rooftop | train (txt only) | 0 | — | — | — | — | — |
@@ -97,6 +98,7 @@ Kept deliberately — a crashed configuration is evidence too.
 - `resnet34_eroded` (diagnostics/merge_split/resnet34_eroded.json)
 - `s1_crossdomain` (diagnostics/s1_crossdomain.json)
 - `s2_crossdomain` (diagnostics/s2_crossdomain.json)
+- `s4_crossdomain` (diagnostics/s4_crossdomain.json)
 - `unet_resnet34_100ep_20260330_111230` (logs/unet_resnet34_100ep_20260330_111230.txt)
 - `unet_resnet34_100ep_20260330_112025` (logs/unet_resnet34_100ep_20260330_112025.txt)
 - `unet_resnet34_100ep_20260330_115938` (logs/unet_resnet34_100ep_20260330_115938.txt)

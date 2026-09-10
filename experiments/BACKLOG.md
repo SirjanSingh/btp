@@ -78,6 +78,18 @@ baseline is unreproducible precisely because that script never existed.
 
 ## Queue — solar (Stage 2)
 
+### S6 · Map the threshold cliff between 0.4563 and 0.0004 ★
+S4 (thr 0.4563) reached **0.6165**; S2 (thr 0.0004) collapsed to **0.3752**. Somewhere between
+them the method goes from beating the baseline to destroying it, and the boundary is unmapped.
+Try 0.05 / 0.15 / 0.30.
+*Decides:* how much threshold headroom a Jaipur transfer has, given Jaipur's confidence
+distribution cannot be checked against labels. **Predict: sharp cliff below ~0.1.**
+
+### S7 · Multi-round confidence self-training
+S4 was one round. CBST literature reports compounding gains over 2-3 rounds; re-pseudo-label
+with the S4 model and repeat. **Predict: +0.02-0.04 more, with diminishing returns.**
+
+
 ### S5 · Port `--cache_ram` to `train_solar.py` — solar runs are 2.3× slower than they need to be
 `rooftop/train.py` got the RAM cache (measured 3.68×: 74.4 → 20.2 s/epoch). `train_solar.py`
 did not, so every solar run still re-decodes 16,763 PNGs per epoch and sits dataloader-bound:
@@ -85,14 +97,6 @@ S4 is taking ~340 s/epoch against the cached rooftop arm's 147 s. Same fix, same
 structure.
 *Needs:* copy the cache block from `FolderDataset`. ~15 min. **Predict: 2-3× on solar runs.**
 
-
-### S4 · Self-training with a fixed confidence threshold ★ next, isolates S2's cause
-S2 showed CBST ratio-matching drove the threshold to 0.0004 and cost 18.6 points of target
-IoU. Repeat with a plain **0.5** threshold (which selects 0.59 % of target pixels, a third of
-the source rate) instead of forcing the source ratio.
-*Decides:* whether the failure is **CBST's ratio policy specifically** — in which case
-confidence self-training may still work — or **self-training at all** at this gap width.
-**Predict: recovers to 0.50–0.58, i.e. near but not above the 0.5611 source-only baseline.**
 
 
 ### S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
@@ -122,6 +126,7 @@ first. Until then every Stage-2 precision number, S1's included, measures the wr
 | **Eroded labels (0.4 m)** | merge 0.4615→**0.3256**, pred/label 0.760→**0.9745**, −0.016 IoU; synergistic with MiT |
 | **S1 solar google→ign** | source 0.8723 → **target 0.5611**; best thr 0.5 on both, so not calibration |
 | **R8 merge/split rate** | **50 % of buildings merged** at IoU 0.648; MiT-B2 4.3 pts better; split rate 0 |
+| **S4 confidence self-training** | **0.5611 → 0.6165** on target, beats baseline; CBST ratio-matching was the problem |
 | **D4 adjacency** | **78 %** of buildings touch a neighbour — merging workstream justified |
 | **R3 label confidence** | ⚠️ confounded — 0.6281 vs 0.6483 on shared val, but each model wins on its own labels |
 | **R4 MiT-B2 backbone** | ✅ 0.6569 vs 0.6483 — +0.0086, 2x faster convergence, gain all precision |

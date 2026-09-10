@@ -1,0 +1,89 @@
+{
+  "checkpoint": "experiments/2026-09-10-solar-selftrain-conf/checkpoints/unet_resnet34_30ep_20260910_083614/best.pth",
+  "results": {
+    "google_val (source)": {
+      "0.1": {
+        "iou": 0.8701,
+        "precision": 0.9121,
+        "recall": 0.9498
+      },
+      "0.2": {
+        "iou": 0.8726,
+        "precision": 0.9194,
+        "recall": 0.9449
+      },
+      "0.3": {
+        "iou": 0.8736,
+        "precision": 0.9237,
+        "recall": 0.9416
+      },
+      "0.4": {
+        "iou": 0.8742,
+        "precision": 0.9271,
+        "recall": 0.9387
+      },
+      "0.5": {
+        "iou": 0.8745,
+        "precision": 0.9301,
+        "recall": 0.936
+      },
+      "0.6": {
+        "iou": 0.8747,
+        "precision": 0.9331,
+        "recall": 0.9333
+      },
+      "0.7": {
+        "iou": 0.8747,
+        "precision": 0.9362,
+        "recall": 0.9302
+      },
+      "0.8": {
+        "iou": 0.8743,
+        "precision": 0.9399,
+        "recall": 0.9261
+      }
+    },
+    "ign_val (TARGET)": {
+      "0.1": {
+        "iou": 0.6165,
+        "precision": 0.789,
+        "recall": 0.7382
+      },
+      "0.2": {
+        "iou": 0.6162,
+        "precision": 0.8011,
+        "recall": 0.7275
+      },
+      "0.3": {
+        "iou": 0.6155,
+        "precision": 0.8082,
+        "recall": 0.7208
+      },
+      "0.4": {
+        "iou": 0.6146,
+        "precision": 0.8137,
+        "recall": 0.7152
+      },
+      "0.5": {
+        "iou": 0.6135,
+        "precision": 0.8185,
+        "recall": 0.7102
+      },
+      "0.6": {
+        "iou": 0.6122,
+        "precision": 0.8232,
+        "recall": 0.7049
+      },
+      "0.7": {
+        "iou": 0.6106,
+        "precision": 0.8282,
+        "recall": 0.6991
+      },
+      "0.8": {
+        "iou": 0.6083,
+        "precision": 0.8345,
+        "recall": 0.6918
+      }
+    }
+  }
+}
