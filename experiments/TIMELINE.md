@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 19:01 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 19:30 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -305,10 +305,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-115 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+116 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  54 commits
+### 2026-09-10  ·  55 commits
 
+- `19:01` **2144180** Regenerate ledger and timeline (S6 arms mid-flight: r008 ep18, r012 ep17)
 - `19:00` **56d831a** Visual label review, and the wrong conclusion it nearly produced
 - `18:34` **2df17c6** R12: stratified hand-labelling package for 30 Jaipur crops
 - `18:14` **c17d43e** docs: session note for 2026-09-10, the experiment-runner day
