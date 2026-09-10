@@ -50,7 +50,12 @@ def main(a):
     img_dir = os.path.join(a.src_dir, "images")
     names = sorted(os.listdir(img_dir))
     if a.limit:
-        names = names[:a.limit]
+        # Stride, never a prefix. Crop names sort by parent tile, so
+        # names[:600] drew all 600 from the first 2 of 16 tiles -- both denser
+        # than median -- and reported a foreground prior 35% too high, which
+        # then justified the wrong threshold. Striding spans every tile.
+        step = max(1, len(names) // a.limit)
+        names = names[::step][:a.limit]
     os.makedirs(os.path.join(a.out_dir, "masks"), exist_ok=True)
     print(f"[st] {len(names)} target images from {img_dir}")
 

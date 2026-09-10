@@ -408,6 +408,32 @@ the second command was never a process that could fail.
 **Rule.** One command per `run_docker.sh` call. To chain, either make separate calls or pass
 `bash -c "a && b"` as the single command so the chain is inside one process.
 
+### 3.21 `--limit N` took a sorted prefix, so the sample was one corner of the city ★
+
+**What happened.** Probed the model's foreground prior on 600 of 7,371 Jaipur crops to decide a
+self-training threshold. It reported **31.2 %** foreground at threshold 0.5 against Open
+Buildings' 23.1 %, so I concluded the model over-predicts, wrote that into an experiment
+README and a commit message, and built an argument on it about the S6 ratio-warning
+"reversing". The full-set number is **23.3 %** — the model is well calibrated and none of it
+was true.
+
+**Why.** `names = sorted(os.listdir(img_dir))[:600]`. Crop filenames begin with their parent
+tile, so a sorted prefix is not a sample of the city — all 600 came from **2 of 16 tiles**,
+`map67_1-2` (0.351 density) and `map67_1-3` (0.242), both above the 0.282 median. The probe
+measured the densest corner and I called it Jaipur.
+
+**Shape.** Pattern A with a new face: the probe *could not* have detected a density bias,
+because every crop in it shared the bias. It is also the same lesson as the val-split design
+in `make_weak_labels.py` — which splits by **whole tile** precisely because adjacent crops
+share content — applied everywhere except here.
+
+**Rule.** Any `--limit`/`--sample` over a sorted list must **stride**, not slice:
+`names[::len(names)//limit][:limit]`. And before quoting a statistic from a subsample, print
+how many parent tiles it touched. Fixed in `self_train_pseudolabel.py`.
+
+**Cost.** Two committed claims retracted (the "over-predicts" finding and the "weak supervision
+overcorrected D6" follow-on), plus one arm launched at a threshold chosen from the bad number.
+
 ## 4. Pre-existing, still open
 
 - **BDAPPV has zero negative crops** (`MASTER_CONTEXT` C1). `prep_bdappv.py:85` drops

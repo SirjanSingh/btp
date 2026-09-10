@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-10T22:43:25",
+ "generated": "2026-09-10T22:55:50",
  "n_runs": 69,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
@@ -8,6 +8,7 @@
   "experiments/2026-09-10-eroded-labels-rerun/checkpoints/unet_mit_b2_40ep_20260910_053557/best.pth",
   "experiments/2026-09-10-erosion-02/checkpoints/unet_mit_b2_40ep_20260910_090326/best.pth",
   "experiments/2026-09-10-erosion-sweep/checkpoints/unet_mit_b2_40ep_20260910_033956/best.pth",
+  "experiments/2026-09-10-jaipur-selftrain/ckpt_t080/unet_mit_b2_40ep_20260910_171610/best.pth",
   "experiments/2026-09-10-label-quantity-vs-quality/checkpoints/unet_resnet34_40ep_20260909_210501/best.pth",
   "experiments/2026-09-10-segformer-backbone/checkpoints/unet_mit_b2_40ep_20260909_201300/best.pth",
   "experiments/2026-09-10-selftrain-round2/ckpt/unet_resnet34_30ep_20260910_142120/best.pth",

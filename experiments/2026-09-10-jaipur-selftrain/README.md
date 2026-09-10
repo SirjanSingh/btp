@@ -52,56 +52,64 @@ fused blobs the erosion work exists to prevent, and self-training is actively wr
 stage.
 
 
-## Probe result (before training) — the S6 warning does NOT transfer, and reverses
+## Probe result — and the correction that followed
 
-Ran the ratio policy on 600 crops purely to read off the threshold it implies:
+**First, what I reported (wrong).** A 600-crop probe returned:
 
 ```
 class-ratio 0.231: threshold = 0.8138   (a fixed 0.5 would select 0.3120)
 ```
 
-**Prediction 1 half-right.** I said the map would be gentle rather than tail-steep — correct,
-0.8138 is squarely in the bulk, nothing like solar's 0.0004. I also said "order 0.2–0.5", and
-it is **0.81**. The direction of the error is the informative part.
+From this I concluded the rooftop model **over-predicts** foreground — 31.2 % against Open
+Buildings' 23.1 % — and wrote up a tidy story that the S6 ratio-warning "reverses" here.
 
-**The rooftop model OVER-predicts foreground; the solar model UNDER-predicted it.** At a fixed
-0.5 the rooftop model calls **31.2 %** of pixels building, against Open Buildings' **23.1 %**.
-So ratio-matching here *raises* the threshold to 0.81 to become more selective, whereas on
-solar it *lowered* the threshold to 0.0004 to become less so.
+**That was wrong, and the full-set numbers refute it.** Running both thresholds over all 7,371
+crops:
 
-That inverts the risk. CBST is dangerous when it forces the threshold **down** into noise to
-manufacture foreground the model does not believe in. On Jaipur rooftops it would force the
-threshold **up**, discarding the model's least-confident predictions — which is the
-conservative direction. **The S6 prohibition is specific to sparse-foreground targets and does
-not generalise to this stage.** Worth stating plainly, because the tidy lesson "never use a
-ratio policy" would have been the wrong thing to carry over.
+| threshold | pseudo-label foreground | vs OB prior (23.1 %) |
+|---|---|---|
+| 0.50 | **23.30 %** | +0.2 pts — essentially exact |
+| 0.80 | **17.17 %** | −6 pts |
 
-Note also this is the mirror image of D6: the *AIRS seed* predicted only 5.69 % foreground
-against a 23–28 % truth, a 5× under-prediction. The weakly-supervised model has overshot to
-31.2 %. Training on Open Buildings did not just fix the under-prediction — it overcorrected.
+At its default operating point the model selects **23.3 %** against a 23.1 % prior. It is
+**well calibrated on Jaipur, not over-predicting.** The 31.2 % figure was an artefact.
+
+**Root cause.** `--limit 600` took `sorted(names)[:600]`. Crop filenames sort by parent tile,
+so all 600 came from **2 of 16 tiles** — `map67_1-2` (0.351 density) and `map67_1-3` (0.242),
+both above the 0.282 median. The probe measured the densest corner of the city and called it
+Jaipur. Fixed in `self_train_pseudolabel.py` to stride across the full list; logged as
+PITFALLS 3.21.
+
+**What survives.** The claim the probe was actually run to test — *is the ratio→threshold map
+tail-steep, as it was for solar?* — is answered, and more cleanly than before: matching the
+23.1 % prior lands at a threshold of **~0.50**, right in the bulk. Solar's equivalent was
+0.0004. So the S6 prohibition on ratio policies **does not transfer to this stage**, because
+its mechanism (a ratio that forces the threshold into the noise floor) requires a
+sparse-foreground target. What does *not* survive is the "model over-predicts, so ratio-matching
+becomes conservative" story — the model does neither. Ratio-matching here would simply pick
+≈0.5 and change almost nothing.
+
+**A separate correction, to D6's successor claim.** I wrote earlier today that weak supervision
+"overcorrected" the AIRS seed's 5.69 % under-prediction to 31.2 %. It did not overcorrect: it
+landed at 23.3 % against a 23.1 % truth. The weakly-supervised model reproduces the target
+prior almost exactly, which is a better result than the one I reported.
 
 ## Two arms
 
-Because the threshold is no longer obviously choosable, this brackets it:
-
-| arm | threshold | pseudo-label fg (measured, full set) | rationale |
+| arm | threshold | pseudo-label fg (full set) | what it tests |
 |---|---|---|---|
-| **A** | **0.80** | **17.2 %** | high-confidence |
-| **B** | **0.50** | pending (~31 % expected) | the model's own default operating point |
+| **A** | **0.80** | **17.2 %** | high-confidence only — discards a quarter of OB's foreground |
+| **B** | **0.50** | **23.3 %** | the model's own operating point, ≈ the OB prior |
 
-**Correction to the arm-A rationale.** I chose 0.80 because the 600-crop probe said ratio
-0.231 → threshold 0.8138, so 0.80 should land near the 23.1 % OB prior. Run over all 7,371
-crops, threshold 0.80 actually selects **17.2 %** — the 600-crop probe was not representative
-of the full set, and matching the prior would need roughly 0.70. So arm A is *more*
-conservative than intended: it discards a quarter of the foreground OB claims. That makes it a
-cleaner test of "high confidence only" and a worse test of "match the prior", and the
-comparison against arm B is unaffected. Noted rather than re-run — an unrepresentative probe
-is exactly the kind of thing that should be visible in the record.
+**Prediction (arm A vs arm B):** arm B should win. A's threshold throws away 6 points of
+foreground the labels claim exists, so it should under-segment — `pred/label` below 1 and
+missed rate up. Arm B is near-identical to the teacher's own decision boundary, so its main
+risk is a **null result**: pseudo-labels that reproduce what the model already does teach it
+nothing (exactly the S7 saturation mechanism, which is the closest measured analogue).
 
-**Prediction:** arm A ≥ arm B on `pred/label` and merge rate, because B's extra 8 % of
-foreground is exactly the low-confidence margin where buildings fuse. If B wins, the model's
-uncertain band contains real buildings OB is missing, which would be evidence *about OB* and a
-reason to accelerate R12.
+**Concretely:** arm B within ±0.01 IoU of the 0.6393 teacher and `pred/label` 0.95–1.05;
+arm A down 0.01–0.04 IoU with `pred/label` 0.80–0.95. If arm A *wins*, the low-confidence
+band the teacher emits is mostly noise, and raising the operating point is a free improvement.
 
 ## Setup
 

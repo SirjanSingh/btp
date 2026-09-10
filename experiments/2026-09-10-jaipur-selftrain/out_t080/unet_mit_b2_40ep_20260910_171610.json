@@ -1,0 +1,64 @@
+{
+  "run_name": "unet_mit_b2_40ep_20260910_171610",
+  "timestamp": "2026-09-10T17:16:10.663353",
+  "hardware": {
+    "device": "cuda",
+    "n_gpus": 1,
+    "gpu_name": "Tesla V100-SXM2-32GB",
+    "cuda_version": "12.4"
+  },
+  "config": {
+    "train_dir": "data/jaipur_pseudo_t080/train",
+    "val_dir": "data/jaipur_weak/val",
+    "cache_ram": true,
+    "max_samples": null,
+    "train_csv": null,
+    "val_csv": null,
+    "image_dir": null,
+    "mask_dir": null,
+    "arch": "unet",
+    "encoder": "mit_b2",
+    "encoder_weights": "imagenet",
+    "epochs": 40,
+    "batch_size": 12,
+    "lr": 0.0001,
+    "threshold": 0.5,
+    "patience": 15,
+    "workers": 3,
+    "seed": 42,
+    "ckpt_dir": "experiments/2026-09-10-jaipur-selftrain/ckpt_t080",
+    "resume": null,
+    "init_weights": null,
+    "save_every": 999,
+    "boundary_relax": 0,
+    "simulate_low_res": false,
+    "log_dir": "experiments/2026-09-10-jaipur-selftrain/out_t080"
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "tr_loss": 0.321564,
+      "va_loss": 0.342192,
+      "iou": 0.545917,
+      "f1": 0.70627,
+      "precision": 0.786003,
+      "recall": 0.641223,
+      "lr": 9.984740801978984e-05,
+      "elapsed_s": 248.1,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 2,
+      "tr_loss": 0.216615,
+      "va_loss": 0.388722,
+      "iou": 0.497203,
+      "f1": 0.664175,
+      "precision": 0.828978,
+      "recall": 0.554033,
+      "lr": 9.939057285945931e-05,
+      "elapsed_s": 274.6,
+      "note": ""
+    }
+  ],
+  "summary": {}
+}
