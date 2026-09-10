@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 14:09 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 14:33 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -152,6 +152,7 @@ destroyed two checkpoints, every metric survived because the ledger had been wri
 | 2026-09-10 | [`2026-09-10-d4-adjacency`](2026-09-10-d4-adjacency/) | ✅ done | **78 %** do — instance-merging workstream justified |
 | 2026-09-10 | [`2026-09-10-eroded-labels`](2026-09-10-eroded-labels/) | ✅ done | **Yes** — merge 0.46→0.33, count 0.76→**0.97** per building, −0.016 IoU |
 | 2026-09-10 | [`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/) | ✅ done — reproduced | **0.6393** (orig 0.6405); pred/label **0.9914**, split 0.084 |
+| 2026-09-10 | [`2026-09-10-erosion-02`](2026-09-10-erosion-02/) | running | — |
 | 2026-09-10 | [`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/) | ✅ done — **0.8 m over-erodes** | **0.8 m over-erodes** — merge 0.13 but pred/label 1.47; 0.4 m is the optimum |
 | 2026-09-10 | [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | ✅ done — **confounded; see cross-eval** | **Unresolved** — each model wins on its own labels; needs ground truth |
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
@@ -212,6 +213,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** should reproduce **0.6395–0.6415** — the same recipe, same data, differing only by seed noise. If it lands outside that, something is non-deterministic that I have not accounted for, which would itself be worth knowing. Expect merge ≈ 0.33, `pred/label` ≈ 0.97 as before, plus a split rate that is now *visible* (the old run reported 0.0 under the strict definition; the true value is probably a few 
 
+**[`2026-09-10-erosion-02`](2026-09-10-erosion-02/)** — running
+> **Why:** 0.4 m already achieves `pred/label` **0.9914** — within 0.9 % of one prediction per building — but costs 0.018 IoU and 8.4 % split rate. If 0.2 m gets most of the count benefit for half the cost, it is the better default. If it barely moves, 0.4 m is confirmed as a genuine threshold rather than an arbitrary point on a slope.
+>
+> **Expected:** everything should land **between** the un-eroded and 0.4 m values, since the sweep has been monotonic in every metric so far.
+
 **[`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/)** — ✅ done — **0.8 m over-erodes**
 > **Why:** [eroded-labels](../2026-09-10-eroded-labels/) cut merging 29 % and took `pred/label` from 0.760 to 0.9745 — but **split rate stayed at exactly 0.0**, in all four cells of the 2 × 2. The failure mode erosion is supposed to risk has not appeared at all, which means the useful range has not been explored to its end. If 0.8 m keeps split at 0 while cutting merges further, 0.4 m was simply too timid.
 >
@@ -247,16 +253,17 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 > **Expected:** **0.50–0.58** — recovering most of the loss but landing at or slightly below the 0.5611 source-only baseline. Reasoning: a sane threshold stops the noise-labelling, but self-training can still only reinforce what the model already believes, and the source-only model is wrong about 44 % of the target. Precision should recover to ~0.65–0.75.
 
 
-**17 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+**18 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-98 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+99 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  37 commits
+### 2026-09-10  ·  38 commits
 
+- `14:09` **84f8092** chore: regenerate ledger and timeline
 - `14:08` **f3814ec** result: CBST self-training destroys the solar domain gap -- 0.5611 -> 0.3752
 - `13:32` **cb82ec6** result: 0.4 m arm reproduced and measured honestly -- pred/label 0.9914
 - `13:00` **550ed79** chore: regenerate ledger and timeline
