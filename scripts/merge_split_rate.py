@@ -65,12 +65,12 @@ def instance_stats(pred, gt, min_overlap, min_area_px, split_overlap=0.10):
     n_p -= 1
     n_g -= 1
     if n_g <= 0:
-        return 0, 0, 0, 0, max(n_p, 0)
+        return 0, 0, 0, 0, 0, max(n_p, 0), 0
 
     g_area = np.bincount(g_lbl.ravel(), minlength=n_g + 1)
     keep_g = {i for i in range(1, n_g + 1) if g_area[i] >= min_area_px}
     if not keep_g:
-        return 0, 0, 0, 0, n_p
+        return 0, 0, 0, 0, 0, n_p, 0
 
     # Joint histogram of (pred_label, gt_label) over pixels where both fire.
     # One bincount beats an O(n_p * n_g) loop of boolean ANDs.

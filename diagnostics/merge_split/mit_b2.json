@@ -8,7 +8,10 @@
   "n_label_components": 27918,
   "n_pred_components": 21218,
   "merge_rate": 0.4615,
-  "split_rate": 0.0,
+  "split_rate": 0.0341,
+  "split_rate_strict": 0.0,
+  "fragments_per_label": 0.8903,
+  "split_overlap": 0.1,
   "missed_rate": 0.2423,
   "pred_per_label": 0.76
 }

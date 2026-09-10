@@ -37,7 +37,10 @@ JSON_GLOBS = [
     "rooftop/logs/*.json",
     "solar_panel/logs/*.json",
     "solar_panel/logs/**/*.json",
-    "experiments/*/outputs/*.json",
+    # outputs*, not outputs: the eroded-labels experiment used outputs_mit/ and
+    # outputs_resnet34/, and the narrower glob silently skipped both runs -- the
+    # same directory-naming assumption that let checkpoints_mit/ past .gitignore.
+    "experiments/*/outputs*/*.json",
     "diagnostics/*.json",
     "diagnostics/*/*.json",
 ]
