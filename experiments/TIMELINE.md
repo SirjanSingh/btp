@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 18:09 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 18:14 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -305,10 +305,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-111 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+112 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  50 commits
+### 2026-09-10  ·  51 commits
 
+- `18:09` **9b559ad** perf: contiguous cache -- the list version was 8.4x slower than its own timer said
 - `17:58` **37aee53** chore: regenerate ledger and timeline
 - `17:50` **bb16f0d** chore: park the 4.2 GB crop set on host /tmp -- quota 2.0 -> 6.1 GB free
 - `17:31` **95efd6d** chore: free quota safely, and write down the deletion order
