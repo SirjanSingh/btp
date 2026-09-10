@@ -173,6 +173,29 @@ table with the key row missing.
 
 ---
 
+### 3.12 `git push` fails with HTTP 408 on this network
+Pushes to GitHub began failing with `error: RPC failed; result=22, HTTP code = 408` followed
+by `fatal: The remote end hung up unexpectedly` — while *reads* (`git ls-remote`, `curl
+https://github.com`) worked fine. 408 is **Request Timeout**: git sends the pack with chunked
+transfer encoding, and this node's throttled uplink is slow enough that the server gives up.
+
+Confusingly, git then prints **`Everything up-to-date`** immediately after the failure, which
+reads as success. It is not — verify with SHAs, never with the message.
+
+**Fix:** `git config http.postBuffer 524288000`, which makes git send `Content-Length` instead
+of chunked for payloads under that size. The push then succeeds, slowly.
+
+> **Rule: confirm a push by comparing `git rev-parse HEAD` with
+> `git rev-parse origin/<branch>` after a fetch.** Output text lies in both directions here.
+
+### 3.13 Checking output text instead of exit status
+A retry loop tested `git push ... | tail -1 | grep -qv fatal` and reported "PUSHED on attempt
+1" when nothing had been pushed — the last line happened not to contain "fatal" even though
+the push failed. Same shape as 1.2: a check that cannot detect the thing it is checking for.
+
+> **Rule: branch on exit status, or on the actual state you care about, never on a substring
+> of stdout.**
+
 ## 4. Pre-existing, still open
 
 - **BDAPPV has zero negative crops** (`MASTER_CONTEXT` C1). `prep_bdappv.py:85` drops
