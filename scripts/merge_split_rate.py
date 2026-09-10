@@ -104,6 +104,22 @@ def main(a):
             xs.append(((im.astype(np.float32) / 255. - MEAN) / STD).transpose(2, 0, 1))
         x = torch.from_numpy(np.stack(xs)).to(dev)
         pr = (torch.sigmoid(m(x))[:, 0] > a.threshold).cpu().numpy()
+        if a.dilate_px:
+            # Training on eroded labels shrinks predictions, so scoring against
+            # un-eroded truth charges the method for a deliberate offset.
+            # Dilating back was meant to restore scale without re-merging.
+            #
+            # MEASURED 2026-09-10: it does NOT hold. On the 0.4 m eroded MiT-B2,
+            # dilate_px=2 cut missed 0.3223 -> 0.2496 but pushed merge 0.3256 ->
+            # 0.4163 and pred/label 0.9745 -> 0.8071. Two components 3 px apart
+            # are closed by a 2 px dilation on each side, and after 0.4 m (~1.5
+            # px) erosion most neighbour gaps are exactly that narrow. Dilation
+            # trades misses back for merges at a bad rate. Keep it off unless
+            # the erosion is large enough to leave a gap wider than 2*dilate_px
+            # -- which is what the 0.8 m sweep is for.
+            k = np.ones((2 * a.dilate_px + 1,) * 2, np.uint8)
+            pr = np.stack([cv2.dilate(p.astype(np.uint8), k).astype(bool)
+                           for p in pr])
         for n, p in zip(chunk, pr):
             g = cv2.imread(os.path.join(msk_dir, n), cv2.IMREAD_GRAYSCALE) > 127
             ng, nm, ns, nmiss, npred = instance_stats(p, g, a.min_overlap, a.min_area_px)
@@ -141,6 +157,9 @@ if __name__ == "__main__":
     p.add_argument("--min_area_px", type=int, default=50,
                    help="ignore label blobs under this size; at 26.6 cm, 50 px "
                         "is ~3.5 m2 and mostly labelling specks")
+    p.add_argument("--dilate_px", type=int, default=0,
+                   help="dilate predictions by N px before scoring, to undo "
+                        "label erosion; 0.4 m ~ 1.5 px, 0.8 m ~ 3 px at 26.6 cm")
     p.add_argument("--batch", type=int, default=16)
     p.add_argument("--limit", type=int, default=0)
     p.add_argument("--out", default="")

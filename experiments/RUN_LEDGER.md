@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-10 04:53 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-10 09:05 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**40 runs · 26 checkpoints currently on disk**
+**47 runs · 28 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -29,13 +29,20 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `unet_resnet34_40ep_20260909_173038` | rooftop | train | 1 | **0.5823** | 1 | 0.7360 | 0.7091 | 0.7651 |
 | `unet_resnet34_40ep_20260909_173651` | rooftop | train | 37 | **0.6366** | 22 | 0.7779 | 0.7402 | 0.8197 |
 | `unet_mit_b2_40ep_20260909_201300` | rooftop | train | 40 | **0.6569** | 37 | 0.7929 | 0.7536 | 0.8366 |
-| `unet_resnet34_40ep_20260909_204035` | solar | train | 21 | **0.8693** | 21 | 0.9301 | 0.9336 | 0.9265 |
-| `unet_resnet34_40ep_20260909_210501` | rooftop | train | 25 | **0.6254** | 25 | 0.7695 | 0.6762 | 0.8927 |
+| `unet_resnet34_40ep_20260909_204035` | solar | train | 40 | **0.8723** | 40 | 0.9318 | 0.9308 | 0.9328 |
+| `unet_resnet34_40ep_20260909_210501` | rooftop | train | 40 | **0.6281** | 36 | 0.7716 | 0.6771 | 0.8967 |
 | `d1_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `d4_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d6_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `eval_unet_resnet34_210samples_20260330_192349` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `method_comparison` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `mit_b2` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `mit_b2_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `r3_cross_eval` | diagnostic | eval | 0 | — | — | — | — | — |
+| `resnet34` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `resnet34_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `s1_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_111230` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_112025` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_115938` | rooftop | train (txt only) | 0 | — | — | — | — | — |
@@ -61,9 +68,16 @@ Kept deliberately — a crashed configuration is evidence too.
 - `eval_unet_resnet34_20260404_175648` (solar_panel/logs/eval_unet_resnet34_20260404_175648.json)
 - `d1_summary` (diagnostics/d1/d1_summary.json)
 - `d2_d3_summary` (diagnostics/d2_d3/d2_d3_summary.json)
+- `d4_summary` (diagnostics/d4/d4_summary.json)
 - `d6_summary` (diagnostics/d6_smoke/d6_summary.json)
 - `eval_unet_resnet34_210samples_20260330_192349` (rooftop/logs/eval_unet_resnet34_210samples_20260330_192349.txt)
 - `method_comparison` (diagnostics/method_comparison.json)
+- `mit_b2` (diagnostics/merge_split/mit_b2.json)
+- `mit_b2_eroded` (diagnostics/merge_split/mit_b2_eroded.json)
+- `r3_cross_eval` (diagnostics/r3_cross_eval.json)
+- `resnet34` (diagnostics/merge_split/resnet34.json)
+- `resnet34_eroded` (diagnostics/merge_split/resnet34_eroded.json)
+- `s1_crossdomain` (diagnostics/s1_crossdomain.json)
 - `unet_resnet34_100ep_20260330_111230` (logs/unet_resnet34_100ep_20260330_111230.txt)
 - `unet_resnet34_100ep_20260330_112025` (logs/unet_resnet34_100ep_20260330_112025.txt)
 - `unet_resnet34_100ep_20260330_115938` (logs/unet_resnet34_100ep_20260330_115938.txt)

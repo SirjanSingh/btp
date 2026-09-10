@@ -108,10 +108,21 @@ threshold entirely. Split rate stayed at **exactly 0.0**, contradicting my predi
 does not overshoot into cutting single buildings apart. That headroom suggests **more erosion
 is worth trying**, since the failure mode I feared has not appeared at all.
 
-**The natural next step is inference-time dilation.** Predictions are systematically shrunk by
-construction; dilating them back by ~0.4 m should recover much of the missed rate and IoU
-while keeping the instances separate. It is not implemented, so every number here understates
-the approach.
+**Inference-time dilation was the obvious next step, and it fails.** Predictions are shrunk by
+construction, so dilating them back ought to recover the missed rate while keeping instances
+apart. Measured on the eroded MiT-B2 with `--dilate_px 2`:
+
+| | merge | missed | pred/label |
+|---|---|---|---|
+| no dilation | **0.3256** | 0.3223 | **0.9745** |
+| dilate 2 px | 0.4163 | 0.2496 | 0.8071 |
+
+It recovers misses (−0.073) but **re-merges buildings** (+0.091) and undoes most of the count
+gain (0.9745 → 0.8071). The reason is geometric and should have been obvious: two components
+3 px apart are closed by a 2 px dilation from each side, and after 0.4 m (~1.5 px) erosion
+most neighbour gaps are exactly that narrow. **Dilation trades misses back for merges at a
+bad rate.** Keep it off — unless erosion is large enough to leave a gap wider than
+`2 × dilate_px`, which is precisely what the 0.8 m sweep tests.
 
 ## Decision
 
