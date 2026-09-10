@@ -49,11 +49,12 @@ baseline is unreproducible precisely because that script never existed.
 The same CBST recipe as R5, tuned where the score is visible.
 *Needs:* S1 first.
 
-### S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ blocks all Stage-2 numbers
+### S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
 `prep_bdappv.py:85` drops mask-less images, so **every** training crop contains a panel and
-the model never learns "no panel here". Re-prep keeping negatives, verify the fraction is
-non-zero, then re-run S1.
-*Needs:* CPU re-prep. **Do before quoting any Stage-2 precision.**
+the model never learns "no panel here". Re-prep keeping negatives, then re-run S1.
+**Blocked 2026-09-10:** `solar_panel/bdappv/` is **empty** — only the derived crops survive,
+so there is nothing to re-prep from. Fixing C1 requires **re-downloading BDAPPV** from source
+first. Until then every Stage-2 precision number, S1's included, measures the wrong task.
 
 ---
 
