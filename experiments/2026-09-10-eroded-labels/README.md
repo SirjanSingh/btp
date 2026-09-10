@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ✅ done |
 | **Date** | 2026-09-10 |
 
 ## Question
@@ -55,7 +55,25 @@ exactly the confound that made R3 unresolvable.
 
 ## Results
 
-### MiT-B2 arm (complete; early-stopped epoch 34, best @19)
+### The full 2 × 2
+
+| encoder | labels | IoU | **merge** | split | missed | **pred/label** |
+|---|---|---|---|---|---|---|
+| ResNet-34 | un-eroded | 0.6483 | 0.5040 | 0.0 | 0.2364 | 0.789 |
+| ResNet-34 | **eroded** | 0.6395 | 0.4397 | 0.0 | 0.2654 | 0.903 |
+| MiT-B2 | un-eroded | **0.6569** | 0.4615 | 0.0 | 0.2423 | 0.760 |
+| **MiT-B2** | **eroded** | 0.6405 | **0.3256** | 0.0 | 0.3223 | **0.9745** |
+
+Erosion cuts merging by **12.8 %** relative on ResNet-34 and **29.4 %** on MiT-B2.
+
+> **Prediction wrong, and informatively so.** I expected erosion to help **ResNet more**,
+> reasoning that MiT already merges 4.3 points less so it had less to gain. The opposite
+> held by a factor of two: −0.064 for ResNet against **−0.136** for MiT. The two
+> interventions are **synergistic, not redundant** — a global receptive field can exploit a
+> gap in the label that a convolutional one cannot fully use. Best configuration is both
+> together, by a clear margin.
+
+### MiT-B2 arm detail (early-stopped epoch 34, best @19)
 
 | | un-eroded | **eroded 0.4 m** | delta |
 |---|---|---|---|

@@ -453,7 +453,37 @@
       "lr": 4.767963140691305e-06,
       "elapsed_s": 135.1,
       "note": ""
+    },
+    {
+      "epoch": 36,
+      "tr_loss": 0.268939,
+      "va_loss": 0.256537,
+      "iou": 0.632605,
+      "f1": 0.774964,
+      "precision": 0.772587,
+      "recall": 0.777356,
+      "lr": 3.4227024433898994e-06,
+      "elapsed_s": 138.6,
+      "note": ""
+    },
+    {
+      "epoch": 37,
+      "tr_loss": 0.268827,
+      "va_loss": 0.257886,
+      "iou": 0.630577,
+      "f1": 0.77344,
+      "precision": 0.774942,
+      "recall": 0.771944,
+      "lr": 2.36768894031501e-06,
+      "elapsed_s": 131.5,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.639462,
+    "best_epoch": 22,
+    "checkpoint": "experiments/2026-09-10-eroded-labels/checkpoints_resnet34/unet_resnet34_40ep_20260910_011232/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.259538
+  }
 }
