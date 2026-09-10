@@ -45,6 +45,23 @@ fi
 
 mkdir -p "${TMPDIR_HOST}"
 
+# ---- data parked on host /tmp -----------------------------------------------
+# The 40 GB /home quota is the binding constraint; host /tmp is on / (18 GB free)
+# and outside the quota. Large REGENERABLE datasets live there and are symlinked
+# from data/. Those symlinks work on the host but NOT in the container, because
+# container /tmp is bind-mounted to .tmp on /home -- so mount each parked dataset
+# directly over its expected path instead. Only regenerable data goes here: host
+# /tmp is shared and has no retention guarantee.
+DATA_MOUNTS=()
+if [[ -d /tmp/btp_data ]]; then
+  for _d in /tmp/btp_data/*/; do
+    _n="$(basename "${_d%/}")"
+    DATA_MOUNTS+=(-v "${_d%/}":"/workspace/data/${_n}")
+  done
+  [[ ${#DATA_MOUNTS[@]} -gt 0 ]] && \
+    echo "[run_docker] parked data: ${#DATA_MOUNTS[@]} dataset(s) from /tmp/btp_data"
+fi
+
 # ---- ownership -------------------------------------------------------------
 # Running as root inside the container makes every file it writes to the bind
 # mount root:root on the host, and this user has no sudo to undo that. So run as
@@ -70,6 +87,7 @@ exec docker run "${TTY_FLAGS[@]}" \
   --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
   --shm-size=16g \
   -v "${BTP_ROOT}":/workspace \
+  "${DATA_MOUNTS[@]+"${DATA_MOUNTS[@]}"}" \
   -v "${TMPDIR_HOST}":/tmp \
   -e HOME=/workspace \
   -e TMPDIR=/tmp \

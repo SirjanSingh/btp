@@ -330,6 +330,26 @@ are copy-on-write shared rather than duplicated per worker.
 > **Rule: before tuning a model, sample GPU utilisation. A sawtooth means the bottleneck is
 > upstream, and no amount of batch-size or architecture work will fix it.**
 
+### 3.17 Parking regenerable data on host `/tmp` — and why a plain symlink is not enough
+The 40 GB `/home` quota binds long before disk does; host `/tmp` sits on `/` (18 GB free) and
+is outside the quota. `data/jaipur_weak` (4.2 GB, regenerable from
+`scripts/make_weak_labels.py`) now lives at `/tmp/btp_data/jaipur_weak` with a symlink from
+`data/`.
+
+**The symlink alone does not work in the container.** `run_docker.sh` bind-mounts `.tmp`
+(on `/home`) to container `/tmp`, so a link to `/tmp/btp_data/...` resolves *inside* the
+container to `.tmp/btp_data/...` — which does not exist. Same class as 3.10: a path that is
+valid on the host and dangling under the bind mount.
+
+**Fix:** `run_docker.sh` now mounts each directory under `/tmp/btp_data` directly over its
+expected `/workspace/data/<name>` path, so the container sees real data where the host sees a
+symlink. Verified with a read *inside* the container before deleting the original.
+
+**Only regenerable data goes here.** Host `/tmp` is shared, has no retention guarantee
+(oldest surviving files were 9 days old, no active cleanup timer), and filling it hurts every
+user on the box. Source imagery and anything not rebuildable from a committed script stays on
+`/home`.
+
 ## 4. Pre-existing, still open
 
 - **BDAPPV has zero negative crops** (`MASTER_CONTEXT` C1). `prep_bdappv.py:85` drops

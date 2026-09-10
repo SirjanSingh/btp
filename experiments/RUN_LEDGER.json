@@ -1,8 +1,7 @@
 {
- "generated": "2026-09-10T17:30:16",
+ "generated": "2026-09-10T17:50:40",
  "n_runs": 61,
  "checkpoints_on_disk": [
-  "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173038/best.pth",
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
   "experiments/2026-09-09-does-the-airs-seed-help/checkpoints/unet_resnet34_40ep_20260909_171814/best.pth",
   "experiments/2026-09-09-weak-supervision-jaipur/checkpoints/unet_resnet34_40ep_20260909_152425/best.pth",

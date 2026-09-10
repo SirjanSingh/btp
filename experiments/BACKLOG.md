@@ -11,6 +11,9 @@ write the full entry under `experiments/<date>-<slug>/`.
   training run with `--save_every 999` writes **one ~280 MB `best.pth`**, so ~1 GB free is
   ample. A flat 3 GB floor blocked launches for no reason. Mask generation writes ~60 MB;
   a full crop set writes ~4 GB — *that* is when to check carefully.
+  Large **regenerable** datasets can be parked on host `/tmp` (`/tmp/btp_data/<name>`, outside
+  the quota) and are mounted back automatically by `run_docker.sh`. Only regenerable data —
+  `/tmp` is shared and has no retention guarantee.
   Deletion order when space is needed, safest first: (1) regenerable mask/pseudo-label sets
   from *completed* experiments — they rebuild from committed scripts with recorded flags;
   (2) checkpoints of runs that **aborted before finishing** (1 epoch, killed, superseded by a
