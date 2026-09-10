@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ✅ done — **strong negative result** |
 | **Date** | 2026-09-10 |
 
 ## Question
@@ -60,7 +60,63 @@ Symlink trees, 25 MB of masks, nothing duplicated.
 
 ## Results
 
-*pending*
+Raw: [`diagnostics/s2_crossdomain.json`](../../diagnostics/s2_crossdomain.json)
+
+| | source (google_val) | **target (ign_val)** | best thr on target | precision | recall |
+|---|---|---|---|---|---|
+| S1 source-only | 0.8723 | **0.5611** | 0.5 | 0.741 | 0.698 |
+| **S2 self-trained** | 0.8678 | **0.3752** | **0.8** | **0.391** | 0.902 |
+
+**Self-training cost 18.6 points of target IoU — a 33 % relative degradation.**
+
+Predicted 0.52–0.60, "plausibly below the baseline", with precision falling and recall
+rising. Direction exactly right; **severity badly underestimated**.
+
+## Interpretation
+
+**★ The prescribed fix caused the failure it was prescribed to prevent — inverted.**
+`MASTER_CONTEXT` recommends CBST class-ratio thresholding because a fixed high threshold
+causes *foreground collapse*: sparse predictions → sparser pseudo-labels → sparser teacher.
+Ratio-matching does prevent that. But on a domain gap this wide it prevents it **by force**:
+to select the source's 1.83 % of pixels it drove the threshold to **0.0004**, so the
+pseudo-labels were largely noise labelled as panel. The model dutifully learned to
+over-predict.
+
+The evidence is in the precision/recall split: **precision collapsed 0.741 → 0.391** while
+recall rose 0.698 → 0.902. It is not confused — it is confidently painting panels everywhere.
+
+**The threshold pathology predicted this before a single epoch ran.** That finding was
+recorded in this file before launch, and it was the right read.
+
+**The target's optimal threshold moved 0.5 → 0.8**, further confirming systematic
+over-prediction: the only way to use this model is to demand much more confidence than before.
+
+**This is exactly why the bench exists.** Had this been run on Jaipur, where no target label
+exists, there would have been no way to know it had made things 33 % worse — the in-domain
+score barely moved (0.8723 → 0.8678) and would have looked like a healthy run.
+`MASTER_CONTEXT`'s ordering principle just paid for itself.
+
+## Decision
+
+- [x] **Do not run naive CBST self-training on Jaipur.** It would have silently degraded the
+      target model with no way to detect it.
+- [x] Record that class-ratio thresholding has a failure mode of its own, not mentioned in
+      `plan/03` or `MASTER_CONTEXT`: it is safe only when the target confidence distribution
+      is not crushed.
+- [ ] **Next: isolate the cause.** Repeat with a fixed 0.5 confidence threshold instead of
+      ratio-matching. If that recovers, the problem is CBST's ratio policy specifically; if it
+      also degrades, self-training itself is unsafe at this gap width.
+- [ ] A ratio *between* source prior and model confidence (e.g. 0.006, what 0.5 selects) is
+      the obvious middle ground and untested.
+
+## Threats to validity
+
+- ⚠ **C1 unfixed** — every BDAPPV crop contains a panel, so precision here is not a
+  deployment number. The *relative* collapse is still real: both arms share the defect.
+- One round of self-training. CBST normally runs 2–3 rounds with a growing ratio; a single
+  aggressive round may be the worst case rather than a fair test of the method.
+- Model selected on source val (correctly — selecting on target would leak), so the target
+  number is honest but the run was never optimised for it.
 
 ## Threats to validity
 

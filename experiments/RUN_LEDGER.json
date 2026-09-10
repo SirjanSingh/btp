@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-10T13:32:10",
- "n_runs": 56,
+ "generated": "2026-09-10T14:08:59",
+ "n_runs": 57,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173038/best.pth",
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
@@ -8518,13 +8518,17 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 26,
+   "n_epochs": 30,
    "best_epoch": 26,
    "best_iou": 0.867755,
    "best_f1": 0.929196,
    "best_precision": 0.926024,
    "best_recall": 0.932389,
-   "summary": {},
+   "summary": {
+    "best_val_iou": 0.867755,
+    "best_epoch": 26,
+    "checkpoint": "experiments/2026-09-10-solar-self-training/checkpoints/unet_resnet34_30ep_20260910_044423/best.pth"
+   },
    "threshold_sweep": null,
    "results": null,
    "epochs": [
@@ -8839,6 +8843,54 @@
      "lr": 5.2794998466912506e-06,
      "elapsed_s": 349.3,
      "note": "\u2190 best"
+    },
+    {
+     "epoch": 27,
+     "tr_loss": 0.071861,
+     "va_loss": 0.043292,
+     "iou": 0.86692,
+     "f1": 0.928717,
+     "precision": 0.924719,
+     "recall": 0.932749,
+     "lr": 3.4227024433898994e-06,
+     "elapsed_s": 298.5,
+     "note": ""
+    },
+    {
+     "epoch": 28,
+     "tr_loss": 0.070973,
+     "va_loss": 0.043759,
+     "iou": 0.865672,
+     "f1": 0.928,
+     "precision": 0.921555,
+     "recall": 0.934537,
+     "lr": 2.0816937636766182e-06,
+     "elapsed_s": 282.6,
+     "note": ""
+    },
+    {
+     "epoch": 29,
+     "tr_loss": 0.071101,
+     "va_loss": 0.043338,
+     "iou": 0.866957,
+     "f1": 0.928738,
+     "precision": 0.924065,
+     "recall": 0.933459,
+     "lr": 1.2711661792704665e-06,
+     "elapsed_s": 280.5,
+     "note": ""
+    },
+    {
+     "epoch": 30,
+     "tr_loss": 0.071185,
+     "va_loss": 0.043309,
+     "iou": 0.867073,
+     "f1": 0.928804,
+     "precision": 0.923833,
+     "recall": 0.933829,
+     "lr": 1e-06,
+     "elapsed_s": 284.2,
+     "note": ""
     }
    ]
   },
@@ -10252,6 +10304,110 @@
       "iou": 0.5601,
       "precision": 0.7664,
       "recall": 0.6754
+     }
+    }
+   },
+   "epochs": []
+  },
+  {
+   "run_name": "s2_crossdomain",
+   "log": "diagnostics/s2_crossdomain.json",
+   "stage": "diagnostic",
+   "kind": "diagnostic",
+   "timestamp": "",
+   "config": {},
+   "hardware": {},
+   "n_epochs": 0,
+   "best_epoch": null,
+   "best_iou": null,
+   "best_f1": null,
+   "best_precision": null,
+   "best_recall": null,
+   "summary": {},
+   "threshold_sweep": null,
+   "results": {
+    "google_val (source)": {
+     "0.1": {
+      "iou": 0.8633,
+      "precision": 0.9064,
+      "recall": 0.9477
+     },
+     "0.2": {
+      "iou": 0.8659,
+      "precision": 0.9144,
+      "recall": 0.9423
+     },
+     "0.3": {
+      "iou": 0.867,
+      "precision": 0.9192,
+      "recall": 0.9385
+     },
+     "0.4": {
+      "iou": 0.8676,
+      "precision": 0.9229,
+      "recall": 0.9354
+     },
+     "0.5": {
+      "iou": 0.8678,
+      "precision": 0.9261,
+      "recall": 0.9324
+     },
+     "0.6": {
+      "iou": 0.8678,
+      "precision": 0.9291,
+      "recall": 0.9293
+     },
+     "0.7": {
+      "iou": 0.8675,
+      "precision": 0.9324,
+      "recall": 0.9257
+     },
+     "0.8": {
+      "iou": 0.8669,
+      "precision": 0.9365,
+      "recall": 0.9211
+     }
+    },
+    "ign_val (TARGET)": {
+     "0.1": {
+      "iou": 0.3268,
+      "precision": 0.3366,
+      "recall": 0.9182
+     },
+     "0.2": {
+      "iou": 0.3397,
+      "precision": 0.3509,
+      "recall": 0.9139
+     },
+     "0.3": {
+      "iou": 0.347,
+      "precision": 0.3591,
+      "recall": 0.9116
+     },
+     "0.4": {
+      "iou": 0.3526,
+      "precision": 0.3654,
+      "recall": 0.9098
+     },
+     "0.5": {
+      "iou": 0.3576,
+      "precision": 0.371,
+      "recall": 0.9082
+     },
+     "0.6": {
+      "iou": 0.3625,
+      "precision": 0.3766,
+      "recall": 0.9066
+     },
+     "0.7": {
+      "iou": 0.368,
+      "precision": 0.3829,
+      "recall": 0.9047
+     },
+     "0.8": {
+      "iou": 0.3752,
+      "precision": 0.391,
+      "recall": 0.9023
      }
     }
    },

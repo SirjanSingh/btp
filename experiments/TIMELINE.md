@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 13:32 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 14:08 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -157,7 +157,8 @@ destroyed two checkpoints, every metric survived because the ledger had been wri
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
 | 2026-09-10 | [`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/) | ✅ done — modest win | **+0.0086** (0.6569) and **2× faster convergence**; gain is all precision |
 | 2026-09-10 | [`2026-09-10-solar-google-to-ign`](2026-09-10-solar-google-to-ign/) | ✅ done | **0.8723 → 0.5611** (−31 pts); a capability drop, not miscalibration |
-| 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | running | — |
+| 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | ✅ done — **strong negative result** | **No — it destroys it.** 0.5611 → **0.3752** on target |
+| 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | running | — |
 
 ### Why each was run, and what was expected
 
@@ -235,22 +236,28 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** in-domain google val IoU **0.82–0.86** (prior solar runs reached ~0.85). On IGN, a drop to **0.55–0.70**. The GSD ratio here is only 2× versus Stage 1's 3.55×, and panels are far more visually distinctive than roofs, so I expect a smaller relative drop than the rooftop domain gap — but a clear one.
 
-**[`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/)** — running
+**[`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/)** — ✅ done — **strong negative result**
 > **Why:** Jaipur has zero labels, so a self-training run there can never be scored, only argued about. Both BDAPPV domains are labelled, so every knob — threshold policy, class ratio, number of rounds — can be tuned against a real number, then frozen and transferred. That is `MASTER_CONTEXT`'s ordering principle, and this is the first run to actually exercise it.
 >
 > **Expected:** I expect this to **fail or barely move** — IGN IoU **0.52–0.60**, i.e. plausibly *below* the 0.5611 source-only baseline. Pseudo-labels drawn at a 0.0004 threshold are close to noise-shaped, and training on them should teach over-prediction. If it lands above 0.60 I will have badly misread the threshold evidence.
 
+**[`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/)** — running
+> **Why:** S2 cost **18.6 points** of target IoU (0.5611 → 0.3752) with precision falling 0.741 → 0.391. The suspected cause is CBST's ratio policy: forcing the source's 1.83 % foreground on a target whose confidence distribution is crushed drove the threshold to **0.0004**, so pseudo-labels were largely noise.
+>
+> **Expected:** **0.50–0.58** — recovering most of the loss but landing at or slightly below the 0.5611 source-only baseline. Reasoning: a sane threshold stops the noise-labelling, but self-training can still only reinforce what the model already believes, and the source-only model is wrong about 44 % of the target. Precision should recover to ~0.65–0.75.
 
-**16 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+
+**17 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-96 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+97 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  35 commits
+### 2026-09-10  ·  36 commits
 
+- `13:32` **cb82ec6** result: 0.4 m arm reproduced and measured honestly -- pred/label 0.9914
 - `13:00` **550ed79** chore: regenerate ledger and timeline
 - `12:58` **5dcc98d** chore: regenerate ledger and timeline
 - `12:54` **6574975** perf: --cache_ram makes training 3.7x faster; we were dataloader-bound
@@ -392,7 +399,7 @@ The half of the record that is normally lost. An idea absent from this repo was 
 - queued — R5 · Self-training / CBST on top of the weak model
 - queued — R6 · Multi-source co-training
 - queued — R7 · Low-resolution simulation
-- queued — S2 · google → ign with self-training
+- queued — S4 · Self-training with a fixed confidence threshold ★ next, isolates S2's cause
 - ⛔ **blocked** — S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
 
 ---

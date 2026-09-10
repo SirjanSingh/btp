@@ -78,9 +78,14 @@ baseline is unreproducible precisely because that script never existed.
 
 ## Queue — solar (Stage 2)
 
-### S2 · google → ign with self-training
-The same CBST recipe as R5, tuned where the score is visible.
-*Needs:* S1 first.
+### S4 · Self-training with a fixed confidence threshold ★ next, isolates S2's cause
+S2 showed CBST ratio-matching drove the threshold to 0.0004 and cost 18.6 points of target
+IoU. Repeat with a plain **0.5** threshold (which selects 0.59 % of target pixels, a third of
+the source rate) instead of forcing the source ratio.
+*Decides:* whether the failure is **CBST's ratio policy specifically** — in which case
+confidence self-training may still work — or **self-training at all** at this gap width.
+**Predict: recovers to 0.50–0.58, i.e. near but not above the 0.5611 source-only baseline.**
+
 
 ### S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
 `prep_bdappv.py:85` drops mask-less images, so **every** training crop contains a panel and

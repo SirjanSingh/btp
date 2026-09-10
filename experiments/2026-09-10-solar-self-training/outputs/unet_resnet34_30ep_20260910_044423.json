@@ -339,7 +339,59 @@
       "lr": 5.2794998466912506e-06,
       "elapsed_s": 349.3,
       "note": "\u2190 best"
+    },
+    {
+      "epoch": 27,
+      "tr_loss": 0.071861,
+      "va_loss": 0.043292,
+      "iou": 0.86692,
+      "f1": 0.928717,
+      "precision": 0.924719,
+      "recall": 0.932749,
+      "lr": 3.4227024433898994e-06,
+      "elapsed_s": 298.5,
+      "note": ""
+    },
+    {
+      "epoch": 28,
+      "tr_loss": 0.070973,
+      "va_loss": 0.043759,
+      "iou": 0.865672,
+      "f1": 0.928,
+      "precision": 0.921555,
+      "recall": 0.934537,
+      "lr": 2.0816937636766182e-06,
+      "elapsed_s": 282.6,
+      "note": ""
+    },
+    {
+      "epoch": 29,
+      "tr_loss": 0.071101,
+      "va_loss": 0.043338,
+      "iou": 0.866957,
+      "f1": 0.928738,
+      "precision": 0.924065,
+      "recall": 0.933459,
+      "lr": 1.2711661792704665e-06,
+      "elapsed_s": 280.5,
+      "note": ""
+    },
+    {
+      "epoch": 30,
+      "tr_loss": 0.071185,
+      "va_loss": 0.043309,
+      "iou": 0.867073,
+      "f1": 0.928804,
+      "precision": 0.923833,
+      "recall": 0.933829,
+      "lr": 1e-06,
+      "elapsed_s": 284.2,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.867755,
+    "best_epoch": 26,
+    "checkpoint": "experiments/2026-09-10-solar-self-training/checkpoints/unet_resnet34_30ep_20260910_044423/best.pth"
+  }
 }

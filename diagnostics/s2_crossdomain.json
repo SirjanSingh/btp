@@ -1,0 +1,89 @@
+{
+  "checkpoint": "experiments/2026-09-10-solar-self-training/checkpoints/unet_resnet34_30ep_20260910_044423/best.pth",
+  "results": {
+    "google_val (source)": {
+      "0.1": {
+        "iou": 0.8633,
+        "precision": 0.9064,
+        "recall": 0.9477
+      },
+      "0.2": {
+        "iou": 0.8659,
+        "precision": 0.9144,
+        "recall": 0.9423
+      },
+      "0.3": {
+        "iou": 0.867,
+        "precision": 0.9192,
+        "recall": 0.9385
+      },
+      "0.4": {
+        "iou": 0.8676,
+        "precision": 0.9229,
+        "recall": 0.9354
+      },
+      "0.5": {
+        "iou": 0.8678,
+        "precision": 0.9261,
+        "recall": 0.9324
+      },
+      "0.6": {
+        "iou": 0.8678,
+        "precision": 0.9291,
+        "recall": 0.9293
+      },
+      "0.7": {
+        "iou": 0.8675,
+        "precision": 0.9324,
+        "recall": 0.9257
+      },
+      "0.8": {
+        "iou": 0.8669,
+        "precision": 0.9365,
+        "recall": 0.9211
+      }
+    },
+    "ign_val (TARGET)": {
+      "0.1": {
+        "iou": 0.3268,
+        "precision": 0.3366,
+        "recall": 0.9182
+      },
+      "0.2": {
+        "iou": 0.3397,
+        "precision": 0.3509,
+        "recall": 0.9139
+      },
+      "0.3": {
+        "iou": 0.347,
+        "precision": 0.3591,
+        "recall": 0.9116
+      },
+      "0.4": {
+        "iou": 0.3526,
+        "precision": 0.3654,
+        "recall": 0.9098
+      },
+      "0.5": {
+        "iou": 0.3576,
+        "precision": 0.371,
+        "recall": 0.9082
+      },
+      "0.6": {
+        "iou": 0.3625,
+        "precision": 0.3766,
+        "recall": 0.9066
+      },
+      "0.7": {
+        "iou": 0.368,
+        "precision": 0.3829,
+        "recall": 0.9047
+      },
+      "0.8": {
+        "iou": 0.3752,
+        "precision": 0.391,
+        "recall": 0.9023
+      }
+    }
+  }
+}
