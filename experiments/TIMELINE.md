@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 10:45 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 11:08 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -81,6 +81,31 @@ exist before that experiment could be interpreted at all.**
   closed by a 2 px dilation from each side. The geometry was checkable in advance and I did
   not check it.
 
+### The pattern behind the mistakes
+
+Individually the errors above look unrelated. They are not — `docs/PITFALLS.md` §0 groups all
+fifteen into **three shapes**, and I hit each repeatedly in one session:
+
+**A · Trusting a check that cannot detect what it checks for** — seven times. Raising gdown's
+`MAX_NUMBER_FILES` (a warning gate, not a fetch limit); grepping `tail -1` of a push for
+"fatal"; a split-rate threshold that fragments can never trip; a 32-crop smoke test containing
+no empty-label crop; `df` instead of `quota`. **Every one produced a confident wrong
+statement.** The fix is one question asked *before* reporting: *if the hypothesis were true,
+would this output differ?*
+
+**B · Assuming an exact directory name where code generates it** — three times, always
+silently. `checkpoints_mit/` past `.gitignore`, `outputs_mit/` past the ledger's glob,
+host-absolute symlinks dangling at `/workspace`. A collector that finds nothing looks
+identical to a directory containing nothing.
+
+**C · Applying a stale rule instead of re-deriving it** — a flat 3 GB quota floor blocked
+launches for hours when the job wrote 280 MB, and the two-job rule got applied as dogma while
+four GPUs sat idle at 0 %. Sirjan caught both. **Re-measure every tick; never carry a
+threshold forward.**
+
+The one process that paid for itself was **record-before-deleting**: when `filter-branch`
+destroyed two checkpoints, every metric survived because the ledger had been written first.
+
 ### Judgement calls, and why
 
 - **Predictions written before every run.** Not ceremony — the boundary-relaxation and
@@ -126,6 +151,7 @@ exist before that experiment could be interpreted at all.**
 | 2026-09-09 | [`2026-09-09-weak-supervision-jaipur`](2026-09-09-weak-supervision-jaipur/) | ✅ done | **IoU 0.6475** — 4.6× the unadapted seed |
 | 2026-09-10 | [`2026-09-10-d4-adjacency`](2026-09-10-d4-adjacency/) | ✅ done | **78 %** do — instance-merging workstream justified |
 | 2026-09-10 | [`2026-09-10-eroded-labels`](2026-09-10-eroded-labels/) | ✅ done | **Yes** — merge 0.46→0.33, count 0.76→**0.97** per building, −0.016 IoU |
+| 2026-09-10 | [`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/) | running | — |
 | 2026-09-10 | [`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/) | ✅ done — **0.8 m over-erodes** | **0.8 m over-erodes** — merge 0.13 but pred/label 1.47; 0.4 m is the optimum |
 | 2026-09-10 | [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | ✅ done — **confounded; see cross-eval** | **Unresolved** — each model wins on its own labels; needs ground truth |
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
@@ -180,6 +206,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** - **Merge rate 0.30–0.40**, down from 0.5040. This is the number the experiment lives or dies by. - **IoU 0.60–0.64**, i.e. slightly *worse* than 0.6483 — predictions will be systematically smaller than the un-eroded val targets. An IoU drop is an acceptable price and is expected. - **Split rate rises above 0**, possibly to a few percent. If erosion overshoots it will start cutting single building
 
+**[`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/)** — running
+> **Why:** the original run's *metrics* survived in `RUN_LEDGER` (best IoU **0.6405** @ep19), so nothing scientific was lost. But two things need the weights themselves:
+>
+> **Expected:** should reproduce **0.6395–0.6415** — the same recipe, same data, differing only by seed noise. If it lands outside that, something is non-deterministic that I have not accounted for, which would itself be worth knowing. Expect merge ≈ 0.33, `pred/label` ≈ 0.97 as before, plus a split rate that is now *visible* (the old run reported 0.0 under the strict definition; the true value is probably a few 
+
 **[`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/)** — ✅ done — **0.8 m over-erodes**
 > **Why:** [eroded-labels](../2026-09-10-eroded-labels/) cut merging 29 % and took `pred/label` from 0.760 to 0.9745 — but **split rate stayed at exactly 0.0**, in all four cells of the 2 × 2. The failure mode erosion is supposed to risk has not appeared at all, which means the useful range has not been explored to its end. If 0.8 m keeps split at 0 while cutting merges further, 0.4 m was simply too timid.
 >
@@ -210,16 +241,17 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 > **Expected:** I expect this to **fail or barely move** — IGN IoU **0.52–0.60**, i.e. plausibly *below* the 0.5611 source-only baseline. Pseudo-labels drawn at a 0.0004 threshold are close to noise-shaped, and training on them should teach over-prediction. If it lands above 0.60 I will have badly misread the threshold evidence.
 
 
-**15 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+**16 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-86 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+87 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  25 commits
+### 2026-09-10  ·  26 commits
 
+- `10:45` **2248231** fix: split metric now sees fragmentation; ledger glob missed two whole runs
 - `10:38` **4913d59** fix: split-rate metric was blind to fragmentation; queue hand-labelling as R12
 - `10:22` **97b8734** result: 0.8 m over-erodes -- and my split-rate metric is blind to it
 - `10:17` **4e35d43** feat: CBST self-training on google->ign, plus a finding that arrived before it ran

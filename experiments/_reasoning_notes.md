@@ -68,6 +68,31 @@ exist before that experiment could be interpreted at all.**
   closed by a 2 px dilation from each side. The geometry was checkable in advance and I did
   not check it.
 
+### The pattern behind the mistakes
+
+Individually the errors above look unrelated. They are not — `docs/PITFALLS.md` §0 groups all
+fifteen into **three shapes**, and I hit each repeatedly in one session:
+
+**A · Trusting a check that cannot detect what it checks for** — seven times. Raising gdown's
+`MAX_NUMBER_FILES` (a warning gate, not a fetch limit); grepping `tail -1` of a push for
+"fatal"; a split-rate threshold that fragments can never trip; a 32-crop smoke test containing
+no empty-label crop; `df` instead of `quota`. **Every one produced a confident wrong
+statement.** The fix is one question asked *before* reporting: *if the hypothesis were true,
+would this output differ?*
+
+**B · Assuming an exact directory name where code generates it** — three times, always
+silently. `checkpoints_mit/` past `.gitignore`, `outputs_mit/` past the ledger's glob,
+host-absolute symlinks dangling at `/workspace`. A collector that finds nothing looks
+identical to a directory containing nothing.
+
+**C · Applying a stale rule instead of re-deriving it** — a flat 3 GB quota floor blocked
+launches for hours when the job wrote 280 MB, and the two-job rule got applied as dogma while
+four GPUs sat idle at 0 %. Sirjan caught both. **Re-measure every tick; never carry a
+threshold forward.**
+
+The one process that paid for itself was **record-before-deleting**: when `filter-branch`
+destroyed two checkpoints, every metric survived because the ledger had been written first.
+
 ### Judgement calls, and why
 
 - **Predictions written before every run.** Not ceremony — the boundary-relaxation and

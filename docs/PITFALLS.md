@@ -10,6 +10,58 @@ those are the expensive ones, and they are listed first.
 
 ---
 
+## 0. Root patterns — read this instead of the whole list
+
+Fifteen entries below collapse into **three mistakes made repeatedly**. Learning the list item
+by item is useless; these are the shapes to recognise.
+
+### Pattern A — trusting a check that cannot detect what it is checking for
+**Seven instances in one session.** Every one produced a confident wrong statement.
+
+| The check | Why it could never work |
+|---|---|
+| Raised gdown's `MAX_NUMBER_FILES` and saw no change | That constant only gates a *warning*; it cannot change what is fetched |
+| `push \| tail -1 \| grep -qv fatal` | The failing line was not last, so "PUSHED" printed on a failed push |
+| `tail` on push output | The decisive `100 MB` rejection sat **four lines above** `fatal:` |
+| `split_rate` requiring ≥50 % overlap | Fragments smaller than half a building score 0.0 — reported "surprising 0.0" **three times** |
+| Smoke test on 32 crops | Contained no empty-label crop, so the crash path never ran; the full run died immediately |
+| `df -h /home` | Reports the 7 TB filesystem, not the 40 GB quota that actually binds |
+| `ps` / `docker ps` for "what's running" | The question was about the task panel — right answer, wrong layer |
+
+> **Preventive check: before believing a negative result, state what would have happened if
+> the hypothesis were TRUE.** If the answer is "the same output", the test is worthless. Ask
+> it *out loud* before reporting, not after being contradicted.
+
+### Pattern B — assuming an exact name where code generates the name
+**Three instances**, each failing *silently* and looking like missing data rather than a bug.
+
+- `.gitignore` `**/checkpoints/**/*.pth` — missed `checkpoints_mit/`; 280 MB reached GitHub.
+- `build_run_ledger.py` `experiments/*/outputs/*.json` — missed `outputs_mit/`, silently
+  omitting **two complete runs** from the ledger.
+- Symlinks built with host-absolute paths — dangle inside the container at `/workspace`.
+
+> **Preventive check: glob `prefix*`, and after writing any collector, assert the count it
+> found against a count obtained a different way.** A collector that finds nothing looks
+> identical to a directory that contains nothing.
+
+### Pattern C — applying a stale rule instead of re-deriving it
+- A flat "don't launch under 3 GB quota" floor blocked launches for hours, when the job in
+  question writes **280 MB**. The floor was invented once and never re-checked against what
+  jobs actually cost.
+- Reported "GPUs free" for several ticks while treating the box as busy, because the
+  two-job rule was being applied as dogma rather than re-derived from the current load.
+
+> **Preventive check: re-measure resources every tick and compare against the job's actual
+> cost. Never carry forward a number or a threshold from a previous reading.**
+
+### What actually saved the session
+The **record-before-deleting** rule. When `filter-branch` destroyed two checkpoints, every
+metric survived in `RUN_LEDGER.json` because it had been written first. That rule was the one
+piece of process that paid for itself — and it did so by accident, since the deletion was not
+the deliberate one the rule was written for.
+
+---
+
 ## 1. Reasoning failures — the expensive category
 
 ### 1.1 "Not on this machine" ≠ "does not exist"

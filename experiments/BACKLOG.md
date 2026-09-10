@@ -6,8 +6,13 @@ write the full entry under `experiments/<date>-<slug>/`.
 **Launch rules** (see [`docs/PITFALLS.md`](../docs/PITFALLS.md) for why each exists)
 - Only use a GPU whose **free VRAM ≥ job need + 2 GB margin**. Our runs take ~6 GB at
   batch 16, so ~8 GB free is the bar. Never evict or disrupt another student's job.
-- **Quota guard:** `/home` is a hard 40 GB. If free space < 3 GB, do not launch — delete
-  `epoch*.pth` first (never any `best.pth`), then re-check.
+- **Quota guard:** `/home` is a hard 40 GB cap on the *whole home directory*, not just this
+  repo. Compare free space against **what the job actually writes**, not a flat floor: a
+  training run with `--save_every 999` writes **one ~280 MB `best.pth`**, so ~1 GB free is
+  ample. A flat 3 GB floor blocked launches for no reason. Mask generation writes ~60 MB;
+  a full crop set writes ~4 GB — *that* is when to check carefully.
+  **Hard floor: 1 GB.** Below it, run `build_run_ledger.py` first (stats must outlive the
+  weights), then delete `epoch*.pth`, never a `best.pth`.
 - New runs should pass `--save_every 999` so only `best.pth` is written.
 - **Never delete a checkpoint before running `python scripts/build_run_ledger.py`.** Weights
   are regenerable; the numbers inside them are what the paper needs. The ledger consolidates
