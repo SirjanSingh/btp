@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-10T21:00:54",
+ "generated": "2026-09-10T21:30:01",
  "n_runs": 64,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
@@ -10343,12 +10343,12 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 15,
-   "best_epoch": 14,
-   "best_iou": 0.869616,
-   "best_f1": 0.930262,
-   "best_precision": 0.930252,
-   "best_recall": 0.930271,
+   "n_epochs": 21,
+   "best_epoch": 19,
+   "best_iou": 0.869632,
+   "best_f1": 0.930271,
+   "best_precision": 0.933137,
+   "best_recall": 0.927422,
    "summary": {},
    "threshold_sweep": null,
    "results": null,
@@ -10531,6 +10531,78 @@
      "recall": 0.928919,
      "lr": 5.05e-05,
      "elapsed_s": 315.7,
+     "note": ""
+    },
+    {
+     "epoch": 16,
+     "tr_loss": 0.044622,
+     "va_loss": 0.043344,
+     "iou": 0.867637,
+     "f1": 0.929128,
+     "precision": 0.925276,
+     "recall": 0.933012,
+     "lr": 4.532584106825115e-05,
+     "elapsed_s": 264.9,
+     "note": ""
+    },
+    {
+     "epoch": 17,
+     "tr_loss": 0.044413,
+     "va_loss": 0.043268,
+     "iou": 0.867935,
+     "f1": 0.929299,
+     "precision": 0.927251,
+     "recall": 0.931356,
+     "lr": 4.0208371304520894e-05,
+     "elapsed_s": 315.2,
+     "note": ""
+    },
+    {
+     "epoch": 18,
+     "tr_loss": 0.044129,
+     "va_loss": 0.044777,
+     "iou": 0.863816,
+     "f1": 0.926933,
+     "precision": 0.924587,
+     "recall": 0.92929,
+     "lr": 3.520365877844009e-05,
+     "elapsed_s": 315.8,
+     "note": ""
+    },
+    {
+     "epoch": 19,
+     "tr_loss": 0.043227,
+     "va_loss": 0.042949,
+     "iou": 0.869632,
+     "f1": 0.930271,
+     "precision": 0.933137,
+     "recall": 0.927422,
+     "lr": 3.036653616774789e-05,
+     "elapsed_s": 310.6,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 20,
+     "tr_loss": 0.04322,
+     "va_loss": 0.044637,
+     "iou": 0.863555,
+     "f1": 0.926783,
+     "precision": 0.926764,
+     "recall": 0.926801,
+     "lr": 2.5750000000000002e-05,
+     "elapsed_s": 312.9,
+     "note": ""
+    },
+    {
+     "epoch": 21,
+     "tr_loss": 0.042722,
+     "va_loss": 0.0445,
+     "iou": 0.864425,
+     "f1": 0.927283,
+     "precision": 0.919504,
+     "recall": 0.935194,
+     "lr": 2.140463001152258e-05,
+     "elapsed_s": 314.7,
      "note": ""
     }
    ]
