@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 23:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 23:30 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -323,10 +323,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-131 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+132 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  70 commits
+### 2026-09-10  ·  71 commits
 
+- `23:00` **eb5effb** Regenerate ledger and timeline (R5 arm A ep3)
 - `22:58` **4cebdb3** Regenerate ledger and timeline (R5 arm A ep2, arm B starting)
 - `22:55` **c906b01** Retract the "model over-predicts" finding; --limit sampled one corner of Jaipur
 - `22:43` **fee4295** R5 arm A launched (thr 0.80); correct arm-A rationale — 600-crop probe was unrepresentative, thr 0.80 selects 17.2% not 23%
