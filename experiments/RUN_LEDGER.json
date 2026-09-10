@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-10T15:58:38",
+ "generated": "2026-09-10T16:01:24",
  "n_runs": 59,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173038/best.pth",
@@ -9695,7 +9695,7 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 34,
+   "n_epochs": 35,
    "best_epoch": 26,
    "best_iou": 0.653981,
    "best_f1": 0.790796,
@@ -10111,6 +10111,18 @@
      "recall": 0.79183,
      "lr": 6.395177052675792e-06,
      "elapsed_s": 146.6,
+     "note": ""
+    },
+    {
+     "epoch": 35,
+     "tr_loss": 0.249487,
+     "va_loss": 0.246415,
+     "iou": 0.65193,
+     "f1": 0.789295,
+     "precision": 0.772896,
+     "recall": 0.806405,
+     "lr": 4.767963140691305e-06,
+     "elapsed_s": 146.3,
      "note": ""
     }
    ]

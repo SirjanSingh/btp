@@ -1,6 +1,6 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-10 15:58 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-10 16:01 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
@@ -37,7 +37,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `unet_resnet34_30ep_20260910_044423` | solar | train | 30 | **0.8678** | 26 | 0.9292 | 0.9260 | 0.9324 |
 | `unet_mit_b2_40ep_20260910_053557` | rooftop | train | 34 | **0.6393** | 19 | 0.7799 | 0.7823 | 0.7776 |
 | `unet_resnet34_30ep_20260910_083614` | solar | train | 21 | **0.8725** | 19 | 0.9319 | 0.9298 | 0.9340 |
-| `unet_mit_b2_40ep_20260910_090326` | rooftop | train | 34 | **0.6540** | 26 | 0.7908 | 0.7647 | 0.8188 |
+| `unet_mit_b2_40ep_20260910_090326` | rooftop | train | 35 | **0.6540** | 26 | 0.7908 | 0.7647 | 0.8188 |
 | `d1_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d4_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |

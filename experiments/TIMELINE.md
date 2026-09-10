@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 15:58 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 16:01 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -259,10 +259,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-103 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+104 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  42 commits
+### 2026-09-10  ·  43 commits
 
+- `15:58` **dcd7239** chore: regenerate ledger and timeline
 - `15:30` **9808420** chore: regenerate ledger and timeline
 - `15:01` **5282e4e** chore: regenerate ledger and timeline
 - `14:58` **bab38c8** chore: regenerate ledger and timeline
@@ -411,6 +412,7 @@ The half of the record that is normally lost. An idea absent from this repo was 
 - queued — R5 · Self-training / CBST on top of the weak model
 - queued — R6 · Multi-source co-training
 - queued — R7 · Low-resolution simulation
+- queued — S5 · Port `--cache_ram` to `train_solar.py` — solar runs are 2.3× slower than they need to be
 - queued — S4 · Self-training with a fixed confidence threshold ★ next, isolates S2's cause
 - ⛔ **blocked** — S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
 

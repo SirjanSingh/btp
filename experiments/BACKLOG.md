@@ -78,6 +78,14 @@ baseline is unreproducible precisely because that script never existed.
 
 ## Queue — solar (Stage 2)
 
+### S5 · Port `--cache_ram` to `train_solar.py` — solar runs are 2.3× slower than they need to be
+`rooftop/train.py` got the RAM cache (measured 3.68×: 74.4 → 20.2 s/epoch). `train_solar.py`
+did not, so every solar run still re-decodes 16,763 PNGs per epoch and sits dataloader-bound:
+S4 is taking ~340 s/epoch against the cached rooftop arm's 147 s. Same fix, same file
+structure.
+*Needs:* copy the cache block from `FolderDataset`. ~15 min. **Predict: 2-3× on solar runs.**
+
+
 ### S4 · Self-training with a fixed confidence threshold ★ next, isolates S2's cause
 S2 showed CBST ratio-matching drove the threshold to 0.0004 and cost 18.6 points of target
 IoU. Repeat with a plain **0.5** threshold (which selects 0.59 % of target pixels, a third of
