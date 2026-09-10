@@ -61,6 +61,20 @@ The write-up **links** to its raw output rather than restating it, so there is e
 copy of every number. Diagnostics keep their existing home so the master context's
 cross-references stay valid.
 
+## The four records, and what each is for
+
+| File | Answers | Indexed by |
+|---|---|---|
+| [`TIMELINE.md`](TIMELINE.md) | *what was tried, in what order, and what came of it* — **including what was never run** | time |
+| `README.md` (this file) | what did we learn about X? | question |
+| [`RUN_LEDGER.md`](RUN_LEDGER.md) | what did run Y score? metrics + per-epoch curves | run |
+| [`BACKLOG.md`](BACKLOG.md) | what is next? | priority |
+
+All four except this one are **generated** — rerun `scripts/build_timeline.py` and
+`scripts/build_run_ledger.py` rather than editing them. A hand-maintained record drifts the
+moment someone forgets, and a drifted record is worse than none because it still looks
+authoritative.
+
 ## Relationship to `docs/sessions/`
 
 They answer different questions and both are worth keeping.
