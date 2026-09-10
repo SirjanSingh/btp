@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ❌ negative — teacher wins; kill criterion fired |
 | **Date** | 2026-09-10 |
 
 ## Question
@@ -124,7 +124,92 @@ target only insofar as OB is right.
 
 ## Results
 
-*pending*
+Teacher = the current default (MiT-B2, 0.4 m eroded OB labels). All three scored on the same
+1,701-crop held-out val tiles.
+
+| | val IoU | merge | split | frag/label | missed | **pred/label** |
+|---|---|---|---|---|---|---|
+| **teacher** (no self-training) | 0.6393 | 0.3155 | 0.0840 | 0.9203 | 0.3257 | **0.9914** |
+| **arm B** (thr 0.50) | **0.6432** | 0.3371 | 0.0787 | 0.9159 | 0.3156 | **0.9134** |
+| **arm A** (thr 0.80) | 0.5673 | **0.0998** | 0.1541 | 0.9221 | 0.5474 | **1.2282** |
+
+**Self-training does not help. The teacher stays the best model.**
+
+Arm B gains **+0.0039 IoU** — and moves `pred/label` from 0.9914 to **0.9134**, i.e.
+under-counting rises from 0.9 % to 8.7 %. Merge rate worsens too (0.3155 → 0.3371). On the
+metric that decides a per-building kW estimate, the arm with the better IoU is the worse model.
+This is the project's own thesis landing on its own experiment.
+
+**Prediction scorecard — one hit, three misses.**
+
+| prediction | outcome |
+|---|---|
+| arm B beats arm A | ✅ clearly |
+| arm B within ±0.01 IoU of teacher | ✅ +0.0039 |
+| arm B `pred/label` 0.95–1.05 | ❌ **0.9134** |
+| arm A down 0.01–0.04 IoU | ❌ down **0.0720**, far worse |
+| arm A `pred/label` 0.80–0.95 (under-segments) | ❌ **1.2282** — it *over*-counts |
+
+**My pre-registered kill criterion fired.** I wrote: *"if merge rate worsens, pseudo-labelling
+is reinforcing the fused blobs the erosion work exists to prevent, and self-training is
+actively wrong for this stage."* Merge went **0.3155 → 0.3371**. By the standard set before
+the run, self-training is wrong for Stage 1.
+
+## Interpretation
+
+**Arm A does not under-segment — it hallucinates.** I expected a high threshold to produce
+conservative, sparse masks that miss buildings: `pred/label` below 1. Instead it misses
+**54.7 %** of labels entirely *while emitting 1.23 predictions per label*. Reconciling the two:
+`frag/label` 0.9221 × 27,918 labels ≈ 25,700 components touch a label, against **34,288**
+predicted — so **~8,500 components (25 %) touch no label at all.** Training on high-confidence
+pseudo-labels that cover only 17.2 % of pixels teaches the model that buildings are small and
+rare, and it scatters fragments into the gaps.
+
+This is the **same signature as 0.8 m over-erosion** (`pred/label` 1.47 with `frag/label` only
+1.04): starve the model of foreground and it invents buildings rather than shrinking them. Two
+different knobs — label erosion and pseudo-label threshold — with one failure mode. Worth
+naming: **foreground starvation produces hallucination, not conservatism.**
+
+**Arm B fails for the opposite reason, and it is the more interesting failure.** Its
+pseudo-labels reproduce the teacher's own decision boundary almost exactly (23.3 % foreground
+against the teacher's own operating point). Nearly all its components land on real labels —
+`frag/label` 0.9159 against 25,501 predictions is essentially zero hallucination. But it merges
+*more* than the teacher. Pseudo-labels are the teacher's **raw** output, which contains the
+fused blobs; the teacher's real training signal was **eroded** Open Buildings labels, which
+contain the gaps. Round 2 therefore trains on a target *without* the erosion that made round 1
+good. **Self-training silently discards the single most valuable property of the label set.**
+
+That is the general lesson, and it is not specific to Jaipur: when the labelling pipeline
+contains a deliberate correction the model has not fully learned, pseudo-labelling from that
+model **throws the correction away**. Erosion cost 0.018 IoU and bought `pred/label` 0.76 →
+0.99; self-training hands back a third of that for +0.004 IoU.
+
+**Why the solar bench did not predict this.** S4 worked (0.5611 → 0.6135) because BDAPPV's
+labels carry no analogous correction — a panel mask is just a panel mask. The rooftop labels
+are engineered. **The bench transfers hyperparameters, not the decision to use the method.**
+
+## Decision
+
+- [x] **Reject self-training for Stage 1.** The teacher is the deliverable; neither arm improves
+      it on `pred/label` or merge rate.
+- [x] **Keep IoU out of the headline.** Arm B is the concrete case where higher IoU means a
+      worse model, measured on this project's own target.
+- [ ] **If revisited: erode the pseudo-labels before training.** The obvious repair — apply the
+      same 0.4 m erosion to the teacher's output. Cheap (one flag) and directly targets the
+      diagnosed cause. Queued, not run.
+- [x] Record "foreground starvation → hallucination" as the shared signature of arm A and 0.8 m
+      over-erosion.
+
+## Threats to validity
+
+- **Agreement, not accuracy (R12).** Every number is against Open Buildings. If OB merges two
+  structures, `pred/label` cannot see it, and a model that copies OB's errors scores well.
+- Single seed per arm; arm B's +0.0039 IoU is inside seed noise, though its −0.078
+  `pred/label` is not.
+- The teacher was selected on the same OB-derived val set the students are scored on, which
+  favours the teacher. The instance-metric gaps are large enough that this does not explain them.
+- Two thresholds only. The repair (eroded pseudo-labels) is untested, so "self-training fails
+  here" is really "self-training *from raw teacher output* fails here".
 
 ## Threats to validity
 

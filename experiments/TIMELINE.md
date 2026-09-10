@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 00:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 02:36 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -194,7 +194,7 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/) | ✅ done — reproduced | **0.6393** (orig 0.6405); pred/label **0.9914**, split 0.084 |
 | 2026-09-10 | [`2026-09-10-erosion-02`](2026-09-10-erosion-02/) | ✅ done — completes the sweep | **No** — monotonic curve; 0.4 m is the only point with pred/label ≈ 1 |
 | 2026-09-10 | [`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/) | ✅ done — **0.8 m over-erodes** | **0.8 m over-erodes** — merge 0.13 but pred/label 1.47; 0.4 m is the optimum |
-| 2026-09-10 | [`2026-09-10-jaipur-selftrain`](2026-09-10-jaipur-selftrain/) | running | — |
+| 2026-09-10 | [`2026-09-10-jaipur-selftrain`](2026-09-10-jaipur-selftrain/) | ❌ negative — teacher wins; kill criterion fired | **No.** +0.004 IoU but `pred/label` 0.9914 → 0.9134 — self-training discards the label erosion |
 | 2026-09-10 | [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | ✅ done — **confounded; see cross-eval** | **Unresolved** — each model wins on its own labels; needs ground truth |
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
 | 2026-09-10 | [`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/) | ✅ done — modest win | **+0.0086** (0.6569) and **2× faster convergence**; gain is all precision |
@@ -204,6 +204,7 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | ✅ done — **strong negative result** | **No — it destroys it.** 0.5611 → **0.3752** on target |
 | 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
 | 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
+| 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | running | — |
 
 ### Why each was run, and what was expected
 
@@ -267,7 +268,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** - **merge rate below 0.25**, down from 0.3256. - **split rate finally rises above 0** — somewhere around 0.02–0.08. If it stays at exactly 0.0 again, that is a real surprise and means the model simply never over-segments at any erosion this side of destroying the labels. - **missed rate rises further**, ~0.36–0.42; more erosion means more conservatism. - **IoU 0.61–0.63**, below 0.6405. - **`pred/
 
-**[`2026-09-10-jaipur-selftrain`](2026-09-10-jaipur-selftrain/)** — running
+**[`2026-09-10-jaipur-selftrain`](2026-09-10-jaipur-selftrain/)** — ❌ negative — teacher wins; kill criterion fired
 > **Why:** this is the first UDA method in the project applied to the actual target with evidence behind its hyperparameters rather than a guess. `MASTER_CONTEXT`'s ordering principle in full: settle where measurable, freeze, transfer blind.
 >
 > **Expected:** 1. **The ratio→threshold map will be far flatter than solar's.** Selecting 23 % of pixels should land at a threshold of order **0.2–0.5**, not 0.0004. If it lands below 0.05, the rooftop model is as poorly calibrated on Jaipur as the solar model was on IGN, and the S6 warning transfers intact. 2. **Self-training will help, modestly: `pred/label` stays within 0.95–1.05 and merge rate improves by 0.
@@ -316,14 +317,21 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** the published split rates are wrong and will move once recomputed with the loose (≥ 10 %) definition.
 
+**[`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/)** — running
+> **Why:** it decides whether "self-training fails on Stage 1" is a fact about the method or an artefact of one fixable implementation detail. R5's conclusion is currently the stronger claim and this is the test that could weaken it.
 
-**22 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+
+**23 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-134 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+135 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+
+### 2026-09-11  ·  1 commits
+
+- `00:00` **cb70fd3** Regenerate ledger and timeline (arm A ep16, arm B ep14)
 
 ### 2026-09-10  ·  73 commits
 
@@ -502,7 +510,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 The half of the record that is normally lost. An idea absent from this repo was either never had, or was had and forgotten — and there is no way to tell later.
 
 - queued — R12 · Hand-label ~30 Jaipur tiles ★★★ nothing else can be validated without it
-- queued — R5 · Self-training / CBST on top of the weak model
+- queued — R5b · Self-training with ERODED pseudo-labels
 - queued — R6 · Multi-source co-training
 - queued — R7 · Low-resolution simulation
 - ⛔ **blocked** — S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
