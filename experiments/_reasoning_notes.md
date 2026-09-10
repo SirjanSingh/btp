@@ -117,6 +117,22 @@ threshold forward.**
 The one process that paid for itself was **record-before-deleting**: when `filter-branch`
 destroyed two checkpoints, every metric survived because the ledger had been written first.
 
+### Avoiding one mistake caused a worse one
+
+Worth recording because it is the subtlest error of the session. I cached the solar crops as a
+**list** of arrays specifically to avoid assuming a fixed shape — pattern B, which had already
+bitten three times. That choice made training **8.4× slower than its own timer reported**:
+forked DataLoader workers copy a list of 33k Python objects because refcounting writes to
+every object header, while a single contiguous `ndarray` stays copy-on-write shared.
+
+Defensiveness is not free. The right move was **neither assuming the shape nor avoiding it,
+but verifying it** — probe, build the fast path, check as you go, fall back if ragged. The
+crops were uniformly 400×400 all along.
+
+And I only found it by comparing wall-clock against the instrumented per-epoch time. **Every
+number in the log said 2.8 min/epoch; reality was 23.5.** A timer only measures what you
+wrapped around.
+
 ### Judgement calls, and why
 
 - **Predictions written before every run.** Not ceremony — the boundary-relaxation and

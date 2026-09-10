@@ -350,6 +350,25 @@ symlink. Verified with a read *inside* the container before deleting the origina
 user on the box. Source imagery and anything not rebuildable from a committed script stays on
 `/home`.
 
+### 3.18 A list cache defeats copy-on-write — 8.4× slower than its own timer claimed ★
+The solar runs reported **2.8 min/epoch** while taking **23.5 min** of wall clock. The
+instrumented region covered train + val + tensorboard, so 85 % of the time was vanishing
+*outside* any timer — invisible to every per-epoch number in the logs.
+
+**Cause:** the RAM cache stored a **list of 33k numpy arrays**. DataLoader workers are forked,
+and copy-on-write only helps while pages are not written — but **Python refcounting writes to
+the header of every object a worker touches**, so each worker copies the whole structure. One
+contiguous `ndarray` is a single object and stays genuinely shared.
+
+**Why I got it wrong:** I chose the list deliberately, to avoid assuming a fixed crop shape
+(pattern B). Avoiding one failure mode created a worse one. **The right move was neither
+assuming nor avoiding — it was verifying:** probe the first crop, build the contiguous array,
+check each crop matches as it loads, and fall back to the list only if something is ragged.
+BDAPPV turned out to be uniformly 400×400.
+
+> **Rule: when wall-clock and instrumented time disagree, the gap is the bug.** Per-epoch
+> timers only measure what you wrapped; compare against `timestamp` and the clock.
+
 ## 4. Pre-existing, still open
 
 - **BDAPPV has zero negative crops** (`MASTER_CONTEXT` C1). `prep_bdappv.py:85` drops

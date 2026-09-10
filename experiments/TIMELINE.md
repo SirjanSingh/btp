@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 17:58 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 18:09 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -129,6 +129,22 @@ threshold forward.**
 
 The one process that paid for itself was **record-before-deleting**: when `filter-branch`
 destroyed two checkpoints, every metric survived because the ledger had been written first.
+
+### Avoiding one mistake caused a worse one
+
+Worth recording because it is the subtlest error of the session. I cached the solar crops as a
+**list** of arrays specifically to avoid assuming a fixed shape — pattern B, which had already
+bitten three times. That choice made training **8.4× slower than its own timer reported**:
+forked DataLoader workers copy a list of 33k Python objects because refcounting writes to
+every object header, while a single contiguous `ndarray` stays copy-on-write shared.
+
+Defensiveness is not free. The right move was **neither assuming the shape nor avoiding it,
+but verifying it** — probe, build the fast path, check as you go, fall back if ragged. The
+crops were uniformly 400×400 all along.
+
+And I only found it by comparing wall-clock against the instrumented per-epoch time. **Every
+number in the log said 2.8 min/epoch; reality was 23.5.** A timer only measures what you
+wrapped around.
 
 ### Judgement calls, and why
 
@@ -289,10 +305,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-110 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+111 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  49 commits
+### 2026-09-10  ·  50 commits
 
+- `17:58` **37aee53** chore: regenerate ledger and timeline
 - `17:50` **bb16f0d** chore: park the 4.2 GB crop set on host /tmp -- quota 2.0 -> 6.1 GB free
 - `17:31` **95efd6d** chore: free quota safely, and write down the deletion order
 - `17:16` **809c8a2** feat: solar RAM cache (S5); launch the self-training threshold cliff (S6)

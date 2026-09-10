@@ -151,28 +151,57 @@ class SolarFolderDataset(Dataset):
         # waiting for it; caching gave 3.68x (74.4 -> 20.2 s/epoch). Solar runs
         # were still re-decoding 16,763 PNGs every epoch at ~340 s/epoch.
         #
-        # Stored as a LIST, not a fixed-shape array: BDAPPV crop sizes are not
-        # guaranteed uniform, and assuming a shape is the same class of mistake
-        # that let checkpoints_mit/ past .gitignore (PITFALLS pattern B).
+        # Stored as ONE CONTIGUOUS ARRAY, not a list of arrays.
+        #
+        # The list version was 8.4x slower in wall-clock than its own per-epoch
+        # timer reported (23.5 min/epoch actual vs 2.8 min instrumented). Cause:
+        # DataLoader workers are forked, and copy-on-write only helps while the
+        # pages are not written. Python refcounting touches the header of every
+        # object a worker reads, so a list of 33k numpy objects gets copied per
+        # worker; a single ndarray is one object and stays shared.
+        #
+        # The list was chosen to avoid assuming a fixed shape (PITFALLS pattern
+        # B). The right answer is to VERIFY the shape rather than assume it or
+        # avoid it -- uniform crops take the fast path, anything else falls back
+        # to the list with a warning.
         self.cache = None
         if cache_ram:
             n = len(self.paths)
             print(f"Caching {n} solar crops into RAM ...", flush=True)
-            imgs, msks = [], []
+            probe = cv2.imread(str(self.paths[0]))
+            H, W = probe.shape[:2]
+            imgs = np.empty((n, H, W, 3), np.uint8)
+            msks = np.empty((n, H, W), np.uint8)
+            ragged = False
             for i, ip in enumerate(self.paths):
                 im = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
+                if im.shape[:2] != (H, W):      # verified, not assumed
+                    ragged = True
+                    break
                 mp = self.msk_dir / ip.name
-                if mp.exists():
-                    mk = (cv2.imread(str(mp), cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8)
-                else:
-                    mk = np.zeros(im.shape[:2], np.uint8)
-                imgs.append(im)
-                msks.append(mk)
+                mk = ((cv2.imread(str(mp), cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8)
+                      if mp.exists() else np.zeros((H, W), np.uint8))
+                imgs[i] = im
+                msks[i] = mk
                 if (i + 1) % 4000 == 0:
                     print(f"  cached {i+1}/{n}", flush=True)
-            self.cache = (imgs, msks)
-            gb = sum(a.nbytes for a in imgs) + sum(a.nbytes for a in msks)
-            print(f"Cache ready ({gb/1e9:.1f} GB).", flush=True)
+            if ragged:
+                print("  ! crop sizes are not uniform -- falling back to a list "
+                      "cache (slower: breaks copy-on-write across workers)",
+                      flush=True)
+                imgs, msks = [], []
+                for ip in self.paths:
+                    im = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
+                    mp = self.msk_dir / ip.name
+                    imgs.append(im)
+                    msks.append((cv2.imread(str(mp), cv2.IMREAD_GRAYSCALE) > 127
+                                 ).astype(np.uint8) if mp.exists()
+                                else np.zeros(im.shape[:2], np.uint8))
+                self.cache = (imgs, msks)
+            else:
+                self.cache = (imgs, msks)
+                print(f"Cache ready ({(imgs.nbytes + msks.nbytes)/1e9:.1f} GB, "
+                      f"contiguous {H}x{W}).", flush=True)
 
     def __len__(self):
         return len(self.paths)
