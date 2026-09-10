@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 10:22 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 10:38 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -216,10 +216,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-84 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+85 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  23 commits
+### 2026-09-10  ·  24 commits
 
+- `10:22` **97b8734** result: 0.8 m over-erodes -- and my split-rate metric is blind to it
 - `10:17` **4e35d43** feat: CBST self-training on google->ign, plus a finding that arrived before it ran
 - `09:40` **0a28fb9** docs: put the reasoning in the timeline, not just the results
 - `09:38` **48c2ad4** feat: generated TIMELINE.md -- what was run, what wasn't, in order
@@ -344,6 +345,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 The half of the record that is normally lost. An idea absent from this repo was either never had, or was had and forgotten — and there is no way to tell later.
 
+- queued — R12 · Hand-label ~30 Jaipur tiles ★★★ nothing else can be validated without it
 - queued — R11 · Fix the split-rate metric ★★ it is silently blind
 - queued — R5 · Self-training / CBST on top of the weak model
 - queued — R6 · Multi-source co-training

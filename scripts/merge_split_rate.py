@@ -43,8 +43,23 @@ MEAN = np.array([0.485, 0.456, 0.406], np.float32)
 STD = np.array([0.229, 0.224, 0.225], np.float32)
 
 
-def instance_stats(pred, gt, min_overlap, min_area_px):
-    """-> (n_gt, n_merged_gt, n_split_gt, n_missed_gt, n_pred)."""
+def instance_stats(pred, gt, min_overlap, min_area_px, split_overlap=0.10):
+    """-> (n_gt, n_merged, n_split_strict, n_split, n_missed, n_pred, frag_sum).
+
+    TWO split definitions, because the strict one was silently blind.
+
+    `split_strict` uses the same >=50% association as merge: a label counts as
+    split only when two predictions EACH cover half of it. Nothing smaller than
+    half a building qualifies, so a model shattering a building into thirds
+    scores zero. That is exactly what happened at 0.8 m erosion -- split read
+    0.0 while pred/label hit 1.47 -- and I reported the silence as a surprising
+    result for three consecutive runs before noticing.
+
+    `split` uses a low bar (>=10% of the label) and `frag_sum` counts every
+    predicted component touching a label at all, so fragmentation is visible
+    rather than rounded away. A metric with no failing case in your data has not
+    been validated.
+    """
     n_p, p_lbl = cv2.connectedComponents(pred.astype(np.uint8), connectivity=8)
     n_g, g_lbl = cv2.connectedComponents(gt.astype(np.uint8), connectivity=8)
     n_p -= 1
@@ -64,7 +79,7 @@ def instance_stats(pred, gt, min_overlap, min_area_px):
     counts = np.bincount(pairs)
     nz = np.nonzero(counts)[0]
 
-    p_to_g, g_to_p = {}, {}
+    p_to_g, g_to_p, g_to_p_loose = {}, {}, {}
     for code in nz:
         pi, gi = divmod(int(code), n_g + 1)
         if pi == 0 or gi == 0 or gi not in keep_g:
@@ -72,14 +87,19 @@ def instance_stats(pred, gt, min_overlap, min_area_px):
         if counts[code] >= min_overlap * g_area[gi]:
             p_to_g.setdefault(pi, set()).add(gi)
             g_to_p.setdefault(gi, set()).add(pi)
+        if counts[code] >= split_overlap * g_area[gi]:
+            g_to_p_loose.setdefault(gi, set()).add(pi)
 
     merged = set()
     for pi, gs in p_to_g.items():
         if len(gs) >= 2:
             merged |= gs
-    split = {gi for gi, ps in g_to_p.items() if len(ps) >= 2}
+    split_strict = {gi for gi, ps in g_to_p.items() if len(ps) >= 2}
+    split_loose = {gi for gi, ps in g_to_p_loose.items() if len(ps) >= 2}
     missed = {gi for gi in keep_g if gi not in g_to_p}
-    return len(keep_g), len(merged), len(split), len(missed), n_p
+    frag_sum = sum(len(ps) for ps in g_to_p_loose.values())
+    return (len(keep_g), len(merged), len(split_strict), len(split_loose),
+            len(missed), n_p, frag_sum)
 
 
 @torch.no_grad()
@@ -95,7 +115,7 @@ def main(a):
     if a.limit:
         names = names[:a.limit]
 
-    tot = dict(gt=0, merged=0, split=0, missed=0, pred=0)
+    tot = dict(gt=0, merged=0, split_strict=0, split=0, missed=0, pred=0, frag=0)
     for i in range(0, len(names), a.batch):
         chunk = names[i:i + a.batch]
         xs = []
@@ -122,9 +142,11 @@ def main(a):
                            for p in pr])
         for n, p in zip(chunk, pr):
             g = cv2.imread(os.path.join(msk_dir, n), cv2.IMREAD_GRAYSCALE) > 127
-            ng, nm, ns, nmiss, npred = instance_stats(p, g, a.min_overlap, a.min_area_px)
-            tot["gt"] += ng; tot["merged"] += nm; tot["split"] += ns
-            tot["missed"] += nmiss; tot["pred"] += npred
+            ng, nm, nss, ns, nmiss, npred, fs = instance_stats(
+                p, g, a.min_overlap, a.min_area_px, a.split_overlap)
+            tot["gt"] += ng; tot["merged"] += nm
+            tot["split_strict"] += nss; tot["split"] += ns
+            tot["missed"] += nmiss; tot["pred"] += npred; tot["frag"] += fs
         if (i // a.batch) % 20 == 0:
             print(f"   {i+len(chunk)}/{len(names)}", flush=True)
 
@@ -136,6 +158,9 @@ def main(a):
         "n_label_components": tot["gt"], "n_pred_components": tot["pred"],
         "merge_rate": round(tot["merged"] / g, 4),
         "split_rate": round(tot["split"] / g, 4),
+        "split_rate_strict": round(tot["split_strict"] / g, 4),
+        "fragments_per_label": round(tot["frag"] / g, 4),
+        "split_overlap": a.split_overlap,
         "missed_rate": round(tot["missed"] / g, 4),
         "pred_per_label": round(tot["pred"] / g, 4),
     }
@@ -157,6 +182,10 @@ if __name__ == "__main__":
     p.add_argument("--min_area_px", type=int, default=50,
                    help="ignore label blobs under this size; at 26.6 cm, 50 px "
                         "is ~3.5 m2 and mostly labelling specks")
+    p.add_argument("--split_overlap", type=float, default=0.10,
+                   help="a label counts as split if >=2 predictions each cover "
+                        "this fraction of it; the strict 0.5 bar misses "
+                        "fragmentation entirely")
     p.add_argument("--dilate_px", type=int, default=0,
                    help="dilate predictions by N px before scoring, to undo "
                         "label erosion; 0.4 m ~ 1.5 px, 0.8 m ~ 3 px at 26.6 cm")

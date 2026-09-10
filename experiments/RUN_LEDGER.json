@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-10T10:21:43",
+ "generated": "2026-09-10T10:38:28",
  "n_runs": 52,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173038/best.pth",
@@ -7553,12 +7553,12 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 1,
-   "best_epoch": 1,
-   "best_iou": 0.792999,
-   "best_f1": 0.88455,
-   "best_precision": 0.865425,
-   "best_recall": 0.90454,
+   "n_epochs": 4,
+   "best_epoch": 4,
+   "best_iou": 0.837321,
+   "best_f1": 0.911459,
+   "best_precision": 0.909877,
+   "best_recall": 0.913046,
    "summary": {},
    "threshold_sweep": null,
    "results": null,
@@ -7573,6 +7573,42 @@
      "recall": 0.90454,
      "lr": 9.972883382072954e-05,
      "elapsed_s": 314.2,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 2,
+     "tr_loss": 0.132596,
+     "va_loss": 0.077032,
+     "iou": 0.796643,
+     "f1": 0.886813,
+     "precision": 0.837591,
+     "recall": 0.942181,
+     "lr": 9.891830623632339e-05,
+     "elapsed_s": 305.5,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 3,
+     "tr_loss": 0.107141,
+     "va_loss": 0.058022,
+     "iou": 0.832463,
+     "f1": 0.908573,
+     "precision": 0.889553,
+     "recall": 0.928424,
+     "lr": 9.757729755661011e-05,
+     "elapsed_s": 294.3,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 4,
+     "tr_loss": 0.100011,
+     "va_loss": 0.054973,
+     "iou": 0.837321,
+     "f1": 0.911459,
+     "precision": 0.909877,
+     "recall": 0.913046,
+     "lr": 9.572050015330873e-05,
+     "elapsed_s": 291.6,
      "note": "\u2190 best"
     }
    ]

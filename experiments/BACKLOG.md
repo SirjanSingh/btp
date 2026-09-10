@@ -22,6 +22,22 @@ write the full entry under `experiments/<date>-<slug>/`.
 
 ## Queue — rooftop (Stage 1)
 
+### R12 · Hand-label ~30 Jaipur tiles ★★★ nothing else can be validated without it
+**There is no ground truth in this project.** Every Jaipur number is agreement with Open
+Buildings — which are machine-generated *ground footprints*, not human-verified *roof*
+outlines, and are the same labels the models train on. "IoU 0.6483" means "agrees 65 % with
+Google's building detector", not "65 % accurate". `pred/label` counts OB polygons, not real
+buildings, so where OB has already fused two houses the merge rate cannot see it.
+
+Relative comparisons survive (the reference is held constant), absolute ones do not.
+
+Three results now dead-end here: R3 is unresolvable, the 50 % merge rate is only a lower
+bound, and no IoU in the repo is interpretable as accuracy. The full 400-tile task is
+13–17 h; **~30 stratified tiles across D1's density range would already give the project its
+first honest number** and calibrate how far the OB proxy sits from reality.
+*Needs:* a labelling setup (browser tool writing masks, or QGIS-ready GeoTIFF + shapefile).
+
+
 ### R11 · Fix the split-rate metric ★★ it is silently blind
 A label counts as "split" only if >= 2 predictions each cover >= 50 % of it, so fragments
 smaller than half a building never qualify. At 0.8 m erosion the model shattered buildings
