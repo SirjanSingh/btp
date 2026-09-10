@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-10T20:00:58",
+ "generated": "2026-09-10T20:30:03",
  "n_runs": 64,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
@@ -13,6 +13,7 @@
   "experiments/2026-09-10-selftrain-round2/ckpt/unet_resnet34_30ep_20260910_142120/best.pth",
   "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r008/unet_resnet34_30ep_20260910_114523/best.pth",
   "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r008/unet_resnet34_30ep_20260910_123658/best.pth",
+  "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r010/unet_resnet34_30ep_20260910_142752/best.pth",
   "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r012/unet_resnet34_30ep_20260910_114531/best.pth",
   "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r012/unet_resnet34_30ep_20260910_123659/best.pth",
   "experiments/2026-09-10-solar-google-to-ign/checkpoints/unet_resnet34_40ep_20260909_204035/best.pth",
@@ -10342,12 +10343,12 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 3,
-   "best_epoch": 3,
-   "best_iou": 0.847431,
-   "best_f1": 0.917416,
-   "best_precision": 0.911778,
-   "best_recall": 0.923124,
+   "n_epochs": 9,
+   "best_epoch": 8,
+   "best_iou": 0.856676,
+   "best_f1": 0.922806,
+   "best_precision": 0.908136,
+   "best_recall": 0.937959,
    "summary": {},
    "threshold_sweep": null,
    "results": null,
@@ -10387,6 +10388,78 @@
      "lr": 9.757729755661011e-05,
      "elapsed_s": 186.0,
      "note": "\u2190 best"
+    },
+    {
+     "epoch": 4,
+     "tr_loss": 0.063523,
+     "va_loss": 0.053372,
+     "iou": 0.84222,
+     "f1": 0.914353,
+     "precision": 0.894143,
+     "recall": 0.935498,
+     "lr": 9.572050015330873e-05,
+     "elapsed_s": 184.4,
+     "note": ""
+    },
+    {
+     "epoch": 5,
+     "tr_loss": 0.059549,
+     "va_loss": 0.052233,
+     "iou": 0.844213,
+     "f1": 0.915527,
+     "precision": 0.903958,
+     "recall": 0.927395,
+     "lr": 9.336825748732972e-05,
+     "elapsed_s": 185.4,
+     "note": ""
+    },
+    {
+     "epoch": 6,
+     "tr_loss": 0.05675,
+     "va_loss": 0.048271,
+     "iou": 0.854163,
+     "f1": 0.921346,
+     "precision": 0.916013,
+     "recall": 0.926742,
+     "lr": 9.05463412215599e-05,
+     "elapsed_s": 186.4,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 7,
+     "tr_loss": 0.055051,
+     "va_loss": 0.047429,
+     "iou": 0.856284,
+     "f1": 0.922578,
+     "precision": 0.914535,
+     "recall": 0.930765,
+     "lr": 8.728566886113101e-05,
+     "elapsed_s": 271.8,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 8,
+     "tr_loss": 0.053203,
+     "va_loss": 0.047301,
+     "iou": 0.856676,
+     "f1": 0.922806,
+     "precision": 0.908136,
+     "recall": 0.937959,
+     "lr": 8.362196501476347e-05,
+     "elapsed_s": 309.3,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 9,
+     "tr_loss": 0.051842,
+     "va_loss": 0.048255,
+     "iou": 0.854779,
+     "f1": 0.921704,
+     "precision": 0.926909,
+     "recall": 0.916558,
+     "lr": 7.959536998847741e-05,
+     "elapsed_s": 311.9,
+     "note": ""
     }
    ]
   },
