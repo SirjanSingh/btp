@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-11 04:19 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-11 04:39 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**72 runs · 40 checkpoints currently on disk**
+**78 runs · 40 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -68,6 +68,12 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `s6_r010_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s6_r012_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s7_round2_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `thr_sweep_0.3` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `thr_sweep_0.4` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `thr_sweep_0.6` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `thr_sweep_0.7` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `thr_sweep_0.8` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `thr_sweep_0.9` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_111230` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_112025` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_115938` | rooftop | train (txt only) | 0 | — | — | — | — | — |
@@ -120,6 +126,12 @@ Kept deliberately — a crashed configuration is evidence too.
 - `s6_r010_crossdomain` (diagnostics/s6_r010_crossdomain.json)
 - `s6_r012_crossdomain` (diagnostics/s6_r012_crossdomain.json)
 - `s7_round2_crossdomain` (diagnostics/s7_round2_crossdomain.json)
+- `thr_sweep_0.3` (diagnostics/thr_sweep_0.3.json)
+- `thr_sweep_0.4` (diagnostics/thr_sweep_0.4.json)
+- `thr_sweep_0.6` (diagnostics/thr_sweep_0.6.json)
+- `thr_sweep_0.7` (diagnostics/thr_sweep_0.7.json)
+- `thr_sweep_0.8` (diagnostics/thr_sweep_0.8.json)
+- `thr_sweep_0.9` (diagnostics/thr_sweep_0.9.json)
 - `unet_resnet34_100ep_20260330_111230` (logs/unet_resnet34_100ep_20260330_111230.txt)
 - `unet_resnet34_100ep_20260330_112025` (logs/unet_resnet34_100ep_20260330_112025.txt)
 - `unet_resnet34_100ep_20260330_115938` (logs/unet_resnet34_100ep_20260330_115938.txt)

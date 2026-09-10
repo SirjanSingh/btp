@@ -14,6 +14,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
+| [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | 2026-09-11 | Can merging be fixed at inference, for free? | **Partly — same merge/missed curve as erosion**, but erosion wins `pred/label` by 0.086 at a matched operating point | ✅ |
 | [`2026-09-10-jaipur-selftrain`](2026-09-10-jaipur-selftrain/) | 2026-09-10 | Does the solar self-training recipe transfer to Jaipur rooftops? | **No.** +0.004 IoU but `pred/label` 0.9914 → 0.9134 — self-training discards the label erosion | ❌ |
 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | 2026-09-10 | Is the split rate blind, and what is the 0.8 m damage? | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments | ✅ |
 | [`2026-09-10-selftrain-round2`](2026-09-10-selftrain-round2/) | 2026-09-10 | Does a second self-training round compound? | **No — it saturates.** 0.6135 → 0.6104; teacher selects the same pixels | ❌ |

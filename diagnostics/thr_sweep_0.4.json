@@ -1,0 +1,17 @@
+{
+  "checkpoint": "experiments/2026-09-10-eroded-labels-rerun/checkpoints/unet_mit_b2_40ep_20260910_053557/best.pth",
+  "encoder": "mit_b2",
+  "val_dir": "data/jaipur_weak/val",
+  "threshold": 0.4,
+  "min_overlap": 0.5,
+  "min_area_px": 50,
+  "n_label_components": 27918,
+  "n_pred_components": 25564,
+  "merge_rate": 0.3851,
+  "split_rate": 0.064,
+  "split_rate_strict": 0.0,
+  "fragments_per_label": 0.9167,
+  "split_overlap": 0.1,
+  "missed_rate": 0.2804,
+  "pred_per_label": 0.9157
+}
