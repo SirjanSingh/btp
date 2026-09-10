@@ -48,6 +48,12 @@ __pycache__/
 *.pyo
 .ipynb_checkpoints/
 
+# ── Framework caches ─────────────────────────────────
+# Docker runs with HOME=/workspace, so torch/HF download their pretrained
+# weights INTO the repo (~178 MB) instead of the real home. Regenerable, and
+# it counts against the 40 GB quota.
+.cache/
+
 # ── IDE ───────────────────────────────────────────────
 .vscode/
 .idea/
