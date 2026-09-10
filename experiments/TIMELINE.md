@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 19:55 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 19:58 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -309,10 +309,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-117 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+118 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  56 commits
+### 2026-09-10  ·  57 commits
 
+- `19:55` **8b78c93** S6 threshold cliff: there is no cliff, there is a plateau
 - `19:30` **afc8b68** Regenerate ledger and timeline (S6 arms at ep29/ep27 of 30)
 - `19:01` **2144180** Regenerate ledger and timeline (S6 arms mid-flight: r008 ep18, r012 ep17)
 - `19:00` **56d831a** Visual label review, and the wrong conclusion it nearly produced
