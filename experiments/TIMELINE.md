@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 13:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 13:32 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -151,7 +151,7 @@ destroyed two checkpoints, every metric survived because the ledger had been wri
 | 2026-09-09 | [`2026-09-09-weak-supervision-jaipur`](2026-09-09-weak-supervision-jaipur/) | ✅ done | **IoU 0.6475** — 4.6× the unadapted seed |
 | 2026-09-10 | [`2026-09-10-d4-adjacency`](2026-09-10-d4-adjacency/) | ✅ done | **78 %** do — instance-merging workstream justified |
 | 2026-09-10 | [`2026-09-10-eroded-labels`](2026-09-10-eroded-labels/) | ✅ done | **Yes** — merge 0.46→0.33, count 0.76→**0.97** per building, −0.016 IoU |
-| 2026-09-10 | [`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/) | running | — |
+| 2026-09-10 | [`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/) | ✅ done — reproduced | **0.6393** (orig 0.6405); pred/label **0.9914**, split 0.084 |
 | 2026-09-10 | [`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/) | ✅ done — **0.8 m over-erodes** | **0.8 m over-erodes** — merge 0.13 but pred/label 1.47; 0.4 m is the optimum |
 | 2026-09-10 | [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | ✅ done — **confounded; see cross-eval** | **Unresolved** — each model wins on its own labels; needs ground truth |
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
@@ -206,7 +206,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** - **Merge rate 0.30–0.40**, down from 0.5040. This is the number the experiment lives or dies by. - **IoU 0.60–0.64**, i.e. slightly *worse* than 0.6483 — predictions will be systematically smaller than the un-eroded val targets. An IoU drop is an acceptable price and is expected. - **Split rate rises above 0**, possibly to a few percent. If erosion overshoots it will start cutting single building
 
-**[`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/)** — running
+**[`2026-09-10-eroded-labels-rerun`](2026-09-10-eroded-labels-rerun/)** — ✅ done — reproduced
 > **Why:** the original run's *metrics* survived in `RUN_LEDGER` (best IoU **0.6405** @ep19), so nothing scientific was lost. But two things need the weights themselves:
 >
 > **Expected:** should reproduce **0.6395–0.6415** — the same recipe, same data, differing only by seed noise. If it lands outside that, something is non-deterministic that I have not accounted for, which would itself be worth knowing. Expect merge ≈ 0.33, `pred/label` ≈ 0.97 as before, plus a split rate that is now *visible* (the old run reported 0.0 under the strict definition; the true value is probably a few 
@@ -247,10 +247,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-95 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+96 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  34 commits
+### 2026-09-10  ·  35 commits
 
+- `13:00` **550ed79** chore: regenerate ledger and timeline
 - `12:58` **5dcc98d** chore: regenerate ledger and timeline
 - `12:54` **6574975** perf: --cache_ram makes training 3.7x faster; we were dataloader-bound
 - `12:30` **d438820** chore: regenerate ledger and timeline

@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-10 13:00 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-10 13:32 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**55 runs · 29 checkpoints currently on disk**
+**56 runs · 29 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -34,8 +34,8 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `unet_resnet34_40ep_20260910_011232` | rooftop | train | 37 | **0.6395** | 22 | 0.7801 | 0.7463 | 0.8171 |
 | `unet_mit_b2_40ep_20260910_011238` | rooftop | train | 34 | **0.6405** | 19 | 0.7808 | 0.7799 | 0.7818 |
 | `unet_mit_b2_40ep_20260910_033956` | rooftop | train | 25 | **0.5911** | 10 | 0.7430 | 0.7978 | 0.6952 |
-| `unet_resnet34_30ep_20260910_044423` | solar | train | 22 | **0.8660** | 19 | 0.9282 | 0.9225 | 0.9340 |
-| `unet_mit_b2_40ep_20260910_053557` | rooftop | train | 27 | **0.6393** | 19 | 0.7799 | 0.7823 | 0.7776 |
+| `unet_resnet34_30ep_20260910_044423` | solar | train | 26 | **0.8678** | 26 | 0.9292 | 0.9260 | 0.9324 |
+| `unet_mit_b2_40ep_20260910_053557` | rooftop | train | 34 | **0.6393** | 19 | 0.7799 | 0.7823 | 0.7776 |
 | `d1_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d4_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -47,6 +47,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `mit_b2_erode08_dil3` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `mit_b2_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `mit_b2_eroded_dilate2` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `mit_b2_eroded_rerun` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `r3_cross_eval` | diagnostic | eval | 0 | — | — | — | — | — |
 | `resnet34` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `resnet34_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -85,6 +86,7 @@ Kept deliberately — a crashed configuration is evidence too.
 - `mit_b2_erode08_dil3` (diagnostics/merge_split/mit_b2_erode08_dil3.json)
 - `mit_b2_eroded` (diagnostics/merge_split/mit_b2_eroded.json)
 - `mit_b2_eroded_dilate2` (diagnostics/merge_split/mit_b2_eroded_dilate2.json)
+- `mit_b2_eroded_rerun` (diagnostics/merge_split/mit_b2_eroded_rerun.json)
 - `r3_cross_eval` (diagnostics/r3_cross_eval.json)
 - `resnet34` (diagnostics/merge_split/resnet34.json)
 - `resnet34_eroded` (diagnostics/merge_split/resnet34_eroded.json)

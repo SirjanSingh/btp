@@ -357,7 +357,97 @@
       "lr": 2.463632104656053e-05,
       "elapsed_s": 248.5,
       "note": ""
+    },
+    {
+      "epoch": 28,
+      "tr_loss": 0.256784,
+      "va_loss": 0.258657,
+      "iou": 0.626338,
+      "f1": 0.770243,
+      "precision": 0.802822,
+      "recall": 0.740206,
+      "lr": 2.1404630011522583e-05,
+      "elapsed_s": 225.0,
+      "note": ""
+    },
+    {
+      "epoch": 29,
+      "tr_loss": 0.256386,
+      "va_loss": 0.256517,
+      "iou": 0.632044,
+      "f1": 0.774543,
+      "precision": 0.795548,
+      "recall": 0.754619,
+      "lr": 1.835232160765591e-05,
+      "elapsed_s": 224.9,
+      "note": ""
+    },
+    {
+      "epoch": 30,
+      "tr_loss": 0.255864,
+      "va_loss": 0.255352,
+      "iou": 0.635032,
+      "f1": 0.776783,
+      "precision": 0.793912,
+      "recall": 0.760377,
+      "lr": 1.5498214331265897e-05,
+      "elapsed_s": 222.4,
+      "note": ""
+    },
+    {
+      "epoch": 31,
+      "tr_loss": 0.255899,
+      "va_loss": 0.260189,
+      "iou": 0.624213,
+      "f1": 0.768635,
+      "precision": 0.805607,
+      "recall": 0.734907,
+      "lr": 1.2859904702798466e-05,
+      "elapsed_s": 213.2,
+      "note": ""
+    },
+    {
+      "epoch": 32,
+      "tr_loss": 0.255302,
+      "va_loss": 0.253091,
+      "iou": 0.638462,
+      "f1": 0.779343,
+      "precision": 0.79029,
+      "recall": 0.768695,
+      "lr": 1.0453658778440104e-05,
+      "elapsed_s": 211.9,
+      "note": ""
+    },
+    {
+      "epoch": 33,
+      "tr_loss": 0.254359,
+      "va_loss": 0.255713,
+      "iou": 0.633679,
+      "f1": 0.775769,
+      "precision": 0.794979,
+      "recall": 0.757466,
+      "lr": 8.294311864472434e-06,
+      "elapsed_s": 214.6,
+      "note": ""
+    },
+    {
+      "epoch": 34,
+      "tr_loss": 0.254597,
+      "va_loss": 0.25603,
+      "iou": 0.633497,
+      "f1": 0.775633,
+      "precision": 0.797665,
+      "recall": 0.754786,
+      "lr": 6.395177052675792e-06,
+      "elapsed_s": 210.0,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.639263,
+    "best_epoch": 19,
+    "checkpoint": "experiments/2026-09-10-eroded-labels-rerun/checkpoints/unet_mit_b2_40ep_20260910_053557/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.259737
+  }
 }

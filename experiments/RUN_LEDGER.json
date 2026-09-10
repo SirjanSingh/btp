@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-10T13:00:55",
- "n_runs": 55,
+ "generated": "2026-09-10T13:32:10",
+ "n_runs": 56,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173038/best.pth",
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
@@ -8518,12 +8518,12 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 22,
-   "best_epoch": 19,
-   "best_iou": 0.866016,
-   "best_f1": 0.928198,
-   "best_precision": 0.922463,
-   "best_recall": 0.934004,
+   "n_epochs": 26,
+   "best_epoch": 26,
+   "best_iou": 0.867755,
+   "best_f1": 0.929196,
+   "best_precision": 0.926024,
+   "best_recall": 0.932389,
    "summary": {},
    "threshold_sweep": null,
    "results": null,
@@ -8791,6 +8791,54 @@
      "lr": 1.737803498523653e-05,
      "elapsed_s": 639.4,
      "note": ""
+    },
+    {
+     "epoch": 23,
+     "tr_loss": 0.07263,
+     "va_loss": 0.04336,
+     "iou": 0.867056,
+     "f1": 0.928795,
+     "precision": 0.92488,
+     "recall": 0.932743,
+     "lr": 1.3714331138868993e-05,
+     "elapsed_s": 498.9,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 24,
+     "tr_loss": 0.071988,
+     "va_loss": 0.043645,
+     "iou": 0.866073,
+     "f1": 0.928231,
+     "precision": 0.921757,
+     "recall": 0.934796,
+     "lr": 1.0453658778440105e-05,
+     "elapsed_s": 472.9,
+     "note": ""
+    },
+    {
+     "epoch": 25,
+     "tr_loss": 0.072354,
+     "va_loss": 0.043543,
+     "iou": 0.866317,
+     "f1": 0.928371,
+     "precision": 0.924302,
+     "recall": 0.932475,
+     "lr": 7.631742512670283e-06,
+     "elapsed_s": 459.6,
+     "note": ""
+    },
+    {
+     "epoch": 26,
+     "tr_loss": 0.071525,
+     "va_loss": 0.043054,
+     "iou": 0.867755,
+     "f1": 0.929196,
+     "precision": 0.926024,
+     "recall": 0.932389,
+     "lr": 5.2794998466912506e-06,
+     "elapsed_s": 349.3,
+     "note": "\u2190 best"
     }
    ]
   },
@@ -8832,13 +8880,19 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 27,
+   "n_epochs": 34,
    "best_epoch": 19,
    "best_iou": 0.639263,
    "best_f1": 0.779939,
    "best_precision": 0.782285,
    "best_recall": 0.777608,
-   "summary": {},
+   "summary": {
+    "best_val_iou": 0.639263,
+    "best_epoch": 19,
+    "checkpoint": "experiments/2026-09-10-eroded-labels-rerun/checkpoints/unet_mit_b2_40ep_20260910_053557/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.259737
+   },
    "threshold_sweep": null,
    "results": null,
    "epochs": [
@@ -9164,6 +9218,90 @@
      "recall": 0.747098,
      "lr": 2.463632104656053e-05,
      "elapsed_s": 248.5,
+     "note": ""
+    },
+    {
+     "epoch": 28,
+     "tr_loss": 0.256784,
+     "va_loss": 0.258657,
+     "iou": 0.626338,
+     "f1": 0.770243,
+     "precision": 0.802822,
+     "recall": 0.740206,
+     "lr": 2.1404630011522583e-05,
+     "elapsed_s": 225.0,
+     "note": ""
+    },
+    {
+     "epoch": 29,
+     "tr_loss": 0.256386,
+     "va_loss": 0.256517,
+     "iou": 0.632044,
+     "f1": 0.774543,
+     "precision": 0.795548,
+     "recall": 0.754619,
+     "lr": 1.835232160765591e-05,
+     "elapsed_s": 224.9,
+     "note": ""
+    },
+    {
+     "epoch": 30,
+     "tr_loss": 0.255864,
+     "va_loss": 0.255352,
+     "iou": 0.635032,
+     "f1": 0.776783,
+     "precision": 0.793912,
+     "recall": 0.760377,
+     "lr": 1.5498214331265897e-05,
+     "elapsed_s": 222.4,
+     "note": ""
+    },
+    {
+     "epoch": 31,
+     "tr_loss": 0.255899,
+     "va_loss": 0.260189,
+     "iou": 0.624213,
+     "f1": 0.768635,
+     "precision": 0.805607,
+     "recall": 0.734907,
+     "lr": 1.2859904702798466e-05,
+     "elapsed_s": 213.2,
+     "note": ""
+    },
+    {
+     "epoch": 32,
+     "tr_loss": 0.255302,
+     "va_loss": 0.253091,
+     "iou": 0.638462,
+     "f1": 0.779343,
+     "precision": 0.79029,
+     "recall": 0.768695,
+     "lr": 1.0453658778440104e-05,
+     "elapsed_s": 211.9,
+     "note": ""
+    },
+    {
+     "epoch": 33,
+     "tr_loss": 0.254359,
+     "va_loss": 0.255713,
+     "iou": 0.633679,
+     "f1": 0.775769,
+     "precision": 0.794979,
+     "recall": 0.757466,
+     "lr": 8.294311864472434e-06,
+     "elapsed_s": 214.6,
+     "note": ""
+    },
+    {
+     "epoch": 34,
+     "tr_loss": 0.254597,
+     "va_loss": 0.25603,
+     "iou": 0.633497,
+     "f1": 0.775633,
+     "precision": 0.797665,
+     "recall": 0.754786,
+     "lr": 6.395177052675792e-06,
+     "elapsed_s": 210.0,
      "note": ""
     }
    ]
@@ -9923,6 +10061,25 @@
   {
    "run_name": "mit_b2_eroded_dilate2",
    "log": "diagnostics/merge_split/mit_b2_eroded_dilate2.json",
+   "stage": "diagnostic",
+   "kind": "diagnostic",
+   "timestamp": "",
+   "config": {},
+   "hardware": {},
+   "n_epochs": 0,
+   "best_epoch": null,
+   "best_iou": null,
+   "best_f1": null,
+   "best_precision": null,
+   "best_recall": null,
+   "summary": {},
+   "threshold_sweep": null,
+   "results": null,
+   "epochs": []
+  },
+  {
+   "run_name": "mit_b2_eroded_rerun",
+   "log": "diagnostics/merge_split/mit_b2_eroded_rerun.json",
    "stage": "diagnostic",
    "kind": "diagnostic",
    "timestamp": "",
