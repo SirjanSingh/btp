@@ -1,0 +1,41 @@
+Run: unet_mit_b2_40ep_20260910_210834
+Date: 2026-09-10 21:08:34
+Hardware: {'device': 'cuda', 'n_gpus': 1, 'gpu_name': 'Tesla V100-SXM2-32GB', 'cuda_version': '12.4'}
+Config: {
+  "train_dir": "data/jaipur_pseudo_t050_e04/train",
+  "val_dir": "data/jaipur_weak/val",
+  "cache_ram": true,
+  "max_samples": null,
+  "train_csv": null,
+  "val_csv": null,
+  "image_dir": null,
+  "mask_dir": null,
+  "arch": "unet",
+  "encoder": "mit_b2",
+  "encoder_weights": "imagenet",
+  "epochs": 40,
+  "batch_size": 12,
+  "lr": 0.0001,
+  "threshold": 0.5,
+  "patience": 15,
+  "workers": 3,
+  "seed": 42,
+  "ckpt_dir": "experiments/2026-09-11-selftrain-eroded-pseudo/ckpt_e04",
+  "resume": null,
+  "init_weights": null,
+  "save_every": 999,
+  "boundary_relax": 0,
+  "simulate_low_res": false,
+  "log_dir": "experiments/2026-09-11-selftrain-eroded-pseudo/out_e04"
+}
+
+ Epoch    TrLoss    VaLoss      IoU       F1     Prec      Rec         LR   Time(s)  Note
+────────────────────────────────────────────────────────────────────────────────
+     1    0.2963    0.3350   0.5599   0.7178   0.7739   0.6694   9.98e-05     155.9  ← best
+     2    0.1970    0.3492   0.5510   0.7105   0.7943   0.6427   9.94e-05     147.2  
+     3    0.1618    0.3450   0.5920   0.7437   0.7851   0.7065   9.86e-05     147.3  ← best
+     4    0.1403    0.3599   0.5799   0.7341   0.8009   0.6776   9.76e-05     146.7  
+     5    0.1271    0.3602   0.5879   0.7405   0.8002   0.6890   9.62e-05     147.0  
+     6    0.1182    0.3658   0.5918   0.7436   0.7969   0.6970   9.46e-05     146.8  
+     7    0.1106    0.3829   0.5990   0.7492   0.7906   0.7120   9.27e-05     146.7  ← best
+     8    0.1061    0.3816   0.6046   0.7536   0.7918   0.7189   9.05e-05     147.2  ← best

@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-11T02:36:21",
+ "generated": "2026-09-11T02:58:28",
  "n_runs": 71,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
@@ -21,6 +21,8 @@
   "experiments/2026-09-10-solar-google-to-ign/checkpoints/unet_resnet34_40ep_20260909_204035/best.pth",
   "experiments/2026-09-10-solar-self-training/checkpoints/unet_resnet34_30ep_20260910_044423/best.pth",
   "experiments/2026-09-10-solar-selftrain-conf/checkpoints/unet_resnet34_30ep_20260910_083614/best.pth",
+  "experiments/2026-09-11-selftrain-eroded-pseudo/ckpt_e02/unet_mit_b2_40ep_20260910_210840/best.pth",
+  "experiments/2026-09-11-selftrain-eroded-pseudo/ckpt_e04/unet_mit_b2_40ep_20260910_210834/best.pth",
   "rooftop/checkpoints/unet_resnet34_best.pth",
   "rooftop/checkpoints/unet_resnet34_epoch010.pth",
   "rooftop/checkpoints/unet_resnet34_epoch020.pth",

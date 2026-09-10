@@ -1,0 +1,100 @@
+{
+  "run_name": "unet_mit_b2_40ep_20260910_210840",
+  "timestamp": "2026-09-10T21:08:40.285555",
+  "hardware": {
+    "device": "cuda",
+    "n_gpus": 1,
+    "gpu_name": "Tesla V100-SXM2-32GB",
+    "cuda_version": "12.4"
+  },
+  "config": {
+    "train_dir": "data/jaipur_pseudo_t050_e02/train",
+    "val_dir": "data/jaipur_weak/val",
+    "cache_ram": true,
+    "max_samples": null,
+    "train_csv": null,
+    "val_csv": null,
+    "image_dir": null,
+    "mask_dir": null,
+    "arch": "unet",
+    "encoder": "mit_b2",
+    "encoder_weights": "imagenet",
+    "epochs": 40,
+    "batch_size": 12,
+    "lr": 0.0001,
+    "threshold": 0.5,
+    "patience": 15,
+    "workers": 3,
+    "seed": 42,
+    "ckpt_dir": "experiments/2026-09-11-selftrain-eroded-pseudo/ckpt_e02",
+    "resume": null,
+    "init_weights": null,
+    "save_every": 999,
+    "boundary_relax": 0,
+    "simulate_low_res": false,
+    "log_dir": "experiments/2026-09-11-selftrain-eroded-pseudo/out_e02"
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "tr_loss": 0.289652,
+      "va_loss": 0.322048,
+      "iou": 0.579429,
+      "f1": 0.733719,
+      "precision": 0.761526,
+      "recall": 0.707871,
+      "lr": 9.984740801978984e-05,
+      "elapsed_s": 236.4,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 2,
+      "tr_loss": 0.194598,
+      "va_loss": 0.325204,
+      "iou": 0.581355,
+      "f1": 0.735262,
+      "precision": 0.776614,
+      "recall": 0.698091,
+      "lr": 9.939057285945931e-05,
+      "elapsed_s": 246.2,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 3,
+      "tr_loss": 0.159532,
+      "va_loss": 0.328891,
+      "iou": 0.610993,
+      "f1": 0.75853,
+      "precision": 0.773306,
+      "recall": 0.744308,
+      "lr": 9.863231105968498e-05,
+      "elapsed_s": 219.7,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 4,
+      "tr_loss": 0.139033,
+      "va_loss": 0.340526,
+      "iou": 0.598175,
+      "f1": 0.748573,
+      "precision": 0.791609,
+      "recall": 0.709974,
+      "lr": 9.75772975566101e-05,
+      "elapsed_s": 215.6,
+      "note": ""
+    },
+    {
+      "epoch": 5,
+      "tr_loss": 0.125215,
+      "va_loss": 0.336256,
+      "iou": 0.614035,
+      "f1": 0.76087,
+      "precision": 0.783479,
+      "recall": 0.739529,
+      "lr": 9.623203685930868e-05,
+      "elapsed_s": 221.6,
+      "note": "\u2190 best"
+    }
+  ],
+  "summary": {}
+}
