@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-10T12:30:14",
+ "generated": "2026-09-10T12:58:20",
  "n_runs": 55,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173038/best.pth",
@@ -8518,7 +8518,7 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 19,
+   "n_epochs": 21,
    "best_epoch": 19,
    "best_iou": 0.866016,
    "best_f1": 0.928198,
@@ -8755,6 +8755,30 @@
      "lr": 3.036653616774789e-05,
      "elapsed_s": 622.9,
      "note": "\u2190 best"
+    },
+    {
+     "epoch": 20,
+     "tr_loss": 0.075425,
+     "va_loss": 0.044858,
+     "iou": 0.862477,
+     "f1": 0.926161,
+     "precision": 0.913998,
+     "recall": 0.938652,
+     "lr": 2.5750000000000002e-05,
+     "elapsed_s": 614.7,
+     "note": ""
+    },
+    {
+     "epoch": 21,
+     "tr_loss": 0.073792,
+     "va_loss": 0.044218,
+     "iou": 0.864372,
+     "f1": 0.927253,
+     "precision": 0.922247,
+     "recall": 0.932314,
+     "lr": 2.140463001152258e-05,
+     "elapsed_s": 604.2,
+     "note": ""
     }
    ]
   },
@@ -8796,7 +8820,7 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 20,
+   "n_epochs": 26,
    "best_epoch": 19,
    "best_iou": 0.639263,
    "best_f1": 0.779939,
@@ -9044,6 +9068,78 @@
      "recall": 0.728826,
      "lr": 5.0499999999999994e-05,
      "elapsed_s": 263.6,
+     "note": ""
+    },
+    {
+     "epoch": 21,
+     "tr_loss": 0.26291,
+     "va_loss": 0.256612,
+     "iou": 0.632953,
+     "f1": 0.775225,
+     "precision": 0.791953,
+     "recall": 0.759189,
+     "lr": 4.6616274761471674e-05,
+     "elapsed_s": 266.0,
+     "note": ""
+    },
+    {
+     "epoch": 22,
+     "tr_loss": 0.261439,
+     "va_loss": 0.256007,
+     "iou": 0.633582,
+     "f1": 0.775696,
+     "precision": 0.790786,
+     "recall": 0.761172,
+     "lr": 4.275649398050858e-05,
+     "elapsed_s": 265.8,
+     "note": ""
+    },
+    {
+     "epoch": 23,
+     "tr_loss": 0.260836,
+     "va_loss": 0.256383,
+     "iou": 0.631094,
+     "f1": 0.773829,
+     "precision": 0.792144,
+     "recall": 0.756342,
+     "lr": 3.894445448913268e-05,
+     "elapsed_s": 263.8,
+     "note": ""
+    },
+    {
+     "epoch": 24,
+     "tr_loss": 0.259909,
+     "va_loss": 0.252997,
+     "iou": 0.636723,
+     "f1": 0.778046,
+     "precision": 0.788038,
+     "recall": 0.768304,
+     "lr": 3.52036587784401e-05,
+     "elapsed_s": 261.4,
+     "note": ""
+    },
+    {
+     "epoch": 25,
+     "tr_loss": 0.259317,
+     "va_loss": 0.256149,
+     "iou": 0.629956,
+     "f1": 0.772973,
+     "precision": 0.798828,
+     "recall": 0.748738,
+     "lr": 3.155717009792805e-05,
+     "elapsed_s": 261.4,
+     "note": ""
+    },
+    {
+     "epoch": 26,
+     "tr_loss": 0.258131,
+     "va_loss": 0.256279,
+     "iou": 0.633636,
+     "f1": 0.775737,
+     "precision": 0.793507,
+     "recall": 0.758746,
+     "lr": 2.802747026289243e-05,
+     "elapsed_s": 296.8,
      "note": ""
     }
    ]
