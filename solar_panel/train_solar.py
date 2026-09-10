@@ -128,7 +128,8 @@ class SolarFolderDataset(Dataset):
     Reports how many images use the black-mask fallback at construction time.
     """
 
-    def __init__(self, data_dir: str, transform=None, max_samples: int = None):
+    def __init__(self, data_dir: str, transform=None, max_samples: int = None,
+                 cache_ram: bool = False):
         self.img_dir   = Path(data_dir) / "images"
         self.msk_dir   = Path(data_dir) / "masks"
         self.transform = transform
@@ -145,12 +146,48 @@ class SolarFolderDataset(Dataset):
               f"{len(self.paths) - missing} with masks, "
               f"{missing} without masks (→ black mask fallback)")
 
+        # Decode once into RAM. Measured on the rooftop trainer: PNG decode costs
+        # 11.6 ms/image on this node and the GPU idles in a 0->97% sawtooth
+        # waiting for it; caching gave 3.68x (74.4 -> 20.2 s/epoch). Solar runs
+        # were still re-decoding 16,763 PNGs every epoch at ~340 s/epoch.
+        #
+        # Stored as a LIST, not a fixed-shape array: BDAPPV crop sizes are not
+        # guaranteed uniform, and assuming a shape is the same class of mistake
+        # that let checkpoints_mit/ past .gitignore (PITFALLS pattern B).
+        self.cache = None
+        if cache_ram:
+            n = len(self.paths)
+            print(f"Caching {n} solar crops into RAM ...", flush=True)
+            imgs, msks = [], []
+            for i, ip in enumerate(self.paths):
+                im = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
+                mp = self.msk_dir / ip.name
+                if mp.exists():
+                    mk = (cv2.imread(str(mp), cv2.IMREAD_GRAYSCALE) > 127).astype(np.uint8)
+                else:
+                    mk = np.zeros(im.shape[:2], np.uint8)
+                imgs.append(im)
+                msks.append(mk)
+                if (i + 1) % 4000 == 0:
+                    print(f"  cached {i+1}/{n}", flush=True)
+            self.cache = (imgs, msks)
+            gb = sum(a.nbytes for a in imgs) + sum(a.nbytes for a in msks)
+            print(f"Cache ready ({gb/1e9:.1f} GB).", flush=True)
+
     def __len__(self):
         return len(self.paths)
 
     def __getitem__(self, idx):
         ip = self.paths[idx]
         mp = self.msk_dir / ip.name
+
+        if self.cache is not None:
+            img = self.cache[0][idx]
+            mask = self.cache[1][idx].astype(np.float32)
+            if self.transform:
+                out = self.transform(image=img, mask=mask)
+                return out["image"], out["mask"].unsqueeze(0)
+            return img, mask
 
         img = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
 
@@ -333,15 +370,16 @@ def main(args):
         n_val   = len(glob.glob(str(Path(args.val_dir) / "images" / "*.png")))
         val_cap = max(1, int(n_val * ratio))
 
-    train_ds = SolarFolderDataset(args.train_dir, train_aug(args.crop_size), max_samples=args.max_samples)
-    val_ds   = SolarFolderDataset(args.val_dir,   val_aug(args.crop_size),   max_samples=val_cap)
+    train_ds = SolarFolderDataset(args.train_dir, train_aug(args.crop_size), max_samples=args.max_samples, cache_ram=args.cache_ram)
+    val_ds   = SolarFolderDataset(args.val_dir,   val_aug(args.crop_size),   max_samples=val_cap, cache_ram=args.cache_ram)
 
+    _extra = dict(persistent_workers=True, prefetch_factor=4) if args.workers else {}
     train_loader = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True,
-        num_workers=args.workers, pin_memory=True, drop_last=True)
+        num_workers=args.workers, pin_memory=True, drop_last=True, **_extra)
     val_loader = DataLoader(
         val_ds, batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, pin_memory=True)
+        num_workers=args.workers, pin_memory=True, **_extra)
 
     print(f"Train   : {len(train_ds)} crops  ({len(train_loader)} batches)")
     print(f"Val     : {len(val_ds)} crops  ({len(val_loader)} batches)")
@@ -485,6 +523,10 @@ def parse_args():
 
     # ── Data ─────────────────────────────────────────────────────────────────
     g = p.add_argument_group("Data — folder mode (pre-tiled crops)")
+    g.add_argument("--cache_ram", action="store_true",
+                   help="decode the crop set into RAM once; measured 3.68x on "
+                        "the rooftop trainer, solar runs were dataloader-bound "
+                        "at ~340 s/epoch")
     g.add_argument("--max_samples", type=int, default=None,
                    help="Cap training samples (val capped proportionally)")
     g.add_argument("--train_dir", required=True,

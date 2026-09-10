@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 17:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 17:16 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -181,6 +181,7 @@ destroyed two checkpoints, every metric survived because the ledger had been wri
 | 2026-09-10 | [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | ✅ done — **confounded; see cross-eval** | **Unresolved** — each model wins on its own labels; needs ground truth |
 | 2026-09-10 | [`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/) | ✅ done | **50 % merged**, 21 % under-counted — invisible to IoU |
 | 2026-09-10 | [`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/) | ✅ done — modest win | **+0.0086** (0.6569) and **2× faster convergence**; gain is all precision |
+| 2026-09-10 | [`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/) | running | — |
 | 2026-09-10 | [`2026-09-10-solar-google-to-ign`](2026-09-10-solar-google-to-ign/) | ✅ done | **0.8723 → 0.5611** (−31 pts); a capability drop, not miscalibration |
 | 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | ✅ done — **strong negative result** | **No — it destroys it.** 0.5611 → **0.3752** on target |
 | 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
@@ -262,6 +263,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** **+0.03 to +0.08 IoU** (so ~0.68–0.73). A transformer's global receptive field should help most where buildings are dense and share walls — exactly Jaipur, and exactly the instance-merging failure the project worries about. Risk: 7,371 crops is small for a transformer, which may underperform at this data scale.
 
+**[`2026-09-10-selftrain-threshold-cliff`](2026-09-10-selftrain-threshold-cliff/)** — running
+> **Why:** a Jaipur transfer has no labels, so the threshold must be chosen blind. Knowing *where* the cliff is — and how sharp — determines how much margin to leave.
+>
+> **Expected:** thr **0.0100** → **0.42–0.52** (already deep in the noise floor, so most of the damage should already be done); thr **0.0015** → **0.37–0.45** (essentially S2). If 0.0100 lands near 0.6 instead, the cliff is sharper and further down than the distribution suggests, and threshold choice is safer than I think.
+
 **[`2026-09-10-solar-google-to-ign`](2026-09-10-solar-google-to-ign/)** — ✅ done
 >
 > **Expected:** in-domain google val IoU **0.82–0.86** (prior solar runs reached ~0.85). On IGN, a drop to **0.55–0.70**. The GSD ratio here is only 2× versus Stage 1's 3.55×, and panels are far more visually distinctive than roofs, so I expect a smaller relative drop than the rooftop domain gap — but a clear one.
@@ -277,16 +283,17 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 > **Expected:** **0.50–0.58** — recovering most of the loss but landing at or slightly below the 0.5611 source-only baseline. Reasoning: a sane threshold stops the noise-labelling, but self-training can still only reinforce what the model already believes, and the source-only model is wrong about 44 % of the target. Precision should recover to ~0.65–0.75.
 
 
-**18 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+**19 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-106 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+107 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  45 commits
+### 2026-09-10  ·  46 commits
 
+- `17:00` **a11ff32** result: self-training WORKS -- CBST's ratio policy was the entire problem
 - `16:32` **aee4f5b** result: erosion sweep complete -- monotonic curve, 0.4 m is the only pred/label ~ 1
 - `16:01` **418386d** chore: queue S5 -- port --cache_ram to train_solar.py
 - `15:58` **dcd7239** chore: regenerate ledger and timeline
@@ -438,9 +445,7 @@ The half of the record that is normally lost. An idea absent from this repo was 
 - queued — R5 · Self-training / CBST on top of the weak model
 - queued — R6 · Multi-source co-training
 - queued — R7 · Low-resolution simulation
-- queued — S6 · Map the threshold cliff between 0.4563 and 0.0004 ★
 - queued — S7 · Multi-round confidence self-training
-- queued — S5 · Port `--cache_ram` to `train_solar.py` — solar runs are 2.3× slower than they need to be
 - ⛔ **blocked** — S3 · Fix the zero-negatives bug (`MASTER_CONTEXT` C1) ⚠ BLOCKED — raw BDAPPV absent
 
 ---
