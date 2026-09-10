@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 17:16 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 17:31 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -289,10 +289,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-107 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+108 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  46 commits
+### 2026-09-10  ·  47 commits
 
+- `17:16` **809c8a2** feat: solar RAM cache (S5); launch the self-training threshold cliff (S6)
 - `17:00` **a11ff32** result: self-training WORKS -- CBST's ratio policy was the entire problem
 - `16:32` **aee4f5b** result: erosion sweep complete -- monotonic curve, 0.4 m is the only pred/label ~ 1
 - `16:01` **418386d** chore: queue S5 -- port --cache_ram to train_solar.py

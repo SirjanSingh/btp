@@ -1,0 +1,94 @@
+{
+  "run_name": "unet_resnet34_30ep_20260910_114523",
+  "timestamp": "2026-09-10T11:45:23.388275",
+  "hardware": {
+    "device": "cuda",
+    "n_gpus": 1,
+    "gpu_name": "Tesla V100-SXM2-32GB",
+    "cuda_version": "12.4"
+  },
+  "config": {
+    "cache_ram": true,
+    "max_samples": null,
+    "train_dir": "data/bdappv_st_r0.008/train",
+    "val_dir": "data/bdappv_split/google_val",
+    "arch": "unet",
+    "encoder": "resnet34",
+    "encoder_weights": "imagenet",
+    "epochs": 30,
+    "batch_size": 16,
+    "crop_size": 512,
+    "lr": 0.0001,
+    "threshold": 0.5,
+    "patience": 15,
+    "workers": 3,
+    "seed": 42,
+    "ckpt_dir": "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r008",
+    "log_dir": "experiments/2026-09-10-selftrain-threshold-cliff/out_r008",
+    "resume": null,
+    "save_every": 999
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "tr_loss": 0.404339,
+      "va_loss": 0.112508,
+      "iou": 0.803371,
+      "f1": 0.890966,
+      "precision": 0.881259,
+      "recall": 0.900889,
+      "lr": 9.972883382072954e-05,
+      "elapsed_s": 173.4,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 2,
+      "tr_loss": 0.104562,
+      "va_loss": 0.062086,
+      "iou": 0.83178,
+      "f1": 0.908166,
+      "precision": 0.893518,
+      "recall": 0.923302,
+      "lr": 9.891830623632339e-05,
+      "elapsed_s": 168.8,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 3,
+      "tr_loss": 0.078046,
+      "va_loss": 0.055871,
+      "iou": 0.839146,
+      "f1": 0.912539,
+      "precision": 0.888677,
+      "recall": 0.937717,
+      "lr": 9.757729755661011e-05,
+      "elapsed_s": 167.6,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 4,
+      "tr_loss": 0.070625,
+      "va_loss": 0.053766,
+      "iou": 0.840093,
+      "f1": 0.913098,
+      "precision": 0.894617,
+      "recall": 0.93236,
+      "lr": 9.572050015330873e-05,
+      "elapsed_s": 169.0,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 5,
+      "tr_loss": 0.066896,
+      "va_loss": 0.05482,
+      "iou": 0.836188,
+      "f1": 0.910787,
+      "precision": 0.898112,
+      "recall": 0.923825,
+      "lr": 9.336825748732972e-05,
+      "elapsed_s": 168.0,
+      "note": ""
+    }
+  ],
+  "summary": {}
+}
