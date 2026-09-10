@@ -1,0 +1,46 @@
+{
+  "run_name": "unet_resnet34_30ep_20260910_142752",
+  "timestamp": "2026-09-10T14:27:52.044452",
+  "hardware": {
+    "device": "cuda",
+    "n_gpus": 1,
+    "gpu_name": "Tesla V100-SXM2-32GB",
+    "cuda_version": "12.4"
+  },
+  "config": {
+    "cache_ram": true,
+    "max_samples": null,
+    "train_dir": "data/bdappv_st_r0.010/train",
+    "val_dir": "data/bdappv_split/google_val",
+    "arch": "unet",
+    "encoder": "resnet34",
+    "encoder_weights": "imagenet",
+    "epochs": 30,
+    "batch_size": 16,
+    "crop_size": 512,
+    "lr": 0.0001,
+    "threshold": 0.5,
+    "patience": 15,
+    "workers": 3,
+    "seed": 42,
+    "ckpt_dir": "experiments/2026-09-10-selftrain-threshold-cliff/ckpt_r010",
+    "log_dir": "experiments/2026-09-10-selftrain-threshold-cliff/out_r010",
+    "resume": null,
+    "save_every": 999
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "tr_loss": 0.403686,
+      "va_loss": 0.115021,
+      "iou": 0.798937,
+      "f1": 0.888232,
+      "precision": 0.865683,
+      "recall": 0.911989,
+      "lr": 9.972883382072954e-05,
+      "elapsed_s": 189.0,
+      "note": "\u2190 best"
+    }
+  ],
+  "summary": {}
+}

@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 19:58 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 20:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -309,10 +309,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-118 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+119 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  57 commits
+### 2026-09-10  ·  58 commits
 
+- `19:58` **7337c57** Regenerate ledger and timeline (S7 round2 ep2, ratio-0.010 arm starting)
 - `19:55` **8b78c93** S6 threshold cliff: there is no cliff, there is a plateau
 - `19:30` **afc8b68** Regenerate ledger and timeline (S6 arms at ep29/ep27 of 30)
 - `19:01` **2144180** Regenerate ledger and timeline (S6 arms mid-flight: r008 ep18, r012 ep17)
