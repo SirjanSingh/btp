@@ -31,6 +31,8 @@ import subprocess
 from collections import defaultdict
 from datetime import datetime
 
+_REASONING = ""
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -50,6 +52,23 @@ def commits():
     return out
 
 
+def rationale(txt):
+    """Pull the WHY and the PREDICTION out of a write-up.
+
+    These are the two fields that explain a decision rather than record it, and
+    they are the first things forgotten. Extracted rather than re-typed so they
+    cannot drift from the experiment's own words.
+    """
+    why = pred = ""
+    m = re.search(r"\*\*Why[^:]*:\*\*\s*(.+?)(?:\n\n|\Z)", txt, re.S)
+    if m:
+        why = " ".join(m.group(1).split())
+    m = re.search(r"\*\*Predictions?[^:]*:?\*\*\s*(.+?)(?:\n\n|\Z)", txt, re.S)
+    if m:
+        pred = " ".join(m.group(1).split())
+    return why[:400], pred[:400]
+
+
 def experiments():
     """Parse each experiment write-up for status, question and headline."""
     rows = []
@@ -61,11 +80,14 @@ def experiments():
         title = txt.splitlines()[0].lstrip("# ").strip()
         m = re.search(r"\|\s*\*\*Status\*\*\s*\|([^|]*)\|", txt)
         status = m.group(1).strip() if m else "?"
+        why, pred = rationale(txt)
         rows.append({
             "id": os.path.basename(d),
             "date": os.path.basename(d)[:10],
             "title": title,
             "status": status,
+            "why": why,
+            "pred": pred,
         })
     return rows
 
@@ -99,6 +121,15 @@ def not_run():
 
 
 def main():
+    rp = os.path.join(ROOT, "experiments/_reasoning_notes.md")
+    global _REASONING
+    _REASONING = ""
+    if os.path.isfile(rp):
+        _REASONING = "\n".join(
+            l for l in open(rp, errors="ignore").read().splitlines()
+            if not l.strip().startswith("<!--") and not l.strip().startswith("-->")
+            and "Embedded into TIMELINE" not in l and "is the part that cannot" not in l)
+
     cs = commits()
     exps = experiments()
     heads = index_headlines()
@@ -129,6 +160,10 @@ def main():
         "",
         "---",
         "",
+        _REASONING,
+        "",
+        "---",
+        "",
         "## 1. Experiments, oldest first",
         "",
         "| Date | Experiment | Status | Headline result |",
@@ -137,6 +172,18 @@ def main():
     for e in exps:
         head = heads.get(e["id"], "—")
         L.append(f"| {e['date']} | [`{e['id']}`]({e['id']}/) | {e['status']} | {head} |")
+
+    L += ["", "### Why each was run, and what was expected", "",
+          "The rationale in each experiment's own words — extracted, not retyped, so it "
+          "cannot drift from the write-up.", ""]
+    for e in exps:
+        L.append(f"**[`{e['id']}`]({e['id']}/)** — {e['status']}")
+        if e["why"]:
+            L.append(f"> **Why:** {e['why']}")
+        if e["pred"]:
+            L.append(f">")
+            L.append(f"> **Expected:** {e['pred']}")
+        L.append("")
 
     L += [
         "",

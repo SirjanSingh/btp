@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-10 09:38 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-10 09:40 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -10,6 +10,100 @@ This answers the question the other documents do not: **what was tried, in what 
 | [`RUN_LEDGER.md`](RUN_LEDGER.md) | every run's **metrics + per-epoch curves** |
 | [`BACKLOG.md`](BACKLOG.md) | the **queue** |
 | [`../docs/sessions/`](../docs/sessions/) | per-day **narrative** |
+
+---
+
+
+## 0. What I was actually thinking
+
+The results table says what happened. This says **why each thing was tried, what I expected,
+and what changed my mind** — the part that evaporates fastest.
+
+### The thread, in order
+
+**It started with a gap nobody had measured.** The project's premise was "a New Zealand model
+fails on Jaipur", but both halves of that were guesses: the planning docs assumed AIRS ~15 %
+foreground and Jaipur ~50 %. D1 and D6 turned the premise into a number — the model predicts
+**5.7 %** where truth is **28.2 %**, a ~5× under-prediction. Everything after that is an
+attempt to close, explain, or re-frame that gap.
+
+**Then weak supervision made most of the plan look overbuilt.** Open Buildings gives 523k free
+Jaipur footprints, and simply training on them scored **0.6476** against the unadapted seed's
+**0.1419** — 4.6×, in one evening, with data already on disk. My honest reaction: the
+elaborate UDA apparatus (DAFormer → HRDA → MIC, CBST thresholds, self-training rounds) was
+being planned to solve a problem that free labels mostly dissolve. **Data beat algorithms by
+roughly 60× over anything else tried since.** I kept coming back to that ratio when deciding
+what to run next.
+
+**The AIRS ablation is the result I'd defend hardest.** I expected the seed to be worth
+*something* — generic aerial features at minimum — and predicted ImageNet init would land
+0.60–0.64, below it. It landed **0.6483 vs 0.6475**, and more tellingly both runs hit 0.63 at
+**exactly epoch 9** and peaked at **exactly epoch 33**. Identical trajectories. That killed
+the source-domain question (AIRS vs Inria vs Khartoum) that had blocked two sessions, and
+retired the "missing AIRS dataset" blocker. D2/D3 then explained *why*: AIRS buildings are
+**21,084 px** and Jaipur's are **913 px** — a 23× scale difference. It isn't a harder version
+of the same problem, it's a different one.
+
+**The turn came from asking what IoU wasn't telling us.** D4 measured **78 %** of Jaipur
+buildings touching a neighbour. `MASTER_CONTEXT` §6.2 already warned that pixel IoU cannot see
+instance merging — so I implemented merge/split rate expecting maybe 20–35 %. It came back at
+**50 %**. A model reporting a respectable 0.6483 IoU was fusing **half** the buildings it was
+meant to count, and emitting **21 % fewer components than exist**. Since the pipeline's output
+is a *per-building* kW estimate, that is the error that actually matters, and no metric in the
+repo could see it.
+
+**That reframed what "better" means here.** Erosion — shrinking each footprint 0.4 m so
+touching buildings get a gap — costs 0.016 IoU and looks like a regression. It takes
+`pred/label` from **0.760 to 0.9745**: under-counting falls from 24 % to 2.6 %. Judged on IoU
+it fails; judged on the project's actual goal it is the largest win of the run. **R8 had to
+exist before that experiment could be interpreted at all.**
+
+### Instincts that were wrong, and what they cost
+
+- **"Photometric alignment is nearly free"** (`plan/03` Tier 1, and I believed it). Histogram
+  matching took the seed from 0.142 to **0.026** — *worse than doing nothing*. AIRS is
+  vegetated suburban Christchurch; forcing Jaipur's colours onto that reference destroys the
+  roof/ground contrast. Deleted from the plan.
+- **"Boundary relaxation will help"** (+0.02–0.05 predicted). It cost **0.011**. The median
+  Jaipur building is ~30×30 px, so a ±4 px ignore band is most of the object. Sound for large
+  buildings, self-defeating for small ones.
+- **"Erosion helps ResNet more than MiT"** — reasoning that MiT already merged less so had
+  less to gain. Wrong by 2×: −0.064 vs **−0.136**. The two are *synergistic*; a global
+  receptive field can exploit a label gap that convolutions cannot.
+- **"Dilating predictions back will recover the misses"** — I wrote that into a code comment
+  and the next run refuted it. Merge went 0.3256 → **0.4163**. Two components 3 px apart are
+  closed by a 2 px dilation from each side. The geometry was checkable in advance and I did
+  not check it.
+
+### Judgement calls, and why
+
+- **Predictions written before every run.** Not ceremony — the boundary-relaxation and
+  erosion-interaction misses are only visible *as* surprises because the expectation was
+  timestamped first.
+- **Negative results kept in the index**, marked ❌. Deleting a failed run is how a project
+  repeats it six weeks later.
+- **Two concurrent jobs, never three.** At three, load passed 300 on 80 cores and throughput
+  collapsed to ~1 epoch/tick; two sustain ~5. VRAM was never the constraint — CPU was.
+- **Never selected a model on the target set.** S1 picks its checkpoint on *source* val;
+  choosing on `ign_val` would leak the target into model choice and flatter every later
+  method's gap-closure.
+- **R3 is marked unresolved rather than answered.** Each label-confidence model wins on its
+  own label distribution, so the metric measures agreement, not accuracy. Choosing a
+  confidence threshold by scoring against a val set built at *some* threshold is circular —
+  which turns the 400-tile hand-labelling task into the blocker for a specific decision rather
+  than generic good practice.
+
+### What I would do next, and why
+
+1. **Finish the erosion sweep**, since split rate stayed at exactly 0.0 at both 0.4 m and
+   0.8 m-so-far — the overshoot bound is genuinely unfound, and that is unusual enough to be
+   worth pinning down.
+2. **Hand-label the 400 tiles.** Three separate results now dead-end on the absence of ground
+   truth (R3, the merge-rate lower bound, and every IoU quoted anywhere).
+3. **Self-training on google→ign before Jaipur.** It is the only place a target IoU exists;
+   tuning on Jaipur is guessing with extra steps.
+4. **Re-read the weak-supervision headline.** "0.6483 IoU" reads far better than "half the
+   buildings merged, 21 % under-counted" — and the second sentence is the true one.
 
 ---
 
@@ -32,16 +126,89 @@ This answers the question the other documents do not: **what was tried, in what 
 | 2026-09-10 | [`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/) | ✅ done — modest win | **+0.0086** (0.6569) and **2× faster convergence**; gain is all precision |
 | 2026-09-10 | [`2026-09-10-solar-google-to-ign`](2026-09-10-solar-google-to-ign/) | ✅ done | **0.8723 → 0.5611** (−31 pts); a capability drop, not miscalibration |
 
+### Why each was run, and what was expected
+
+The rationale in each experiment's own words — extracted, not retyped, so it cannot drift from the write-up.
+
+**[`2026-09-08-d6-seed-probe`](2026-09-08-d6-seed-probe/)** — ✅ done
+> **Why:** it decides whether this checkpoint is usable as a self-training teacher at all. A teacher that predicts far below the true prior collapses under self-training — sparse predictions → sparse pseudo-labels → sparser teacher. Paired with D1 it is the project's motivating figure.
+>
+> **Expected:** *(not recorded in advance — reconstructed)* `MASTER_CONTEXT` §3.1 assumed AIRS ~15 % fg and Jaipur ~50 %, and predicted the seed would under-predict substantially. The direction was expected; the magnitude was not quantified.
+
+**[`2026-09-09-boundary-relaxed-loss`](2026-09-09-boundary-relaxed-loss/)** — ✅ done — **negative result**
+> **Why:** the first weak-supervision run showed **recall ~0.11 above precision for all 40 epochs**. The labels are Open Buildings *ground footprints*; the model predicts *roof* outlines; off-nadir at 26.6 cm those disagree by roughly 8 px (Gap 4). So the loss was actively teaching the model to shrink roofs down to footprint size — punishing it for roof area that is genuinely there. Relaxing the boundary rem
+>
+> **Expected:** **+0.02 to +0.05 IoU** (so ~0.67–0.70), with **precision rising** and the precision/recall gap narrowing. Risk: a 4 px band on a 512 px crop removes a large share of the informative pixels at this building density, so it may instead blur edges and cost IoU.
+
+**[`2026-09-09-d1-target-prior`](2026-09-09-d1-target-prior/)** — ✅ done
+> **Why:** 1. It sets the **CBST class ratio** for self-training. Guessing it wrong biases every pseudo-label round. 2. Paired with D6 it is the **motivating figure** of the project. 3. `MASTER_CONTEXT` §11 explicitly forbids putting estimated priors in the report.
+>
+> **Expected:** the planning docs assumed ~50 %, on the intuition that dense Indian wards are near-fully built. Expectation going in was 40–55 %.
+
+**[`2026-09-09-d2-d3-source-stats`](2026-09-09-d2-d3-source-stats/)** — ✅ done
+> **Why:** D1 measured the Jaipur prior (28.19%). The AIRS half stayed a guess, so the project's central "trained on X%, deployed on Y%" claim was half estimate — and `MASTER_CONTEXT` §11 forbids estimated priors in the report. D3 decides whether a 512² crop and the receptive field are sized correctly for the target.
+>
+> **Expected:** AIRS ~15% (the planning-doc figure); prior shift therefore ~1.9×.
+
+**[`2026-09-09-does-the-airs-seed-help`](2026-09-09-does-the-airs-seed-help/)** — ✅ done
+>
+> **Expected:** **0.60–0.64**, a little below the seeded 0.6475. The AIRS seed should be worth something — generic aerial-imagery features, roof-shaped priors — but much less than its 0.8784 source score suggests, because 7,371 target crops is plenty to learn from directly. If the gap is under 0.01 I would call the seed worthless here.
+
+**[`2026-09-09-method-comparison`](2026-09-09-method-comparison/)** — ✅ done
+>
+> **Expected:** Tier-1 photometric methods (histogram matching, FDA) give small positive gains — `plan/03` calls Tier 1 *"nearly free"* wins. AdaBN gives a real gain. Weak supervision wins overall.
+
+**[`2026-09-09-weak-supervision-jaipur`](2026-09-09-weak-supervision-jaipur/)** — ✅ done
+> **Why:** `plan/README.md` calls Open Buildings weak supervision *"★ biggest win"* and projects **IoU 0.74–0.82**. If that holds, the target domain can be trained on *directly* and the whole unsupervised-domain-adaptation apparatus — DAFormer/HRDA/MIC, CBST thresholds, self-training rounds — becomes optional rather than central. That is the largest single fork in the project, and it is decidable in one GPU-
+>
+> **Expected:** val IoU **0.60–0.72** against the weak labels — below `plan/`'s 0.74–0.82, because that projection assumes SAM2 refinement and shift correction which this run does not do. Predicted foreground should move from D6's **5.69 %** up toward the label prior of **23.06 %**; if it does not, the fine-tune is not taking.
+
+**[`2026-09-10-d4-adjacency`](2026-09-10-d4-adjacency/)** — ✅ done
+> **Why:** `MASTER_CONTEXT` §3.2 lists **instance merging** as a distinct failure mode — party-wall buildings with no visible gap fusing into one blob — and a whole planned workstream (three-class labelling, split-aware metrics) exists to address it. That work is only worth doing if buildings actually touch. A low rate would let the project *delete* a workstream, which is the cheapest kind of result availabl
+>
+> **Expected:** 40–60%. Dense Indian urban form suggests high, but Open Buildings footprints are individually delineated and I expected visible gaps between many of them.
+
+**[`2026-09-10-eroded-labels`](2026-09-10-eroded-labels/)** — ✅ done
+> **Why:** [R8](../2026-09-10-merge-split-rate/) measured a **50.4 % merge rate with a 0.0 % split rate** — the model fuses neighbours and never over-segments. [D4](../2026-09-10-d4-adjacency/) explains it: 78 % of Jaipur buildings have a neighbour within half a metre, under two pixels, so frequently **there is no gap in the label for the model to learn**. The cheapest possible intervention is to put one the
+>
+> **Expected:** - **Merge rate 0.30–0.40**, down from 0.5040. This is the number the experiment lives or dies by. - **IoU 0.60–0.64**, i.e. slightly *worse* than 0.6483 — predictions will be systematically smaller than the un-eroded val targets. An IoU drop is an acceptable price and is expected. - **Split rate rises above 0**, possibly to a few percent. If erosion overshoots it will start cutting single building
+
+**[`2026-09-10-erosion-sweep`](2026-09-10-erosion-sweep/)** — running
+> **Why:** [eroded-labels](../2026-09-10-eroded-labels/) cut merging 29 % and took `pred/label` from 0.760 to 0.9745 — but **split rate stayed at exactly 0.0**, in all four cells of the 2 × 2. The failure mode erosion is supposed to risk has not appeared at all, which means the useful range has not been explored to its end. If 0.8 m keeps split at 0 while cutting merges further, 0.4 m was simply too timid.
+>
+> **Expected:** - **merge rate below 0.25**, down from 0.3256. - **split rate finally rises above 0** — somewhere around 0.02–0.08. If it stays at exactly 0.0 again, that is a real surprise and means the model simply never over-segments at any erosion this side of destroying the labels. - **missed rate rises further**, ~0.36–0.42; more erosion means more conservatism. - **IoU 0.61–0.63**, below 0.6405. - **`pred/
+
+**[`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/)** — ✅ done — **confounded; see cross-eval**
+> **Why:** the baseline discards **205,076 buildings** — 39% of the dataset — on a confidence threshold nobody has justified with a measurement. Open Buildings is least confident about buildings that are small, irregular, or densely packed, which in Jaipur are plausibly the **hard and important** ones. If discarding them costs accuracy, the threshold is throwing away exactly the signal the project needs; if 
+>
+> **Expected:** within **±0.02** of the 0.6475 baseline — more labels but noisier, roughly cancelling. Slight lean to a small *gain* in recall and a small *loss* in precision, since the extra buildings are real but their outlines are less reliable.
+
+**[`2026-09-10-merge-split-rate`](2026-09-10-merge-split-rate/)** — ✅ done
+> **Why:** [D4](../2026-09-10-d4-adjacency/) measured **78 % of Jaipur buildings touching a neighbour**. `MASTER_CONTEXT` §6.2 states that pixel IoU cannot detect instance merging and boundary IoU largely cannot either. So every IoU in this repo has been silent about a failure mode affecting most buildings — and the pipeline ends in a **per-building kW estimate**, where merging two houses corrupts the count,
+>
+> **Expected:** merge rate 20–35 % for ResNet-34, with MiT-B2 a few points lower.
+
+**[`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/)** — ✅ done — modest win
+> **Why:** DAFormer's central empirical claim is that the *architecture* mattered more than the adaptation algorithm — self-attention features are less domain-specific than early convolutional ones. `plan/03` §2.3 asks for this table regardless of which wins.
+>
+> **Expected:** **+0.03 to +0.08 IoU** (so ~0.68–0.73). A transformer's global receptive field should help most where buildings are dense and share walls — exactly Jaipur, and exactly the instance-merging failure the project worries about. Risk: 7,371 crops is small for a transformer, which may underperform at this data scale.
+
+**[`2026-09-10-solar-google-to-ign`](2026-09-10-solar-google-to-ign/)** — ✅ done
+>
+> **Expected:** in-domain google val IoU **0.82–0.86** (prior solar runs reached ~0.85). On IGN, a drop to **0.55–0.70**. The GSD ratio here is only 2× versus Stage 1's 3.55×, and panels are far more visually distinctive than roofs, so I expect a smaller relative drop than the rooftop domain gap — but a clear one.
+
+
 **14 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-81 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+82 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-10  ·  20 commits
+### 2026-09-10  ·  21 commits
 
+- `09:38` **48c2ad4** feat: generated TIMELINE.md -- what was run, what wasn't, in order
 - `09:20` **e00f501** docs: the push failure was a 280 MB file, not the network
 - `09:16` **f8bf942** fix: gitignore all *.pth -- pattern missed checkpoints_mit/ and friends
 - `09:11` **5c95100** feat: erosion sweep at 0.8 m -- find where splitting finally starts
