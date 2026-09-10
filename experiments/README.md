@@ -14,6 +14,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
+| [`2026-09-10-label-quantity-vs-quality`](2026-09-10-label-quantity-vs-quality/) | 2026-09-10 | Are the 205k low-confidence buildings worth keeping? | **Unresolved** — each model wins on its own labels; needs ground truth | ⚠️ |
 | [`2026-09-10-segformer-backbone`](2026-09-10-segformer-backbone/) | 2026-09-10 | Does a transformer encoder beat ResNet-34? | **+0.0086** (0.6569) and **2× faster convergence**; gain is all precision | ✅ |
 | [`2026-09-09-boundary-relaxed-loss`](2026-09-09-boundary-relaxed-loss/) | 2026-09-09 | Does ignoring a 4 px label band help? | **No** — 0.6366 vs 0.6475; +0.004 precision for −0.024 recall | ❌ |
 | [`2026-09-09-does-the-airs-seed-help`](2026-09-09-does-the-airs-seed-help/) | 2026-09-09 | Is AIRS pretraining worth anything for Jaipur? | **No** — ImageNet init 0.6483 vs seeded 0.6475, identical trajectory | ✅ |

@@ -72,6 +72,7 @@ non-zero, then re-run S1.
 | D1 target prior | 28.19 % (23.06 % @ conf ≥ 0.75) |
 | D6 seed probe | 5.69 % predicted foreground — ~5× under |
 | Weak supervision | **IoU 0.6475** |
+| **R3 label confidence** | ⚠️ confounded — 0.6281 vs 0.6483 on shared val, but each model wins on its own labels |
 | **R4 MiT-B2 backbone** | ✅ 0.6569 vs 0.6483 — +0.0086, 2x faster convergence, gain all precision |
 | **R1 boundary relax (4 px)** | ❌ 0.6366 vs 0.6475 — band removes signal, not just noise |
 | **R2 AIRS seed ablation** | **ImageNet init 0.6483 vs AIRS-seeded 0.6475 — seed worth nothing** |

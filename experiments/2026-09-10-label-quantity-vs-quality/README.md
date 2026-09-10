@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ✅ done — **confounded; see cross-eval** |
 | **Date** | 2026-09-10 |
 
 ## Question
@@ -53,7 +53,73 @@ exhaust the quota.
 
 ## Results
 
-*pending*
+### The comparison as designed (both scored on the conf-0.75 val set)
+
+| | conf ≥ 0.75 (318k) | conf ≥ 0.0 (523k) | delta |
+|---|---|---|---|
+| best val IoU | **0.6483** @ep33 | 0.6281 @ep36 | **−0.0202** |
+| precision | 0.7363 | 0.6771 | **−0.0592** |
+| recall | 0.8443 | 0.8967 | **+0.0524** |
+
+Predicted within ±0.02; measured −0.0202, right at the edge. The directional lean
+(recall up, precision down) held — but both moves were far larger than "slight".
+
+### Cross-evaluation — both models, both label sets
+
+The precision drop above has an obvious alternative explanation: **a building present only in
+the conf-0.0 label set is absent from the conf-0.75 val masks, so predicting it correctly
+scores as a false positive.** Scoring both checkpoints against both label sets separates
+"the extra labels are noise" from "the extra labels are real buildings the val set refuses to
+credit". Raw: [`diagnostics/r3_cross_eval.json`](../../diagnostics/r3_cross_eval.json).
+
+| trained ↓ · evaluated → | val @ 0.75 | val @ 0.00 |
+|---|---|---|
+| **conf ≥ 0.75** | **0.6483** (P 0.736 / R 0.844) | 0.6769 (P 0.835 / R 0.781) |
+| **conf ≥ 0.00** | 0.6281 (P 0.677 / R 0.897) | **0.7205** (P 0.806 / R 0.871) |
+
+## Interpretation
+
+**Each model wins on its own label distribution.** That is the signature of a metric
+measuring *label agreement* rather than accuracy, and it means the headline −0.0202 does not
+support the conclusion it appears to.
+
+**The low-confidence buildings are largely real, not noise.** The conf-0.0 model's precision
+jumps from **0.677 → 0.806** simply by switching to a val set that includes the buildings it
+was trained to find. Roughly 0.13 of what looked like false positives were real structures
+missing from the conf-0.75 labels. If the extra 205k polygons were mostly junk, that number
+would not move like that.
+
+**But 0.7205 is not "the best model in the project".** IoU rises with foreground fraction,
+and val@0.00 is a denser, easier target — visible in the fact that even the *conf-0.75* model
+scores higher on it (0.6769) than on its own val set (0.6483). **Comparing IoU across
+different label sets is meaningless.** Anyone quoting 0.7205 alongside 0.6483 would be
+comparing two different tasks.
+
+**The honest position: this question cannot be settled with these labels.** Neither val set is
+ground truth; both are footprint approximations at different recall levels. Choosing a
+confidence threshold by scoring against a val set built at *some* confidence threshold is
+circular by construction.
+
+## Decision
+
+- [x] **Keep conf ≥ 0.75 as the default** — not because it is proven better, but because the
+      comparison is unresolved and it is the incumbent.
+- [x] **Do not quote 0.7205.** It is not comparable to any other number in this repo.
+- [ ] ★ **This is a concrete argument for the 400-tile hand-labelling task.** It is the only
+      way to break the circularity, and it now blocks a real decision rather than being
+      generic good practice. `MASTER_CONTEXT` already lists it on the critical path; this
+      experiment gives it a specific, dated justification.
+- [ ] When ground truth exists, re-run this as a proper confidence sweep (0.0 / 0.5 / 0.75 /
+      0.9) scored against it.
+
+## Threats to validity
+
+- **The original design was confounded** — one variable was meant to change and two did
+  (training labels *and*, implicitly, what counts as correct). I wrote "mildly disadvantages
+  this arm" when predicting; the cross-eval shows it was the dominant effect, not a mild one.
+- Cross-eval used a single fixed threshold (0.5), no sweep.
+- Neither val set is ground truth. Every number here is agreement-with-footprints.
+- Single seed per arm.
 
 ## Threats to validity
 
