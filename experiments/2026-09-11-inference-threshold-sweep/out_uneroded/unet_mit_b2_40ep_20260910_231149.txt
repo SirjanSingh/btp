@@ -1,0 +1,39 @@
+Run: unet_mit_b2_40ep_20260910_231149
+Date: 2026-09-10 23:11:49
+Hardware: {'device': 'cuda', 'n_gpus': 1, 'gpu_name': 'Tesla V100-SXM2-32GB', 'cuda_version': '12.4'}
+Config: {
+  "train_dir": "data/jaipur_weak/train",
+  "val_dir": "data/jaipur_weak/val",
+  "cache_ram": true,
+  "max_samples": null,
+  "train_csv": null,
+  "val_csv": null,
+  "image_dir": null,
+  "mask_dir": null,
+  "arch": "unet",
+  "encoder": "mit_b2",
+  "encoder_weights": "imagenet",
+  "epochs": 40,
+  "batch_size": 12,
+  "lr": 0.0001,
+  "threshold": 0.5,
+  "patience": 15,
+  "workers": 3,
+  "seed": 42,
+  "ckpt_dir": "experiments/2026-09-11-inference-threshold-sweep/ckpt_uneroded",
+  "resume": null,
+  "init_weights": null,
+  "save_every": 999,
+  "boundary_relax": 0,
+  "simulate_low_res": false,
+  "log_dir": "experiments/2026-09-11-inference-threshold-sweep/out_uneroded"
+}
+
+ Epoch    TrLoss    VaLoss      IoU       F1     Prec      Rec         LR   Time(s)  Note
+────────────────────────────────────────────────────────────────────────────────
+     1    0.3651    0.3019   0.6014   0.7511   0.7125   0.7942   9.98e-05     156.4  ← best
+     2    0.3130    0.2899   0.6102   0.7579   0.7132   0.8086   9.94e-05     146.8  ← best
+     3    0.2983    0.2757   0.6263   0.7702   0.7294   0.8159   9.86e-05     147.7  ← best
+     4    0.2879    0.2684   0.6339   0.7759   0.7268   0.8321   9.76e-05     147.5  ← best
+     5    0.2826    0.2660   0.6351   0.7768   0.7368   0.8214   9.62e-05     146.9  ← best
+     6    0.2780    0.2625   0.6408   0.7811   0.7319   0.8373   9.46e-05     147.2  ← best
