@@ -483,7 +483,35 @@
       "lr": 1.6094271405406857e-06,
       "elapsed_s": 221.7,
       "note": ""
+    },
+    {
+      "epoch": 39,
+      "tr_loss": 0.034048,
+      "va_loss": 0.042416,
+      "iou": 0.870605,
+      "f1": 0.930827,
+      "precision": 0.92884,
+      "recall": 0.932824,
+      "lr": 1.1525919802101657e-06,
+      "elapsed_s": 199.4,
+      "note": ""
+    },
+    {
+      "epoch": 40,
+      "tr_loss": 0.03414,
+      "va_loss": 0.041862,
+      "iou": 0.872325,
+      "f1": 0.931809,
+      "precision": 0.930847,
+      "recall": 0.932774,
+      "lr": 1e-06,
+      "elapsed_s": 190.5,
+      "note": "\u2190 best"
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.872325,
+    "best_epoch": 40,
+    "checkpoint": "experiments/2026-09-10-solar-google-to-ign/checkpoints/unet_resnet34_40ep_20260909_204035/best.pth"
+  }
 }

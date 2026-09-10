@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ✅ done |
 | **Date** | 2026-09-10 |
 
 ## Question
@@ -54,7 +54,59 @@ Splits are symlink trees under `data/bdappv_split/` (2 MB, no data duplicated).
 
 ## Results
 
-*pending*
+Raw: [`diagnostics/s1_crossdomain.json`](../../diagnostics/s1_crossdomain.json)
+
+| | best IoU | at threshold | precision | recall |
+|---|---|---|---|---|
+| **google_val** (source, in-domain) | **0.8723** | 0.5 | 0.931 | 0.933 |
+| **ign_val** (TARGET, never seen) | **0.5611** | 0.5 | 0.741 | 0.698 |
+
+**Domain gap: −0.3112 absolute, −35.7 % relative.**
+
+Predicted 0.82–0.86 in-domain (got 0.8723, slightly above) and 0.55–0.70 on IGN (got 0.5611,
+at the bottom of the band). Both calls landed.
+
+## Interpretation
+
+**★ This is a real capability drop, not miscalibration — and the threshold sweep is what
+proves it.** The optimum sits at **0.5 on both domains**. Contrast the rooftop case, where
+the AIRS seed's best threshold on Jaipur was **0.01** and simply turning that dial recovered
+0.142 → 0.333 IoU. There, most of the apparent domain gap was calibration. Here there is no
+free lunch: the model is genuinely worse on IGN, and closing the gap requires learning, not
+rescaling.
+
+That distinction matters because the two need different fixes, and reporting a single fixed
+threshold would have conflated them.
+
+**Precision and recall fall together** (0.93/0.93 → 0.74/0.70), rather than one collapsing.
+The model is not systematically over- or under-predicting on IGN; it is simply less accurate
+— consistent with a genuine appearance shift rather than a prior shift.
+
+**The project now has a measurable adaptation testbed with explicit headroom: 0.5611 → 0.8723.**
+Every UDA method — self-training, CBST, DAFormer/HRDA/MIC — can be scored on how much of
+those 31 points it closes. On Jaipur none of them can ever be scored at all. Per
+`MASTER_CONTEXT`'s ordering principle, hyperparameters should be tuned here and transferred
+frozen.
+
+## Decision
+
+- [x] **Source-only baseline established: 0.5611 on IGN.** This is the number to beat.
+- [ ] S2: run self-training / CBST here and report gap closed, before touching Jaipur.
+- [ ] Re-run after C1 is fixed — see below; the absolute values are not deployment numbers.
+
+## Threats to validity
+
+- ⚠ **C1 (zero negatives) is unfixed, and now known to be unfixable from disk**:
+  `solar_panel/bdappv/` is empty, so a re-prep needs BDAPPV re-downloaded from source. Every
+  crop on both sides contains a panel, so **the model has never seen a panel-free roof and
+  these precision figures are not deployment numbers.** The *relative* drop remains
+  informative because both domains share the defect — but the 0.8723 in particular would fall
+  sharply against realistic negatives.
+- Google and IGN differ in GSD, sensor **and** geography within France. The 31-point drop
+  bundles all three; it is not a pure resolution effect.
+- IGN crops were resized to 512² to match the model input, which adds a resampling step the
+  source domain did not undergo.
+- Single seed.
 
 ## Threats to validity
 

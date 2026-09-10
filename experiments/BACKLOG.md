@@ -72,6 +72,7 @@ first. Until then every Stage-2 precision number, S1's included, measures the wr
 | D1 target prior | 28.19 % (23.06 % @ conf ≥ 0.75) |
 | D6 seed probe | 5.69 % predicted foreground — ~5× under |
 | Weak supervision | **IoU 0.6475** |
+| **S1 solar google→ign** | source 0.8723 → **target 0.5611**; best thr 0.5 on both, so not calibration |
 | **R8 merge/split rate** | **50 % of buildings merged** at IoU 0.648; MiT-B2 4.3 pts better; split rate 0 |
 | **D4 adjacency** | **78 %** of buildings touch a neighbour — merging workstream justified |
 | **R3 label confidence** | ⚠️ confounded — 0.6281 vs 0.6483 on shared val, but each model wins on its own labels |
