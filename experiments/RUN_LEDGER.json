@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-10T12:01:18",
+ "generated": "2026-09-10T12:30:14",
  "n_runs": 55,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173038/best.pth",
@@ -8518,12 +8518,12 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 16,
-   "best_epoch": 16,
-   "best_iou": 0.863204,
-   "best_f1": 0.92658,
-   "best_precision": 0.917152,
-   "best_recall": 0.936205,
+   "n_epochs": 19,
+   "best_epoch": 19,
+   "best_iou": 0.866016,
+   "best_f1": 0.928198,
+   "best_precision": 0.922463,
+   "best_recall": 0.934004,
    "summary": {},
    "threshold_sweep": null,
    "results": null,
@@ -8719,6 +8719,42 @@
      "lr": 4.532584106825115e-05,
      "elapsed_s": 646.3,
      "note": "\u2190 best"
+    },
+    {
+     "epoch": 17,
+     "tr_loss": 0.076494,
+     "va_loss": 0.04577,
+     "iou": 0.859958,
+     "f1": 0.924707,
+     "precision": 0.907676,
+     "recall": 0.942389,
+     "lr": 4.0208371304520894e-05,
+     "elapsed_s": 618.1,
+     "note": ""
+    },
+    {
+     "epoch": 18,
+     "tr_loss": 0.07581,
+     "va_loss": 0.044916,
+     "iou": 0.86193,
+     "f1": 0.925846,
+     "precision": 0.912261,
+     "recall": 0.939841,
+     "lr": 3.520365877844009e-05,
+     "elapsed_s": 630.1,
+     "note": ""
+    },
+    {
+     "epoch": 19,
+     "tr_loss": 0.075888,
+     "va_loss": 0.043631,
+     "iou": 0.866016,
+     "f1": 0.928198,
+     "precision": 0.922463,
+     "recall": 0.934004,
+     "lr": 3.036653616774789e-05,
+     "elapsed_s": 622.9,
+     "note": "\u2190 best"
     }
    ]
   },
@@ -8760,12 +8796,12 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 13,
-   "best_epoch": 10,
-   "best_iou": 0.636779,
-   "best_f1": 0.778088,
-   "best_precision": 0.765039,
-   "best_recall": 0.791589,
+   "n_epochs": 20,
+   "best_epoch": 19,
+   "best_iou": 0.639263,
+   "best_f1": 0.779939,
+   "best_precision": 0.782285,
+   "best_recall": 0.777608,
    "summary": {},
    "threshold_sweep": null,
    "results": null,
@@ -8924,6 +8960,90 @@
      "recall": 0.729032,
      "lr": 7.636367895343945e-05,
      "elapsed_s": 271.0,
+     "note": ""
+    },
+    {
+     "epoch": 14,
+     "tr_loss": 0.27123,
+     "va_loss": 0.259857,
+     "iou": 0.627408,
+     "f1": 0.771052,
+     "precision": 0.791025,
+     "recall": 0.752063,
+     "lr": 7.297252973710755e-05,
+     "elapsed_s": 268.4,
+     "note": ""
+    },
+    {
+     "epoch": 15,
+     "tr_loss": 0.270022,
+     "va_loss": 0.259446,
+     "iou": 0.629554,
+     "f1": 0.77267,
+     "precision": 0.785862,
+     "recall": 0.759913,
+     "lr": 6.944282990207194e-05,
+     "elapsed_s": 265.8,
+     "note": ""
+    },
+    {
+     "epoch": 16,
+     "tr_loss": 0.268216,
+     "va_loss": 0.263516,
+     "iou": 0.62035,
+     "f1": 0.765699,
+     "precision": 0.799317,
+     "recall": 0.734795,
+     "lr": 6.57963412215599e-05,
+     "elapsed_s": 270.2,
+     "note": ""
+    },
+    {
+     "epoch": 17,
+     "tr_loss": 0.267239,
+     "va_loss": 0.253797,
+     "iou": 0.638753,
+     "f1": 0.77956,
+     "precision": 0.775737,
+     "recall": 0.783421,
+     "lr": 6.205554551086731e-05,
+     "elapsed_s": 269.5,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 18,
+     "tr_loss": 0.265776,
+     "va_loss": 0.256224,
+     "iou": 0.633107,
+     "f1": 0.77534,
+     "precision": 0.788068,
+     "recall": 0.763017,
+     "lr": 5.824350601949142e-05,
+     "elapsed_s": 271.0,
+     "note": ""
+    },
+    {
+     "epoch": 19,
+     "tr_loss": 0.26464,
+     "va_loss": 0.253935,
+     "iou": 0.639263,
+     "f1": 0.779939,
+     "precision": 0.782285,
+     "recall": 0.777608,
+     "lr": 5.438372523852832e-05,
+     "elapsed_s": 267.1,
+     "note": "\u2190 best"
+    },
+    {
+     "epoch": 20,
+     "tr_loss": 0.263638,
+     "va_loss": 0.26338,
+     "iou": 0.61856,
+     "f1": 0.764334,
+     "precision": 0.803479,
+     "recall": 0.728826,
+     "lr": 5.0499999999999994e-05,
+     "elapsed_s": 263.6,
      "note": ""
     }
    ]
