@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 06:28 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 06:31 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -205,6 +205,8 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
 | 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
 | 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Erosion is necessary.** Eroded model wins recall *and* counting at every matched merge; un-eroded `pred/label` tops out at 0.9119 |
+| 2026-09-11 | [`2026-09-11-mit-b5`](2026-09-11-mit-b5/) | running | — |
+| 2026-09-11 | [`2026-09-11-seed-variance`](2026-09-11-seed-variance/) | running | — |
 | 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | ❌ negative — diagnosis confirmed, teacher still wins | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins |
 
 ### Why each was run, and what was expected
@@ -323,22 +325,29 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** I expected thresholding to trace a *worse* merge/missed trade than erosion. Matched at equal merge rate, the two curves are nearly the same:
 
+**[`2026-09-11-mit-b5`](2026-09-11-mit-b5/)** — running
+> **Why:** the median Jaipur building is ~30×30 px (D2/D3: 913 px against AIRS's 21,084). Small-object segmentation is usually capacity- and receptive-field-limited, and MiT-B5 has a wider global receptive field — the property that made B2 exploit label gaps ResNet could not.
+
+**[`2026-09-11-seed-variance`](2026-09-11-seed-variance/)** — running
+> **Why:** it retroactively determines which of tonight's conclusions are real. Three in particular hinge on it:
+
 **[`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/)** — ❌ negative — diagnosis confirmed, teacher still wins
 > **Why:** it decides whether "self-training fails on Stage 1" is a fact about the method or an artefact of one fixable implementation detail. R5's conclusion is currently the stronger claim and this is the test that could weaken it.
 >
 > **Expected:** Eroding the pseudo-labels recovers most of what raw self-training threw away: `pred/label` **0.9134 → 0.9672** (under-counting 8.7 % → 3.3 %) and merge **0.3371 → 0.2666**, now *better* than the teacher's 0.3155. The mechanism proposed in R5 — that self-training discards the label erosion — is confirmed by repairing exactly that and watching both metrics move back.
 
 
-**24 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+**26 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-149 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+150 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  15 commits
+### 2026-09-11  ·  16 commits
 
+- `06:28` **5ac635f** Un-eroded curve settles it: erosion is necessary, not redundant with thresholding
 - `06:00` **5927321** Regenerate ledger and timeline (un-eroded ep32 at 0.6571)
 - `05:58` **a45ea00** Regenerate ledger and timeline (un-eroded retrain ep31 at 0.6559)
 - `05:37` **13251b8** E04's curve is compressed, not coincident -- and my criterion was defective again
