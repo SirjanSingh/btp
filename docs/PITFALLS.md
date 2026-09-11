@@ -453,7 +453,16 @@ threshold pair can separate them.
 could not fail in the way the experiment actually failed.
 
 **Rule.** A pre-registered decision rule must be stated over the **full metric set that would
-change the decision**, and must name a **comparison target**, not absolute thresholds. Here it
+change the decision**, and must name a **comparison target**, not absolute thresholds.
+
+**Recurrence, same session.** Hours after logging this, I wrote another single-metric
+criterion for the E04 threshold sweep (*"if E04's `pred/label` beats the teacher's at
+matched merge, reopen R5b"*). It passed at 4 of 5 points, and acting on it would have been
+wrong: the teacher wins recall at every one of those points and beats E04's best
+`pred/label` outright. **Writing the rule down did not make it fire correctly.** What caught
+it was checking the full metric set *before* acting on the verdict. Treat a pre-registered
+criterion as a hypothesis about what will matter, never as an authority that overrides
+looking at the rest of the numbers. Here it
 should have read: *"beats the teacher on `pred/label` AND does not lose recall"* — which E04
 fails cleanly. Pre-registration is still right; a rule that only lists the metrics you expect to
 improve is advocacy with a timestamp.

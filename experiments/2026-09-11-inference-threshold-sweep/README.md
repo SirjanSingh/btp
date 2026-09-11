@@ -139,3 +139,70 @@ that would actually settle whether erosion is necessary.
 - Merge/split are computed on connected components at the swept threshold, so the metric and
   the knob move together by construction — that is the point, but it means "merge fell" must
   always be read beside "missed rose".
+
+---
+
+## Follow-up: does self-training shift the curve, or only move along it?
+
+The matched-operating-point comparison above showed **erosion shifts the fusion/recall curve**
+to a better `pred/label`, while thresholding only slides along it. R5b's eroded-pseudo arms
+were compared to the teacher at *single points*, which cannot tell those two cases apart.
+
+Sweeping E04's own inference threshold answers it directly.
+
+**Prediction (before running):** E04's curve will **coincide with the teacher's** — self-training
+moves along the curve rather than shifting it. Reasoning: the teacher's probability field is
+what generated E04's training target, so E04 should inherit the same instance structure, just
+re-centred. Concretely, at matched merge rate I expect E04's `pred/label` within **±0.03** of
+the teacher's curve.
+
+**If E04's curve sits at better `pred/label` than the teacher's at matched merge**, then
+self-training *does* shift the curve, and R5b's rejection was measuring the wrong thing — the
+arms would have been compared at the wrong operating point rather than being genuinely worse.
+That would reopen R5b.
+
+### Result — the curves do not coincide, and the criterion I wrote was wrong again
+
+E04's threshold sweep (0.5 row from R5b):
+
+| thr | merge | missed | pred/label |
+|---|---|---|---|
+| 0.3 | 0.2903 | 0.3717 | 0.9584 |
+| 0.4 | 0.2770 | 0.3852 | 0.9645 |
+| 0.5 | 0.2666 | 0.3974 | 0.9672 |
+| 0.6 | 0.2555 | 0.4093 | 0.9736 |
+| 0.7 | 0.2427 | 0.4231 | 0.9796 |
+
+**Prediction wrong.** I said E04's curve would coincide with the teacher's, `pred/label` within
+±0.03 at matched merge. The gaps are **0.06–0.09** — the curves are genuinely different.
+
+**E04's curve is compressed.** Across thresholds 0.3–0.7 its merge moves only
+**0.2427–0.2903** and missed only **0.3717–0.4231**, where the teacher spans merge
+**0.1616–0.4514** and missed **0.2402–0.4627**. Training on eroded pseudo-labels produced a
+much more saturated probability field: the threshold barely moves it. That is a real, and
+somewhat unwelcome, property — **it costs the free dial.** The teacher can be tuned across a
+wide operating range at inference; E04 essentially cannot.
+
+**Now the criterion I pre-registered.** I wrote: *"if E04's curve sits at better `pred/label`
+than the teacher's at matched merge, self-training does shift the curve … that would reopen
+R5b."* By that test E04 **passes at 4 of 5 matched points** (0.9645 vs 1.0376, 0.9672 vs
+1.0500, 0.9736 vs 1.0633, 0.9796 vs 1.0787).
+
+**I am not reopening R5b, because I wrote the same defective criterion as PITFALLS 3.22 —
+single-metric, no comparison to the actual deliverable.** Checking the full set:
+
+- **The teacher wins recall at every single matched merge point** (0.3458 vs 0.3717, 0.3563 vs
+  0.3852, 0.3646 vs 0.3974, 0.3734 vs 0.4093, 0.3836 vs 0.4231).
+- **E04's best `pred/label` at any threshold is 0.9796, at missed 0.4231.** The teacher at its
+  default 0.5 gives **0.9914 at missed 0.3257** — better on both, simultaneously.
+
+So E04 does shift the curve, and shifts it to a place that is worse on recall everywhere and
+never reaches the teacher's counting. **R5b's rejection stands, now tested against E04's whole
+curve rather than one point.**
+
+**Two lessons, one of them about me.** (1) Self-training does change the model's instance
+structure, not just its operating point — so "it only moves along the curve" was too glib.
+(2) I wrote a single-metric pre-registered criterion **again**, hours after logging PITFALLS
+3.22 for exactly that. Writing the rule down does not make it fire correctly; the discipline
+that actually caught it was checking the full metric set before acting on the verdict. The
+criterion is the artefact, the check is the practice.

@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-11 05:13 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-11 05:37 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**79 runs · 41 checkpoints currently on disk**
+**83 runs · 41 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -43,6 +43,10 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d4_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d6_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `e04_thr_0.3` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `e04_thr_0.4` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `e04_thr_0.6` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `e04_thr_0.7` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `eval_unet_resnet34_210samples_20260330_192349` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `method_comparison` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `mit_b2` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -102,6 +106,10 @@ Kept deliberately — a crashed configuration is evidence too.
 - `d2_d3_summary` (diagnostics/d2_d3/d2_d3_summary.json)
 - `d4_summary` (diagnostics/d4/d4_summary.json)
 - `d6_summary` (diagnostics/d6_smoke/d6_summary.json)
+- `e04_thr_0.3` (diagnostics/e04_thr_0.3.json)
+- `e04_thr_0.4` (diagnostics/e04_thr_0.4.json)
+- `e04_thr_0.6` (diagnostics/e04_thr_0.6.json)
+- `e04_thr_0.7` (diagnostics/e04_thr_0.7.json)
 - `eval_unet_resnet34_210samples_20260330_192349` (rooftop/logs/eval_unet_resnet34_210samples_20260330_192349.txt)
 - `method_comparison` (diagnostics/method_comparison.json)
 - `mit_b2` (diagnostics/merge_split/mit_b2.json)
