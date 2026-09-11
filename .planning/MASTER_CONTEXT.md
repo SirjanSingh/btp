@@ -516,9 +516,20 @@ anywhere, and no kWh figure.
 
 ### 7.1 The missing arithmetic
 ```
-E_annual (kWh/yr) = P_installed (kWp) × PVOUT (kWh/kWp/yr) × PR
-        or        = usable_area_m² × η × GTI_annual (kWh/m²/yr) × PR
+E_annual (kWh/yr) = P_installed (kWp) × PVOUT (kWh/kWp/yr) × PR   ← ✗ DOUBLE-COUNTS
+        or        = usable_area_m² × η × GTI_annual (kWh/m²/yr) × PR   ← ✓ correct
 ```
+
+> **[CORRECTED 2026-09-11]** The two forms above are **not** interchangeable, and the first is
+> wrong. Solargis/World Bank **PVOUT already includes system losses** — 3.5 % soiling, 7.5 %
+> shading/mismatch/inverter/cabling, plus module temperature response. It *is* specific yield,
+> net of losses. Multiplying it by a PR of 0.75–0.80 applies those losses a second time and
+> **underestimates annual energy by 22.5 %** — thirteen times the entire segmentation error term.
+>
+> Use **either** `PVOUT × (rooftop derate ≈ 0.95)` **or** `GTI × η × PR`. Never `PVOUT × PR`.
+> A residual rooftop derate is still justified (Rajasthan dust exceeds GSA's assumed 3.5 %, and
+> roof mounting ventilates worse than the free-standing racking GSA models) but it is a small
+> correction, not a full PR. See `experiments/2026-09-11-d15-pvout-lookup/`.
 **PR** bundles temperature derating, soiling, inverter/wiring losses, mismatch. For Rajasthan
 both heat and dust are material — Singla et al. find seasonal/environmental/technical factors
 can cost **up to 50%** of generation across Indian cities. PR 0.75–0.80 is the standard
@@ -548,7 +559,8 @@ India GHI ranges ~3.8 (NE hills) to ~6.5 kWh/m²/day (western Rajasthan).
 | η (module efficiency) | 0.20 (mono-PERC) | [PLANNED] |
 | **GTI @ OPTA, Jaipur** | from Global Solar Atlas | **[TODO]** |
 | **OPTA, Jaipur** | from Global Solar Atlas | **[TODO]** |
-| **PR** | 0.75–0.80 | **[TODO — state and justify]** |
+| **PR** (with GTI form only) | 0.75–0.80 | **[TODO — state and justify]** |
+| **Rooftop derate** (with PVOUT form) | ≈0.95 | **[ASSUMED 2026-09-11 — never combine with PR]** |
 
 Add a **kWh/yr column to every capacity table.** Extend the ethics caveat
 ("order-of-magnitude estimate, not an engineering assessment") to cover PR and irradiance

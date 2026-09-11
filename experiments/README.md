@@ -15,6 +15,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | 2026-09-11 | Does eroding the pseudo-labels repair R5? | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins | ❌ |
+| [`2026-09-11-d15-pvout-lookup`](2026-09-11-d15-pvout-lookup/) | 2026-09-11 | PVOUT for Jaipur, and is the energy formula right? | ★ **`PVOUT × PR` double-counts losses — 22.5 % underestimate.** `k_usable` share rises to 68 % | ✅ |
 | [`2026-09-11-d14-energy-budget`](2026-09-11-d14-energy-budget/) | 2026-09-11 | Which term controls the headline energy figure? | ★★ **`k_usable` 56 %, PVOUT 30 %, segmentation 1.7 %.** Perfect segmentation moves the answer 0.1 pp | ✅ |
 | [`2026-09-11-d13-extra-predictions`](2026-09-11-d13-extra-predictions/) | 2026-09-11 | Are the model's extra small components fragments or findings? | **Only 10.9 % fragments.** 50 % are sole correct detections, 39 % isolated — a two-sided disagreement with OB | ✅ |
 | [`2026-09-11-d12-pred-size-dist`](2026-09-11-d12-pred-size-dist/) | 2026-09-11 | Can the model produce small components at all? | ★ **Yes — 1.8× more than the labels have.** Capacity refuted; the 62 % is localisation, not resolution | ✅ |
