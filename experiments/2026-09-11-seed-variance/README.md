@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | ★ done — instance metrics have a ±0.06 floor; several claims weakened |
+| **Status** | ★ done (n=3) — `pred/label` 2 sd = 0.076; flagship number needs an error bar |
 | **Date** | 2026-09-11 |
 
 ## Question
@@ -141,3 +141,65 @@ compared on single runs of metrics with a ±0.06 floor.
 - Seed controls init, shuffling and augmentation, but cuDNN autotuning is not deterministic
   either, so this is total run-to-run variance rather than seed variance specifically — which
   is the quantity actually wanted here.
+
+---
+
+## n = 3 — a proper spread, and what it does to the headline number
+
+Third seed complete. All three are the identical config, differing only in `--seed`.
+
+| metric | seed 42 | seed 43 | seed 44 | range | **sd** | **2 sd** |
+|---|---|---|---|---|---|---|
+| val IoU | 0.6393 | 0.6423 | 0.6434 | 0.0041 | 0.0021 | **0.0042** |
+| merge | 0.3155 | 0.3650 | 0.3329 | 0.0495 | 0.0251 | **0.0502** |
+| split | 0.0840 | 0.0634 | 0.0793 | 0.0206 | 0.0108 | 0.0216 |
+| frag/label | 0.9203 | 0.8962 | 0.9310 | 0.0348 | 0.0178 | 0.0356 |
+| missed | 0.3257 | 0.3074 | 0.3045 | 0.0212 | 0.0115 | 0.0230 |
+| **pred/label** | 0.9914 | 0.9317 | **1.0027** | 0.0710 | 0.0382 | **0.0763** |
+
+The n=2 estimate (0.0597 `pred/label`) was in the right region; n=3 gives **2 sd = 0.0763**.
+
+### This changes how the project's flagship number must be quoted
+
+The headline result everywhere in this repo is *"0.4 m erosion gives `pred/label` **0.9914** —
+within **0.9 %** of one prediction per building."* Across three seeds the same configuration
+produces **0.9317, 0.9914, 1.0027**.
+
+**The honest statement is `pred/label` = 0.99 ± 0.08 (2 sd), not 0.9914.** The "within 0.9 %"
+precision is an artefact of reporting one run to four decimals. The *conclusion* survives — 0.4 m
+is still the only erosion setting whose interval contains 1.0, since 0.2 m (0.8412) sits 2.1×
+outside it and 0.8 m (1.4743) is far beyond — but the stated precision was two orders of
+magnitude too confident.
+
+### Re-audit at n=3, threshold = 2 sd
+
+| claim | Δ | × 2 sd | verdict |
+|---|---|---|---|
+| erosion 0.4 → 0.8 m merge | 0.1816 | 3.6× | **safe** |
+| R4: MiT-B2 over ResNet-34 (IoU) | 0.0086 | 2.0× | **safe** |
+| eroded vs un-eroded `pred/label` @ merge 0.3155 | 0.1468 | 1.9× | ok |
+| erosion 0.2 → 0.4 m merge | 0.0963 | 1.9× | ok |
+| eroded vs un-eroded `pred/label` @ merge 0.4514 | 0.0925 | 1.2× | ok |
+| R5 arm B `pred/label` regression | 0.0780 | 1.0× | ok, marginal |
+| E04 curve vs teacher curve | 0.0700 | 0.9× | **not supported** |
+| erosion 0 → 0.2 m merge | 0.0497 | 1.0× | **not supported** |
+| R5 arm B IoU over teacher | 0.0039 | 0.9× | not supported *(I dismissed it as noise — correctly)* |
+| R5b E02 vs E04 `pred/label` | 0.0225 | 0.3× | **not supported** |
+
+**Net effect of going n=2 → n=3:** R4's encoder choice moves from "weak" to safe, and the
+eroded-vs-un-eroded comparison firms up. The three unsupported claims stay unsupported. Nothing
+that was called safe became unsafe.
+
+**The eroded-vs-un-eroded result deserves a note.** Its individual points are only 1.2–1.9× 2 sd,
+but **three matched operating points all move the same direction, with the gap widening
+monotonically** (0.093 → 0.118 → 0.147). Three independent same-direction comparisons is much
+stronger than any one of them; treating each in isolation understates it. That is the argument
+that carries the erosion conclusion, not any single delta.
+
+## Decision (updated for n=3)
+
+- [x] **Quote `pred/label` as X ± 0.08 and merge as X ± 0.05.** Four-decimal single-run
+      reporting is not defensible for these metrics.
+- [x] **Restate the flagship as `pred/label` ≈ 0.99 ± 0.08**, and rest the erosion conclusion on
+      the *interval containing 1.0*, not on the point estimate.
+- [x] n=3 is enough for a noise floor; further seeds are better spent on arms that will be quoted.

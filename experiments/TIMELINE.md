@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 08:29 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 12:32 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -206,7 +206,7 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
 | 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Erosion is necessary.** Eroded model wins recall *and* counting at every matched merge; un-eroded `pred/label` tops out at 0.9119 |
 | 2026-09-11 | [`2026-09-11-mit-b5`](2026-09-11-mit-b5/) | running | — |
-| 2026-09-11 | [`2026-09-11-seed-variance`](2026-09-11-seed-variance/) | ★ done — instance metrics have a ±0.06 floor; several claims weakened | ★ **±0.0597 `pred/label`, ±0.0495 merge, ±0.0030 IoU.** Three prior conclusions sit at or below it |
+| 2026-09-11 | [`2026-09-11-seed-variance`](2026-09-11-seed-variance/) | ★ done (n=3) — `pred/label` 2 sd = 0.076; flagship number needs an error bar | ★ **n=3: 2sd = 0.076 `pred/label`, 0.050 merge, 0.004 IoU.** Flagship 0.9914 is really 0.99 ± 0.08; three claims unsupported |
 | 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | ❌ negative — diagnosis confirmed, teacher still wins | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins |
 
 ### Why each was run, and what was expected
@@ -328,7 +328,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 **[`2026-09-11-mit-b5`](2026-09-11-mit-b5/)** — running
 > **Why:** the median Jaipur building is ~30×30 px (D2/D3: 913 px against AIRS's 21,084). Small-object segmentation is usually capacity- and receptive-field-limited, and MiT-B5 has a wider global receptive field — the property that made B2 exploit label gaps ResNet could not.
 
-**[`2026-09-11-seed-variance`](2026-09-11-seed-variance/)** — ★ done — instance metrics have a ±0.06 floor; several claims weakened
+**[`2026-09-11-seed-variance`](2026-09-11-seed-variance/)** — ★ done (n=3) — `pred/label` 2 sd = 0.076; flagship number needs an error bar
 > **Why:** it retroactively determines which of tonight's conclusions are real. Three in particular hinge on it:
 >
 > **Expected:** Two runs of the identical configuration differ by 0.0495 merge and 0.0597 `pred/label` — larger than several differences already written up as findings. IoU is the *stable* metric here, at 0.0030; the metrics this project elevated over IoU precisely because they capture instance structure are the ones that swing.
@@ -345,10 +345,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-157 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+158 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  23 commits
+### 2026-09-11  ·  24 commits
 
+- `08:29` **e29b7db** Regenerate ledger and timeline (seed-44 ep13, MiT-B5 ep13)
 - `08:00` **08e9f55** Regenerate ledger and timeline (seed-44 ep1, MiT-B5 ep9)
 - `07:58` **597c0dd** Regenerate ledger and timeline (seed-44 starting, MiT-B5 ep9)
 - `07:54` **4a5a436** Seed replicate: instance metrics have a +/-0.06 floor, and it weakens three conclusions
