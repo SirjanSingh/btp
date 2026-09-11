@@ -3,36 +3,38 @@
   "threshold": 0.5,
   "n_crops": 9072,
   "aoi_km2": 168.27,
-  "predicted_roof_eroded_km2": 38.216,
-  "roof_area_km2": 43.685,
-  "roof_fraction_of_aoi": 0.2596,
-  "usable_area_km2": 26.211,
-  "installed_capacity_GWp": 5.242,
-  "annual_energy_TWh": 8.715,
-  "rel_uncertainty_1sd": 0.1516,
+  "predicted_roof_km2": 38.216,
+  "pred_vs_uneroded_label": 0.9849,
+  "erosion_ratio_applied": 1.0,
+  "roof_area_km2": 38.216,
+  "roof_fraction_of_aoi": 0.2271,
+  "usable_area_km2": 22.93,
+  "installed_capacity_GWp": 4.586,
+  "annual_energy_TWh": 7.624,
+  "rel_uncertainty_1sd": 0.1515,
   "terms": [
     {
       "name": "segmentation area",
       "mean": 1.0156,
       "sd": 0.0219,
       "rel_sd": 0.0216,
-      "variance_share": 0.0202,
+      "variance_share": 0.0203,
       "provenance": "MEASURED n=3 seeds (D14)"
     },
     {
       "name": "erosion un-do",
-      "mean": 0.8748,
+      "mean": 1.0,
       "sd": 0.01,
-      "rel_sd": 0.0114,
-      "variance_share": 0.0057,
-      "provenance": "MEASURED from label sets"
+      "rel_sd": 0.01,
+      "variance_share": 0.0044,
+      "provenance": "SELF-CHECKED \u2014 1.0 when output is already un-eroded"
     },
     {
       "name": "k_usable",
       "mean": 0.6,
       "sd": 0.075,
       "rel_sd": 0.125,
-      "variance_share": 0.6798,
+      "variance_share": 0.6808,
       "provenance": "ASSUMED \u2014 68% of variance (D14/D15)"
     },
     {
@@ -40,7 +42,7 @@
       "mean": 0.2,
       "sd": 0.01,
       "rel_sd": 0.05,
-      "variance_share": 0.1088,
+      "variance_share": 0.1089,
       "provenance": "PLANNED \u2014 mono-PERC"
     },
     {
@@ -48,7 +50,7 @@
       "mean": 1750.0,
       "sd": 100.0,
       "rel_sd": 0.0571,
-      "variance_share": 0.1421,
+      "variance_share": 0.1423,
       "provenance": "SECONDARY \u2014 not citable, needs GSA map (D15)"
     },
     {

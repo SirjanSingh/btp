@@ -54,6 +54,15 @@ side and then applied a correction contradicted by those two numbers. The fix is
 value — `d16_capacity_estimate.py` now **computes the ratio and refuses the correction** when the
 output is already at un-eroded extent, printing what it ignored and why.
 
+**The guard is tested, not just written.** An untested guard is the same pattern-A trap it
+exists to prevent, and the confirmation re-run could not exercise it (the default is now
+1.0, so the condition is false by construction). Exercised standalone against the real
+pixel sums: it fires for 0.8748 / 0.90 / 0.50 and correctly **does not** fire when the model
+genuinely sits at eroded extent (pred/label 0.8748), where the correction *should* apply.
+
+**Confirmation run:** 4.59 GWp · 7.62 TWh/yr · ±15.2 %, pred/label 0.9849 — matching the
+hand calculation exactly.
+
 **Generalisable lesson:** a correction derived from *how a model was trained* must be validated
 against *what the model actually emits*. Those differ whenever training and validation use
 different label sets — which is exactly this project's setup, deliberately, since the erosion
