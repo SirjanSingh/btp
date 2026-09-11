@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-11T16:06:24",
- "n_runs": 104,
+ "generated": "2026-09-11T16:32:42",
+ "n_runs": 105,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
   "experiments/2026-09-09-does-the-airs-seed-help/checkpoints/unet_resnet34_40ep_20260909_171814/best.pth",
@@ -11332,6 +11332,25 @@
   {
    "run_name": "d11_ov0.5",
    "log": "diagnostics/d11_ov0.5.json",
+   "stage": "diagnostic",
+   "kind": "diagnostic",
+   "timestamp": "",
+   "config": {},
+   "hardware": {},
+   "n_epochs": 0,
+   "best_epoch": null,
+   "best_iou": null,
+   "best_f1": null,
+   "best_precision": null,
+   "best_recall": null,
+   "summary": {},
+   "threshold_sweep": null,
+   "results": null,
+   "epochs": []
+  },
+  {
+   "run_name": "d12_pred_size_dist",
+   "log": "diagnostics/d12_pred_size_dist.json",
    "stage": "diagnostic",
    "kind": "diagnostic",
    "timestamp": "",

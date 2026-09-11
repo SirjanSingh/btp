@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-11 16:06 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-11 16:32 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**104 runs · 33 checkpoints currently on disk**
+**105 runs · 33 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -45,6 +45,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `d11_ov0.2` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d11_ov0.3` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d11_ov0.5` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `d12_pred_size_dist` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d1_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d4_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -128,6 +129,7 @@ Kept deliberately — a crashed configuration is evidence too.
 - `d11_ov0.2` (diagnostics/d11_ov0.2.json)
 - `d11_ov0.3` (diagnostics/d11_ov0.3.json)
 - `d11_ov0.5` (diagnostics/d11_ov0.5.json)
+- `d12_pred_size_dist` (diagnostics/d12_pred_size_dist.json)
 - `d1_summary` (diagnostics/d1/d1_summary.json)
 - `d2_d3_summary` (diagnostics/d2_d3/d2_d3_summary.json)
 - `d4_summary` (diagnostics/d4/d4_summary.json)
