@@ -10,11 +10,15 @@ the chain is finally specifiable.
 
 TWO CORRECTIONS THIS APPLIES THAT A NAIVE RUN WOULD MISS.
 
-1. **Un-erode before converting to area.** The model is trained on labels eroded
-   by 0.4 m, so its predicted footprints are systematically *smaller* than real
-   roofs -- measured at 0.8748x the un-eroded label area. Reporting predicted
-   pixels as roof area would understate the answer by ~12.5%. Erosion was adopted
-   to fix instance *counting* (D-series); it must be undone for *area*.
+1. **Do NOT blindly un-erode.** The obvious move -- the model trains on 0.4 m
+   eroded labels, so divide its area by the 0.8748 eroded/un-eroded ratio to
+   recover real roofs -- is WRONG here, and I shipped it on the first run for a
+   14.3% inflation. The teacher is trained on eroded labels but **validated and
+   best-epoch-selected on the UN-eroded val set**, so its output already sits at
+   un-eroded extent: measured pred/label = 0.9847. The script now computes that
+   ratio and refuses the correction when it is near 1.0, printing what it
+   ignored. A correction derived from how a model was TRAINED must be checked
+   against what it actually EMITS.
 
 2. **PVOUT already contains system losses** (D15). `PVOUT x PR` double-counts.
    This uses PVOUT x a small rooftop-specific derate instead.
@@ -83,9 +87,28 @@ def main(a):
     tot_px = sum(v[2] for v in res.values())
     n_crops = sum(v[3] for v in res.values())
 
+    lab_px = sum(v[1] for v in res.values())
     aoi_m2 = tot_px * M2_PER_PX
-    pred_m2_eroded = pred_px * M2_PER_PX
-    roof_m2 = pred_m2_eroded / a.erosion_area_ratio      # correction 1
+    pred_m2 = pred_px * M2_PER_PX
+
+    # SELF-CHECK, because I got this wrong on the first run. The un-erosion
+    # correction assumes the model's output matches the ERODED labels it trained
+    # on. It does not: the teacher is validated and best-epoch-selected on the
+    # UN-eroded val set, so its predictions calibrate to un-eroded extent. The
+    # measured ratio against the un-eroded labels summed above settles it --
+    # near 1.0 means no correction is due, and applying one inflates the headline
+    # figure by 14%. Assumed corrections must be checked against what the model
+    # actually emits, not against how it was trained.
+    pred_vs_uneroded = pred_px / max(lab_px, 1)
+    if abs(pred_vs_uneroded - 1.0) < 0.10 and a.erosion_area_ratio < 0.98:
+        print(f"[check] pred/label vs UN-ERODED labels = {pred_vs_uneroded:.4f} "
+              f"-- already un-eroded extent; IGNORING erosion_area_ratio "
+              f"{a.erosion_area_ratio} (would inflate by "
+              f"{100*(1/a.erosion_area_ratio - 1):.1f}%)")
+        eff_ratio = 1.0
+    else:
+        eff_ratio = a.erosion_area_ratio
+    roof_m2 = pred_m2 / eff_ratio
     usable_m2 = roof_m2 * a.k_usable
     kwp = usable_m2 * a.eta * 1.0                        # 1 kW/m^2 at STC
     kwh = kwp * a.pvout * a.rooftop_derate               # correction 2 (D15)
@@ -93,7 +116,7 @@ def main(a):
     # Product chain -> relative variances add.
     terms = [
         ("segmentation area", 1.0156, 0.0219, "MEASURED n=3 seeds (D14)"),
-        ("erosion un-do", a.erosion_area_ratio, 0.010, "MEASURED from label sets"),
+        ("erosion un-do", eff_ratio, 0.010, "SELF-CHECKED — 1.0 when output is already un-eroded"),
         ("k_usable", a.k_usable, 0.075, "ASSUMED — 68% of variance (D14/D15)"),
         ("eta", a.eta, 0.010, "PLANNED — mono-PERC"),
         ("PVOUT", a.pvout, 100.0, "SECONDARY — not citable, needs GSA map (D15)"),
@@ -105,8 +128,9 @@ def main(a):
 
     print(f"\n{'':<26}{'value':>16}")
     print(f"{'AOI covered':<26}{aoi_m2/1e6:>13.1f} km2   ({n_crops} crops)")
-    print(f"{'predicted roof (eroded)':<26}{pred_m2_eroded/1e6:>13.2f} km2")
-    print(f"{'roof area (un-eroded)':<26}{roof_m2/1e6:>13.2f} km2"
+    print(f"{'predicted roof area':<26}{pred_m2/1e6:>13.2f} km2"
+          f"   (pred/label vs un-eroded {pred_vs_uneroded:.4f})")
+    print(f"{'roof area used':<26}{roof_m2/1e6:>13.2f} km2"
           f"   ({100*roof_m2/aoi_m2:.1f}% of AOI)")
     print(f"{'usable area':<26}{usable_m2/1e6:>13.2f} km2   (k_usable {a.k_usable})")
     print(f"{'INSTALLED CAPACITY':<26}{kwp/1e6:>13.2f} GWp")
@@ -122,7 +146,9 @@ def main(a):
     json.dump({
         "checkpoint": a.ckpt, "threshold": a.threshold, "n_crops": n_crops,
         "aoi_km2": round(aoi_m2 / 1e6, 3),
-        "predicted_roof_eroded_km2": round(pred_m2_eroded / 1e6, 3),
+        "predicted_roof_km2": round(pred_m2 / 1e6, 3),
+        "pred_vs_uneroded_label": round(pred_vs_uneroded, 4),
+        "erosion_ratio_applied": eff_ratio,
         "roof_area_km2": round(roof_m2 / 1e6, 3),
         "roof_fraction_of_aoi": round(roof_m2 / aoi_m2, 4),
         "usable_area_km2": round(usable_m2 / 1e6, 3),
@@ -148,7 +174,7 @@ if __name__ == "__main__":
     p.add_argument("--encoder", default="mit_b2")
     p.add_argument("--crops", default="data/jaipur_weak")
     p.add_argument("--threshold", type=float, default=0.5)
-    p.add_argument("--erosion_area_ratio", type=float, default=0.8748,
+    p.add_argument("--erosion_area_ratio", type=float, default=1.0,
                    help="eroded label area / un-eroded label area (0.20172/0.2306)")
     p.add_argument("--k_usable", type=float, default=0.60)
     p.add_argument("--eta", type=float, default=0.20)

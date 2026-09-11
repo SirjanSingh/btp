@@ -1,0 +1,69 @@
+{
+  "checkpoint": "experiments/2026-09-10-eroded-labels-rerun/checkpoints/unet_mit_b2_40ep_20260910_053557/best.pth",
+  "threshold": 0.5,
+  "n_crops": 9072,
+  "aoi_km2": 168.27,
+  "predicted_roof_eroded_km2": 38.216,
+  "roof_area_km2": 43.685,
+  "roof_fraction_of_aoi": 0.2596,
+  "usable_area_km2": 26.211,
+  "installed_capacity_GWp": 5.242,
+  "annual_energy_TWh": 8.715,
+  "rel_uncertainty_1sd": 0.1516,
+  "terms": [
+    {
+      "name": "segmentation area",
+      "mean": 1.0156,
+      "sd": 0.0219,
+      "rel_sd": 0.0216,
+      "variance_share": 0.0202,
+      "provenance": "MEASURED n=3 seeds (D14)"
+    },
+    {
+      "name": "erosion un-do",
+      "mean": 0.8748,
+      "sd": 0.01,
+      "rel_sd": 0.0114,
+      "variance_share": 0.0057,
+      "provenance": "MEASURED from label sets"
+    },
+    {
+      "name": "k_usable",
+      "mean": 0.6,
+      "sd": 0.075,
+      "rel_sd": 0.125,
+      "variance_share": 0.6798,
+      "provenance": "ASSUMED \u2014 68% of variance (D14/D15)"
+    },
+    {
+      "name": "eta",
+      "mean": 0.2,
+      "sd": 0.01,
+      "rel_sd": 0.05,
+      "variance_share": 0.1088,
+      "provenance": "PLANNED \u2014 mono-PERC"
+    },
+    {
+      "name": "PVOUT",
+      "mean": 1750.0,
+      "sd": 100.0,
+      "rel_sd": 0.0571,
+      "variance_share": 0.1421,
+      "provenance": "SECONDARY \u2014 not citable, needs GSA map (D15)"
+    },
+    {
+      "name": "rooftop derate",
+      "mean": 0.95,
+      "sd": 0.03,
+      "rel_sd": 0.0316,
+      "variance_share": 0.0434,
+      "provenance": "ASSUMED (D15)"
+    }
+  ],
+  "caveats": [
+    "PVOUT is secondary-source and not citable (D15)",
+    "train crops were seen during training; full-AOI total is partly in-sample",
+    "areas are agreement with Open Buildings, which over-covers (D10)",
+    "PVOUT x rooftop_derate, never PVOUT x PR (D15)"
+  ]
+}

@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 18:01 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 18:07 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -210,6 +210,7 @@ wrapped around.
 | 2026-09-11 | [`2026-09-11-d13-extra-predictions`](2026-09-11-d13-extra-predictions/) | ✅ done — fragment hypothesis refuted | **Only 10.9 % fragments.** 50 % are sole correct detections, 39 % isolated — a two-sided disagreement with OB |
 | 2026-09-11 | [`2026-09-11-d14-energy-budget`](2026-09-11-d14-energy-budget/) | ★★ done — segmentation is 1.7 % of the uncertainty | ★★ **`k_usable` 56 %, PVOUT 30 %, segmentation 1.7 %.** Perfect segmentation moves the answer 0.1 pp |
 | 2026-09-11 | [`2026-09-11-d15-pvout-lookup`](2026-09-11-d15-pvout-lookup/) | ★ done — formula error found; PVOUT provisional | ★ **`PVOUT × PR` double-counts losses — 22.5 % underestimate.** `k_usable` share rises to 68 % |
+| 2026-09-11 | [`2026-09-11-d16-capacity`](2026-09-11-d16-capacity/) | ★★ done — 4.59 GWp / 7.62 TWh/yr (±15.2 %) | ★★ **4.59 GWp / 7.62 TWh/yr ±15.2 %** — first end-to-end run; caught a 14.3 % un-erosion error |
 | 2026-09-11 | [`2026-09-11-d8-missed-by-size`](2026-09-11-d8-missed-by-size/) | ✅ done — strong size effect; interpretation blocked on R12 | **Small ones — 10.5× higher miss rate, 70 % of misses under 900 px.** Erosion ruled out; resolution-vs-OB-error blocked on R12 |
 | 2026-09-11 | [`2026-09-11-d9-confidence-is-size`](2026-09-11-d9-confidence-is-size/) | ✅ done — no, and the reason matters | **No — confidence *is* a size proxy.** At conf≥0.85 only 20 small polygons remain city-wide; `min_conf 0.75` keeps 11 % of small vs 93 % of large |
 | 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Erosion is necessary.** Eroded model wins recall *and* counting at every matched merge; un-eroded `pred/label` tops out at 0.9119 |
@@ -349,6 +350,8 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 **[`2026-09-11-d15-pvout-lookup`](2026-09-11-d15-pvout-lookup/)** — ★ done — formula error found; PVOUT provisional
 
+**[`2026-09-11-d16-capacity`](2026-09-11-d16-capacity/)** — ★★ done — 4.59 GWp / 7.62 TWh/yr (±15.2 %)
+
 **[`2026-09-11-d8-missed-by-size`](2026-09-11-d8-missed-by-size/)** — ✅ done — strong size effect; interpretation blocked on R12
 > **Why:** - **Misses concentrated in small buildings** → a *resolution* problem. The median Jaipur building is ~913 px (D2/D3) — roughly 30×30 — and a /32-downsampling encoder sees the smallest ones across barely a single feature-map cell. The fix is training at higher effective resolution, which needs a code change (512 is hard-coded in the cache path) and ~3 h/arm. - **Misses spread evenly across sizes** 
 >
@@ -384,16 +387,17 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 > **Expected:** Eroding the pseudo-labels recovers most of what raw self-training threw away: `pred/label` **0.9134 → 0.9672** (under-counting 8.7 % → 3.3 %) and merge **0.3371 → 0.2666**, now *better* than the teacher's 0.3155. The mechanism proposed in R5 — that self-training discards the label erosion — is confirmed by repairing exactly that and watching both metrics move back.
 
 
-**35 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+**36 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-178 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+179 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  44 commits
+### 2026-09-11  ·  45 commits
 
+- `18:01` **b59ff83** Regenerate ledger and timeline (D16 inference at 1600/9072 crops)
 - `17:59` **24c7f9f** d16: end-to-end capacity script — the headline figure the plan references but never computes
 - `17:32` **2b89735** D15: PVOUT x PR double-counts losses -- a 22.5% error in the headline deliverable
 - `17:11` **029ed41** D14: segmentation is 1.7% of the energy uncertainty; k_usable is 56%
