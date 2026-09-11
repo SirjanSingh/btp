@@ -96,7 +96,13 @@ small things. Two readings, and D9/D10 bear on both:
   `fragments_per_label` of 0.9203 argues against this being dominant, since most predicted
   components do land on labels.
 
-Distinguishing them still needs R12. But the *capacity* question is now closed.
+**Resolved by [D13](../2026-09-11-d13-extra-predictions/):** the fragment reading is
+refuted — only **10.9 %** of small predictions are shed pieces of already-detected
+buildings, while **50.1 %** are the model's sole detection of a labelled building and
+**39.0 %** overlap no label at all. The excess is not noise.
+
+Distinguishing OB-missed-it from model-hallucinated-it still needs R12. But the *capacity*
+question is closed, and so is the fragment question.
 
 ## Decision
 

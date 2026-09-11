@@ -15,6 +15,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | 2026-09-11 | Does eroding the pseudo-labels repair R5? | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins | ❌ |
+| [`2026-09-11-d13-extra-predictions`](2026-09-11-d13-extra-predictions/) | 2026-09-11 | Are the model's extra small components fragments or findings? | **Only 10.9 % fragments.** 50 % are sole correct detections, 39 % isolated — a two-sided disagreement with OB | ✅ |
 | [`2026-09-11-d12-pred-size-dist`](2026-09-11-d12-pred-size-dist/) | 2026-09-11 | Can the model produce small components at all? | ★ **Yes — 1.8× more than the labels have.** Capacity refuted; the 62 % is localisation, not resolution | ✅ |
 | [`2026-09-11-d11-overlap-rule`](2026-09-11-d11-overlap-rule/) | 2026-09-11 | How much of the miss rate is the rule, not the model? | ★ **1.77× inflation.** Large-building misses −81 % under a permissive rule (artefact); small-building −17 % (real) | ✅ |
 | [`2026-09-11-d10-missed-gallery`](2026-09-11-d10-missed-gallery/) | 2026-09-11 | What does a "missed building" look like? | **OB error at the tail, real failure mid-range.** Largest misses are compounds/bare plots; "missed" almost always means partial detection | ✅ |
