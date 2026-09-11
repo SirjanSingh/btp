@@ -1,0 +1,57 @@
+{
+  "val_dir": "data/jaipur_weak/val",
+  "threshold": 0.5,
+  "segmentation_area_ratio": {
+    "mean": 1.0156,
+    "sd": 0.0219,
+    "per_seed": [
+      0.9942,
+      1.038,
+      1.0146
+    ]
+  },
+  "terms": [
+    {
+      "name": "segmentation area ratio",
+      "mean": 1.0155724848946557,
+      "sd": 0.021913350581938235,
+      "rel_sd": 0.0216,
+      "variance_share": 0.0167,
+      "provenance": "MEASURED n=3 seeds"
+    },
+    {
+      "name": "k_usable",
+      "mean": 0.6,
+      "sd": 0.075,
+      "rel_sd": 0.125,
+      "variance_share": 0.5601,
+      "provenance": "ASSUMED \u2014 plan notes +/-25% swing"
+    },
+    {
+      "name": "eta (module efficiency)",
+      "mean": 0.2,
+      "sd": 0.01,
+      "rel_sd": 0.05,
+      "variance_share": 0.0896,
+      "provenance": "PLANNED \u2014 mono-PERC"
+    },
+    {
+      "name": "PVOUT kWh/kWp/yr",
+      "mean": 1650.0,
+      "sd": 150.0,
+      "rel_sd": 0.0909,
+      "variance_share": 0.2963,
+      "provenance": "TODO \u2014 plan's India range, NOT Jaipur-specific"
+    },
+    {
+      "name": "PR",
+      "mean": 0.775,
+      "sd": 0.025,
+      "rel_sd": 0.0323,
+      "variance_share": 0.0373,
+      "provenance": "TODO \u2014 plan states 0.75-0.80"
+    }
+  ],
+  "total_rel_uncertainty_1sd": 0.167,
+  "note": "product chain -> relative variances add. PVOUT is the plan's India-wide range, not a Jaipur lookup; it is included to size the cost of that ignorance, not to produce a figure."
+}

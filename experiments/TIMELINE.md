@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 17:03 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 17:11 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -208,6 +208,7 @@ wrapped around.
 | 2026-09-11 | [`2026-09-11-d11-overlap-rule`](2026-09-11-d11-overlap-rule/) | ★ done — rule inflates miss rate 1.77×; large-building misses are artefact | ★ **1.77× inflation.** Large-building misses −81 % under a permissive rule (artefact); small-building −17 % (real) |
 | 2026-09-11 | [`2026-09-11-d12-pred-size-dist`](2026-09-11-d12-pred-size-dist/) | ★ done — capacity hypothesis refuted; resolution experiment cancelled | ★ **Yes — 1.8× more than the labels have.** Capacity refuted; the 62 % is localisation, not resolution |
 | 2026-09-11 | [`2026-09-11-d13-extra-predictions`](2026-09-11-d13-extra-predictions/) | ✅ done — fragment hypothesis refuted | **Only 10.9 % fragments.** 50 % are sole correct detections, 39 % isolated — a two-sided disagreement with OB |
+| 2026-09-11 | [`2026-09-11-d14-energy-budget`](2026-09-11-d14-energy-budget/) | ★★ done — segmentation is 1.7 % of the uncertainty | ★★ **`k_usable` 56 %, PVOUT 30 %, segmentation 1.7 %.** Perfect segmentation moves the answer 0.1 pp |
 | 2026-09-11 | [`2026-09-11-d8-missed-by-size`](2026-09-11-d8-missed-by-size/) | ✅ done — strong size effect; interpretation blocked on R12 | **Small ones — 10.5× higher miss rate, 70 % of misses under 900 px.** Erosion ruled out; resolution-vs-OB-error blocked on R12 |
 | 2026-09-11 | [`2026-09-11-d9-confidence-is-size`](2026-09-11-d9-confidence-is-size/) | ✅ done — no, and the reason matters | **No — confidence *is* a size proxy.** At conf≥0.85 only 20 small polygons remain city-wide; `min_conf 0.75` keeps 11 % of small vs 93 % of large |
 | 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Erosion is necessary.** Eroded model wins recall *and* counting at every matched merge; un-eroded `pred/label` tops out at 0.9119 |
@@ -342,6 +343,9 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** fragments will be the largest class, ~40–60 %, with isolated ~20–30 %. The 0.9203 figure suggested most small components sit on labels, and I read "sits on a label" as mostly meaning "is a piece of one".
 
+**[`2026-09-11-d14-energy-budget`](2026-09-11-d14-energy-budget/)** — ★★ done — segmentation is 1.7 % of the uncertainty
+> **Why:** the project's prime directive is energy (kWh/yr), not segmentation. If segmentation contributes a few percent of the output variance and `k_usable` contributes twenty, then no amount of further segmentation work can move the headline figure — and the last day of diagnostics, however sound, was spent on the wrong term.
+
 **[`2026-09-11-d8-missed-by-size`](2026-09-11-d8-missed-by-size/)** — ✅ done — strong size effect; interpretation blocked on R12
 > **Why:** - **Misses concentrated in small buildings** → a *resolution* problem. The median Jaipur building is ~913 px (D2/D3) — roughly 30×30 — and a /32-downsampling encoder sees the smallest ones across barely a single feature-map cell. The fix is training at higher effective resolution, which needs a code change (512 is hard-coded in the cache path) and ~3 h/arm. - **Misses spread evenly across sizes** 
 >
@@ -377,16 +381,17 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 > **Expected:** Eroding the pseudo-labels recovers most of what raw self-training threw away: `pred/label` **0.9134 → 0.9672** (under-counting 8.7 % → 3.3 %) and merge **0.3371 → 0.2666**, now *better* than the teacher's 0.3155. The mechanism proposed in R5 — that self-training discards the label erosion — is confirmed by repairing exactly that and watching both metrics move back.
 
 
-**33 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+**34 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-174 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+175 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  40 commits
+### 2026-09-11  ·  41 commits
 
+- `17:03` **39ae4e6** D13: the model's extra small components are not fragments
 - `16:32` **88a38b5** D12: the model emits small components freely -- resolution experiment cancelled
 - `16:06` **a16ffda** D11: the inherited overlap rule inflates the miss rate 1.77x
 - `15:35` **ba8c62b** D10: looked at the missed buildings, and refuted my own assumption

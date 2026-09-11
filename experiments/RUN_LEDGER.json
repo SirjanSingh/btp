@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-11T17:03:52",
- "n_runs": 105,
+ "generated": "2026-09-11T17:11:01",
+ "n_runs": 106,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
   "experiments/2026-09-09-does-the-airs-seed-help/checkpoints/unet_resnet34_40ep_20260909_171814/best.pth",
@@ -11351,6 +11351,25 @@
   {
    "run_name": "d12_pred_size_dist",
    "log": "diagnostics/d12_pred_size_dist.json",
+   "stage": "diagnostic",
+   "kind": "diagnostic",
+   "timestamp": "",
+   "config": {},
+   "hardware": {},
+   "n_epochs": 0,
+   "best_epoch": null,
+   "best_iou": null,
+   "best_f1": null,
+   "best_precision": null,
+   "best_recall": null,
+   "summary": {},
+   "threshold_sweep": null,
+   "results": null,
+   "epochs": []
+  },
+  {
+   "run_name": "d14_energy_budget",
+   "log": "diagnostics/d14_energy_budget.json",
    "stage": "diagnostic",
    "kind": "diagnostic",
    "timestamp": "",
