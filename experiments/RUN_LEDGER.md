@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-11 14:58 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-11 15:06 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**97 runs · 33 checkpoints currently on disk**
+**99 runs · 33 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -44,6 +44,8 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d4_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d6_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `d8_missed_by_size` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `d8_uneroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `e04_thr_0.3` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `e04_thr_0.4` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `e04_thr_0.6` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -120,6 +122,8 @@ Kept deliberately — a crashed configuration is evidence too.
 - `d2_d3_summary` (diagnostics/d2_d3/d2_d3_summary.json)
 - `d4_summary` (diagnostics/d4/d4_summary.json)
 - `d6_summary` (diagnostics/d6_smoke/d6_summary.json)
+- `d8_missed_by_size` (diagnostics/d8_missed_by_size.json)
+- `d8_uneroded` (diagnostics/d8_uneroded.json)
 - `e04_thr_0.3` (diagnostics/e04_thr_0.3.json)
 - `e04_thr_0.4` (diagnostics/e04_thr_0.4.json)
 - `e04_thr_0.6` (diagnostics/e04_thr_0.6.json)

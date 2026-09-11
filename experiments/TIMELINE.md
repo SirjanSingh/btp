@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 14:58 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 15:06 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -204,6 +204,7 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | ✅ done — **strong negative result** | **No — it destroys it.** 0.5611 → **0.3752** on target |
 | 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
 | 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
+| 2026-09-11 | [`2026-09-11-d8-missed-by-size`](2026-09-11-d8-missed-by-size/) | ✅ done — strong size effect; interpretation blocked on R12 | **Small ones — 10.5× higher miss rate, 70 % of misses under 900 px.** Erosion ruled out; resolution-vs-OB-error blocked on R12 |
 | 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Erosion is necessary.** Eroded model wins recall *and* counting at every matched merge; un-eroded `pred/label` tops out at 0.9119 |
 | 2026-09-11 | [`2026-09-11-mit-b5`](2026-09-11-mit-b5/) | ❌ negative — +0.0063 IoU (1.5× noise) for 3.6× compute; B2 stays | **Not worth it.** +0.0063 IoU (1.5× noise) for 3.6× compute; every other metric inside noise |
 | 2026-09-11 | [`2026-09-11-replication`](2026-09-11-replication/) | ✅ done — claim 1 promoted to solid, claim 2 demoted to directional | **Erosion: yes, 1.7–2.2× pooled noise at 4 matched points.** Self-training regression: direction only (d/SE 1.78) |
@@ -321,6 +322,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** the published split rates are wrong and will move once recomputed with the loose (≥ 10 %) definition.
 
+**[`2026-09-11-d8-missed-by-size`](2026-09-11-d8-missed-by-size/)** — ✅ done — strong size effect; interpretation blocked on R12
+> **Why:** - **Misses concentrated in small buildings** → a *resolution* problem. The median Jaipur building is ~913 px (D2/D3) — roughly 30×30 — and a /32-downsampling encoder sees the smallest ones across barely a single feature-map cell. The fix is training at higher effective resolution, which needs a code change (512 is hard-coded in the cache path) and ~3 h/arm. - **Misses spread evenly across sizes** 
+>
+> **Expected:** The buggy output showed misses rising with size and the 2000+ bin contributing the most (29.7 %), which reads as *"misses are dominated by large buildings — resolution is the wrong lever"*. That is the opposite of the corrected conclusion. The only tell was a bin that could not legitimately be empty. Fixed, self-tested across 15 boundary values, and re-run.
+
 **[`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/)** — ✅ done — complements, not substitutes; follow-up launched
 > **Why:** the teacher's merge rate is **0.3155** — a third of buildings still fused, and after tonight's work that is the largest remaining weakness in Stage 1. If a threshold change buys a meaningful part of what erosion buys, it is strictly cheaper. If it does not, that is itself informative: it would mean fusion is happening in the model's *confident* interior rather than at soft edges, which erosion can
 >
@@ -347,16 +353,17 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 > **Expected:** Eroding the pseudo-labels recovers most of what raw self-training threw away: `pred/label` **0.9134 → 0.9672** (under-counting 8.7 % → 3.3 %) and merge **0.3371 → 0.2666**, now *better* than the teacher's 0.3155. The mechanism proposed in R5 — that self-training discards the label erosion — is confirmed by repairing exactly that and watching both metrics move back.
 
 
-**27 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+**28 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-168 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+169 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  34 commits
+### 2026-09-11  ·  35 commits
 
+- `14:58` **c2bfc49** Team brief for the R12 labelling batch, plus a polygon->mask converter
 - `14:47` **955c2a4** Replication complete: erosion promoted to solid, self-training demoted to directional
 - `14:30` **ae94c01** Regenerate ledger and timeline (un-eroded s43 ep32)
 - `14:23` **252be15** Replication, claim 2: direction survives, precision does not, and self-training is 2.7x noisier

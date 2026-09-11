@@ -15,6 +15,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | 2026-09-11 | Does eroding the pseudo-labels repair R5? | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins | ❌ |
+| [`2026-09-11-d8-missed-by-size`](2026-09-11-d8-missed-by-size/) | 2026-09-11 | Which buildings does the model miss? | **Small ones — 10.5× higher miss rate, 70 % of misses under 900 px.** Erosion ruled out; resolution-vs-OB-error blocked on R12 | ✅ |
 | [`2026-09-11-replication`](2026-09-11-replication/) | 2026-09-11 | Do the two marginal claims survive a second seed? | **Erosion: yes, 1.7–2.2× pooled noise at 4 matched points.** Self-training regression: direction only (d/SE 1.78) | ✅ |
 | [`2026-09-11-mit-b5`](2026-09-11-mit-b5/) | 2026-09-11 | Does more encoder capacity help small buildings? | **Not worth it.** +0.0063 IoU (1.5× noise) for 3.6× compute; every other metric inside noise | ❌ |
 | [`2026-09-11-seed-variance`](2026-09-11-seed-variance/) | 2026-09-11 | How big is the noise floor everything is compared against? | ★ **n=3: 2sd = 0.076 `pred/label`, 0.050 merge, 0.004 IoU.** Flagship 0.9914 is really 0.99 ± 0.08; three claims unsupported | ⚠️ |

@@ -498,6 +498,29 @@ quoted gets ≥2 seeds. Consistency across several independent comparisons (e.g.
 operating points all moving one way) is real evidence that a pairwise noise estimate does not
 capture — but it has to be argued explicitly, not assumed.
 
+### 3.24 `searchsorted` off-by-one put every label in the wrong size bin ★
+
+**What happened.** D8 bins buildings by pixel area with
+`np.searchsorted(EDGES, area, "right")`. That returns the **insertion index**, which is one past
+the bin the value belongs in, so every label landed a bin too high and the top bin silently
+absorbed two ranges.
+
+**What it would have cost.** The buggy output showed miss rate *rising* with size and the
+largest bin contributing the most misses (29.7 %) — reading as *"misses are dominated by large
+buildings, so resolution is the wrong lever"*. The corrected numbers say the opposite: miss rate
+is **10.5× higher** in the smallest bin and 70 % of misses are under 900 px. A 3-hour experiment
+would have been correctly cancelled for entirely wrong reasons, and the real lever dismissed.
+
+**What caught it.** A **50–200 px bin reporting zero labels**, which is impossible in a set with
+1,630 of them. Nothing else in the output looked wrong — the totals were right, the table was
+well-formed, the trend was plausible.
+
+**Rule.** `searchsorted(..., "right") - 1`, clamped. More generally: in any binning, **print the
+per-bin counts and check none is impossibly empty or impossibly full** before reading the rates.
+A rate table can be entirely self-consistent and entirely wrong. When a result looks slightly
+impossible rather than merely surprising, that is the cheapest bug signal available — chase it
+before interpreting anything else on the page.
+
 ## 4. Pre-existing, still open
 
 - **BDAPPV has zero negative crops** (`MASTER_CONTEXT` C1). `prep_bdappv.py:85` drops
