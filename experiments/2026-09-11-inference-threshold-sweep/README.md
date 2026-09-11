@@ -206,3 +206,50 @@ structure, not just its operating point — so "it only moves along the curve" w
 3.22 for exactly that. Writing the rule down does not make it fire correctly; the discipline
 that actually caught it was checking the full metric set before acting on the verdict. The
 criterion is the artefact, the check is the practice.
+
+---
+
+## The un-eroded curve — erosion is necessary, confirmed on the full sweep
+
+The provisional claim above rested on a **single surviving row** for the un-eroded model. That
+checkpoint has now been retrained (val IoU **0.6580**, reproducing the destroyed model's 0.6569
+to within 0.0011) and swept.
+
+| thr | merge | missed | pred/label |
+|---|---|---|---|
+| 0.3 | 0.5567 | 0.1827 | 0.6803 |
+| 0.4 | 0.5038 | 0.2173 | 0.7146 |
+| 0.5 | 0.4559 | 0.2498 | 0.7507 |
+| 0.6 | 0.4019 | 0.2892 | 0.7879 |
+| 0.7 | 0.3335 | 0.3426 | 0.8285 |
+| 0.8 | 0.2402 | 0.4304 | 0.9119 |
+
+**Matched at equal merge rate, the eroded model wins on recall *and* counting at every point:**
+
+| merge | eroded missed | un-eroded missed | eroded pred/label | un-eroded pred/label |
+|---|---|---|---|---|
+| 0.4514 | **0.2402** | 0.2531 | **0.8463** | 0.7538 |
+| 0.3851 | **0.2804** | 0.3023 | **0.9157** | 0.7979 |
+| 0.3155 | **0.3257** | 0.3595 | **0.9914** | 0.8446 |
+
+**The strongest single statement: no inference threshold makes the un-eroded model count
+correctly.** Its `pred/label` tops out at **0.9119** (thr 0.8) — and pays **0.4304** missed to
+get there. The eroded model reaches **0.9914 at 0.3257 missed**. Counting is not a dial the
+un-eroded model has; erosion is what creates it.
+
+**So the deflationary reading earlier in this document was too strong, and is now corrected.**
+Thresholding and erosion do trace similarly-*shaped* fusion/recall curves — that part holds.
+But they are not interchangeable: erosion moves the whole curve to a strictly better place,
+and the gap widens as merge falls (`pred/label` gap 0.093 → 0.118 → 0.147). The earlier
+one-point comparison understated the effect.
+
+**Final position on the three knobs, all now measured on full curves:**
+
+| knob | what it does | cost |
+|---|---|---|
+| **inference threshold** | slides along the model's own curve | free, reversible |
+| **label erosion** | shifts the curve to strictly better recall *and* counting | 0.018 IoU, one retrain |
+| **self-training** | shifts the curve to a *worse*, compressed place | 2 h/arm, and forfeits the threshold dial |
+
+Erosion is the only one of the three that buys a genuinely better model, and it is confirmed as
+the right default.

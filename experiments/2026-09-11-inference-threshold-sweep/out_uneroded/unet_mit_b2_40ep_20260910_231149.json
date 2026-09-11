@@ -418,7 +418,109 @@
       "lr": 1.0453658778440104e-05,
       "elapsed_s": 146.9,
       "note": ""
+    },
+    {
+      "epoch": 33,
+      "tr_loss": 0.242797,
+      "va_loss": 0.245413,
+      "iou": 0.6578,
+      "f1": 0.793582,
+      "precision": 0.756433,
+      "recall": 0.834568,
+      "lr": 8.294311864472434e-06,
+      "elapsed_s": 146.1,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 34,
+      "tr_loss": 0.243219,
+      "va_loss": 0.245815,
+      "iou": 0.655561,
+      "f1": 0.79195,
+      "precision": 0.764286,
+      "recall": 0.821693,
+      "lr": 6.395177052675792e-06,
+      "elapsed_s": 146.2,
+      "note": ""
+    },
+    {
+      "epoch": 35,
+      "tr_loss": 0.242427,
+      "va_loss": 0.244959,
+      "iou": 0.65802,
+      "f1": 0.793742,
+      "precision": 0.755418,
+      "recall": 0.836162,
+      "lr": 4.767963140691305e-06,
+      "elapsed_s": 146.1,
+      "note": "\u2190 best"
+    },
+    {
+      "epoch": 36,
+      "tr_loss": 0.242363,
+      "va_loss": 0.245731,
+      "iou": 0.656606,
+      "f1": 0.792712,
+      "precision": 0.76069,
+      "recall": 0.827549,
+      "lr": 3.4227024433898994e-06,
+      "elapsed_s": 146.7,
+      "note": ""
+    },
+    {
+      "epoch": 37,
+      "tr_loss": 0.24209,
+      "va_loss": 0.245367,
+      "iou": 0.656879,
+      "f1": 0.792911,
+      "precision": 0.759572,
+      "recall": 0.829312,
+      "lr": 2.36768894031501e-06,
+      "elapsed_s": 146.3,
+      "note": ""
+    },
+    {
+      "epoch": 38,
+      "tr_loss": 0.241737,
+      "va_loss": 0.245313,
+      "iou": 0.656517,
+      "f1": 0.792647,
+      "precision": 0.760435,
+      "recall": 0.82771,
+      "lr": 1.6094271405406857e-06,
+      "elapsed_s": 145.9,
+      "note": ""
+    },
+    {
+      "epoch": 39,
+      "tr_loss": 0.24191,
+      "va_loss": 0.244986,
+      "iou": 0.65787,
+      "f1": 0.793633,
+      "precision": 0.756947,
+      "recall": 0.834056,
+      "lr": 1.1525919802101657e-06,
+      "elapsed_s": 146.0,
+      "note": ""
+    },
+    {
+      "epoch": 40,
+      "tr_loss": 0.241498,
+      "va_loss": 0.244906,
+      "iou": 0.657445,
+      "f1": 0.793324,
+      "precision": 0.759338,
+      "recall": 0.830494,
+      "lr": 1e-06,
+      "elapsed_s": 146.4,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.65802,
+    "best_epoch": 35,
+    "checkpoint": "experiments/2026-09-11-inference-threshold-sweep/ckpt_uneroded/unet_mit_b2_40ep_20260910_231149/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.24098
+  }
 }

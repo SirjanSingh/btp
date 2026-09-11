@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-11 06:00 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-11 06:28 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**83 runs · 41 checkpoints currently on disk**
+**89 runs · 41 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -79,6 +79,12 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `thr_sweep_0.7` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `thr_sweep_0.8` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `thr_sweep_0.9` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `uneroded_thr_0.3` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `uneroded_thr_0.4` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `uneroded_thr_0.5` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `uneroded_thr_0.6` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `uneroded_thr_0.7` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `uneroded_thr_0.8` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_111230` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_112025` | rooftop | train (txt only) | 0 | — | — | — | — | — |
 | `unet_resnet34_100ep_20260330_115938` | rooftop | train (txt only) | 0 | — | — | — | — | — |
@@ -142,6 +148,12 @@ Kept deliberately — a crashed configuration is evidence too.
 - `thr_sweep_0.7` (diagnostics/thr_sweep_0.7.json)
 - `thr_sweep_0.8` (diagnostics/thr_sweep_0.8.json)
 - `thr_sweep_0.9` (diagnostics/thr_sweep_0.9.json)
+- `uneroded_thr_0.3` (diagnostics/uneroded_thr_0.3.json)
+- `uneroded_thr_0.4` (diagnostics/uneroded_thr_0.4.json)
+- `uneroded_thr_0.5` (diagnostics/uneroded_thr_0.5.json)
+- `uneroded_thr_0.6` (diagnostics/uneroded_thr_0.6.json)
+- `uneroded_thr_0.7` (diagnostics/uneroded_thr_0.7.json)
+- `uneroded_thr_0.8` (diagnostics/uneroded_thr_0.8.json)
 - `unet_resnet34_100ep_20260330_111230` (logs/unet_resnet34_100ep_20260330_111230.txt)
 - `unet_resnet34_100ep_20260330_112025` (logs/unet_resnet34_100ep_20260330_112025.txt)
 - `unet_resnet34_100ep_20260330_115938` (logs/unet_resnet34_100ep_20260330_115938.txt)

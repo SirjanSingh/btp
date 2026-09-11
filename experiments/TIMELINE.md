@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 06:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 06:28 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -204,7 +204,7 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-solar-self-training`](2026-09-10-solar-self-training/) | ✅ done — **strong negative result** | **No — it destroys it.** 0.5611 → **0.3752** on target |
 | 2026-09-10 | [`2026-09-10-solar-selftrain-conf`](2026-09-10-solar-selftrain-conf/) | ✅ done — **self-training works; CBST was the problem** | **CBST's policy.** Confidence threshold: **0.5611 → 0.6165**, beats baseline |
 | 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
-| 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Partly — same merge/missed curve as erosion**, but erosion wins `pred/label` by 0.086 at a matched operating point |
+| 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Erosion is necessary.** Eroded model wins recall *and* counting at every matched merge; un-eroded `pred/label` tops out at 0.9119 |
 | 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | ❌ negative — diagnosis confirmed, teacher still wins | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins |
 
 ### Why each was run, and what was expected
@@ -335,10 +335,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-148 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+149 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  14 commits
+### 2026-09-11  ·  15 commits
 
+- `06:00` **5927321** Regenerate ledger and timeline (un-eroded ep32 at 0.6571)
 - `05:58` **a45ea00** Regenerate ledger and timeline (un-eroded retrain ep31 at 0.6559)
 - `05:37` **13251b8** E04's curve is compressed, not coincident -- and my criterion was defective again
 - `05:13` **6d6b2e6** R5b complete: erosion strength is a smooth dial, and no setting beats the teacher
