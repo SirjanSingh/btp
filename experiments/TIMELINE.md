@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 17:32 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 17:59 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -390,10 +390,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-176 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+177 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  42 commits
+### 2026-09-11  ·  43 commits
 
+- `17:32` **2b89735** D15: PVOUT x PR double-counts losses -- a 22.5% error in the headline deliverable
 - `17:11` **029ed41** D14: segmentation is 1.7% of the energy uncertainty; k_usable is 56%
 - `17:03` **39ae4e6** D13: the model's extra small components are not fragments
 - `16:32` **88a38b5** D12: the model emits small components freely -- resolution experiment cancelled
