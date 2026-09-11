@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 05:58 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 06:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -335,10 +335,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-147 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+148 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  13 commits
+### 2026-09-11  ·  14 commits
 
+- `05:58` **a45ea00** Regenerate ledger and timeline (un-eroded retrain ep31 at 0.6559)
 - `05:37` **13251b8** E04's curve is compressed, not coincident -- and my criterion was defective again
 - `05:13` **6d6b2e6** R5b complete: erosion strength is a smooth dial, and no setting beats the teacher
 - `05:00` **39b28ee** Regenerate ledger and timeline (E02 ep37, un-eroded ep7)
