@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 13:00 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 13:30 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -351,10 +351,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-161 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+162 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  27 commits
+### 2026-09-11  ·  28 commits
 
+- `13:00` **7e3f5c7** Regenerate ledger and timeline (both replication arms in cache-load phase)
 - `12:59` **19d6411** Replicate the two claims sitting closest to the noise floor
 - `12:40` **7c1e9e6** MiT-B5: +0.0063 IoU at 1.5x noise for 3.6x compute -- B2 stays the default
 - `12:32` **4399f9e** Seed variance at n=3: the flagship pred/label number needs an error bar
