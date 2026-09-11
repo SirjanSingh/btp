@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-11 15:35 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-11 16:06 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**99 runs · 33 checkpoints currently on disk**
+**104 runs · 33 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -40,6 +40,11 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `unet_mit_b2_40ep_20260910_090326` | rooftop | train | 40 | **0.6540** | 26 | 0.7908 | 0.7647 | 0.8188 |
 | `unet_resnet34_30ep_20260910_142120` | rooftop | train | 30 | **0.8708** | 26 | 0.9309 | 0.9321 | 0.9298 |
 | `unet_mit_b5_40ep_20260911_010428` | rooftop | train | 40 | **0.6480** | 25 | 0.7864 | 0.7773 | 0.7958 |
+| `d11_ov0.05` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `d11_ov0.1` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `d11_ov0.2` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `d11_ov0.3` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `d11_ov0.5` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d1_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d2_d3_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `d4_summary` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -118,6 +123,11 @@ Kept deliberately — a crashed configuration is evidence too.
 - `eval_unet_resnet34_20260403_054802` (solar_panel/logs/eval_unet_resnet34_20260403_054802.json)
 - `eval_unet_resnet34_20260404_171828` (solar_panel/logs/eval_unet_resnet34_20260404_171828.json)
 - `eval_unet_resnet34_20260404_175648` (solar_panel/logs/eval_unet_resnet34_20260404_175648.json)
+- `d11_ov0.05` (diagnostics/d11_ov0.05.json)
+- `d11_ov0.1` (diagnostics/d11_ov0.1.json)
+- `d11_ov0.2` (diagnostics/d11_ov0.2.json)
+- `d11_ov0.3` (diagnostics/d11_ov0.3.json)
+- `d11_ov0.5` (diagnostics/d11_ov0.5.json)
 - `d1_summary` (diagnostics/d1/d1_summary.json)
 - `d2_d3_summary` (diagnostics/d2_d3/d2_d3_summary.json)
 - `d4_summary` (diagnostics/d4/d4_summary.json)

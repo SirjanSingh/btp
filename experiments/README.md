@@ -15,6 +15,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | 2026-09-11 | Does eroding the pseudo-labels repair R5? | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins | ❌ |
+| [`2026-09-11-d11-overlap-rule`](2026-09-11-d11-overlap-rule/) | 2026-09-11 | How much of the miss rate is the rule, not the model? | ★ **1.77× inflation.** Large-building misses −81 % under a permissive rule (artefact); small-building −17 % (real) | ✅ |
 | [`2026-09-11-d10-missed-gallery`](2026-09-11-d10-missed-gallery/) | 2026-09-11 | What does a "missed building" look like? | **OB error at the tail, real failure mid-range.** Largest misses are compounds/bare plots; "missed" almost always means partial detection | ✅ |
 | [`2026-09-11-d9-confidence-is-size`](2026-09-11-d9-confidence-is-size/) | 2026-09-11 | Can OB's own confidence validate its small polygons? | **No — confidence *is* a size proxy.** At conf≥0.85 only 20 small polygons remain city-wide; `min_conf 0.75` keeps 11 % of small vs 93 % of large | ✅ |
 | [`2026-09-11-d8-missed-by-size`](2026-09-11-d8-missed-by-size/) | 2026-09-11 | Which buildings does the model miss? | **Small ones — 10.5× higher miss rate, 70 % of misses under 900 px.** Erosion ruled out; resolution-vs-OB-error blocked on R12 | ✅ |

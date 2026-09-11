@@ -1,0 +1,56 @@
+{
+  "checkpoint": "experiments/2026-09-10-eroded-labels-rerun/checkpoints/unet_mit_b2_40ep_20260910_053557/best.pth",
+  "encoder": "mit_b2",
+  "val_dir": "data/jaipur_weak/val",
+  "threshold": 0.5,
+  "min_overlap": 0.05,
+  "min_area_px": 50,
+  "bin_edges_px": [
+    50,
+    200,
+    400,
+    900,
+    2000
+  ],
+  "bins": [
+    {
+      "size_px": "50-200",
+      "n_labels": 1630,
+      "n_missed": 1013,
+      "miss_rate": 0.6215,
+      "share_of_misses": 0.2271
+    },
+    {
+      "size_px": "200-400",
+      "n_labels": 2847,
+      "n_missed": 1488,
+      "miss_rate": 0.5227,
+      "share_of_misses": 0.3336
+    },
+    {
+      "size_px": "400-900",
+      "n_labels": 4909,
+      "n_missed": 1291,
+      "miss_rate": 0.263,
+      "share_of_misses": 0.2894
+    },
+    {
+      "size_px": "900-2000",
+      "n_labels": 6156,
+      "n_missed": 500,
+      "miss_rate": 0.0812,
+      "share_of_misses": 0.1121
+    },
+    {
+      "size_px": "2000+",
+      "n_labels": 12376,
+      "n_missed": 169,
+      "miss_rate": 0.0137,
+      "share_of_misses": 0.0379
+    }
+  ],
+  "overall_miss_rate": 0.1598,
+  "median_area_missed_px": 357,
+  "median_area_found_px": 2123,
+  "note": "labels are Open Buildings footprints; a 'miss' may be an OB false positive rather than a model failure (R12)"
+}

@@ -144,6 +144,14 @@ running, and it is the binding limitation.
 - [x] **Report miss rate by size band**, not as a single scalar. "0.2831 missed" hides a
       10.5× spread and is nearly meaningless on its own.
 
+> **Superseded framing (2026-09-11, [D11](../2026-09-11-d11-overlap-rule/)):** the miss
+> rates below are computed at the inherited **≥50 % overlap** rule, which inflates them
+> **1.77×**. Under a permissive rule the overall rate is **0.1598**, and large-building
+> misses fall **81 %** (0.0714 → 0.0137) — they are largely a rule artefact. The
+> small-building rate is real: only 17 % dissolves, so **62 % of small labelled buildings
+> get essentially no prediction at all**. The size *profile* below stands; the absolute
+> levels and the "largest remaining error" framing do not.
+
 ## Note on the headline number
 
 Overall miss here is **0.2831**, against the published **0.3257** from
