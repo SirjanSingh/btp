@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 07:54 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 07:58 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -345,10 +345,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-154 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+155 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  20 commits
+### 2026-09-11  ·  21 commits
 
+- `07:54` **4a5a436** Seed replicate: instance metrics have a +/-0.06 floor, and it weakens three conclusions
 - `07:29` **5085ae9** Regenerate ledger and timeline (seed-43 ep23 at 0.6412, MiT-B5 ep6)
 - `07:00` **49e57c2** Regenerate ledger and timeline (seed-43 ep11, MiT-B5 ep2)
 - `06:59` **02c12b9** Quota recovery: delete 13 epoch snapshots, keep every best.pth
