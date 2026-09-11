@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-11T13:58:29",
+ "generated": "2026-09-11T14:00:55",
  "n_runs": 93,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
