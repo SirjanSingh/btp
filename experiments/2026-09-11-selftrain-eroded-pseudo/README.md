@@ -5,6 +5,14 @@
 | **Status** | ❌ negative — diagnosis confirmed, teacher still wins |
 | **Date** | 2026-09-11 |
 
+> ⚠️ **Noise-floor caveat (added 2026-09-11).** A same-config seed replicate measured
+> run-to-run spread of **0.0597 `pred/label`** and **0.0495 merge** — see
+> [`../2026-09-11-seed-variance/`](../2026-09-11-seed-variance/). Differences below
+> that scale in this write-up are **not supported by a single pair of runs**.
+> Specifically: **E02 vs E04 `pred/label` (0.0225) is 0.4x the floor — below noise.** The
+> "monotone across all four metrics" reading is over-read and should not be quoted.
+
+
 ## Question
 
 R5 rejected self-training for Stage 1 with a **diagnosed** cause rather than a vague one:

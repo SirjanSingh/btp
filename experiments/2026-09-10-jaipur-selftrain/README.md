@@ -5,6 +5,15 @@
 | **Status** | ❌ negative — teacher wins; kill criterion fired |
 | **Date** | 2026-09-10 |
 
+> ⚠️ **Noise-floor caveat (added 2026-09-11).** A same-config seed replicate measured
+> run-to-run spread of **0.0597 `pred/label`** and **0.0495 merge** — see
+> [`../2026-09-11-seed-variance/`](../2026-09-11-seed-variance/). Differences below
+> that scale in this write-up are **not supported by a single pair of runs**.
+> Specifically: arm B's `pred/label` drop (0.078) is 1.3x the floor. The direction is
+> corroborated by R5b's eroded arms moving it back, which is independent evidence, but the
+> single comparison alone would not carry it.
+
+
 ## Question
 
 S4/S6/S7 settled the self-training recipe on the one place it could be *measured* —

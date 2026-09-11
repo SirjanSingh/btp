@@ -467,6 +467,37 @@ should have read: *"beats the teacher on `pred/label` AND does not lose recall"*
 fails cleanly. Pre-registration is still right; a rule that only lists the metrics you expect to
 improve is advocacy with a timestamp.
 
+### 3.23 Twenty experiments compared on single runs of a metric with a ±0.06 floor ★★
+
+**What happened.** This project reports merge rate and `pred/label` *instead of* IoU, on the
+correct grounds that IoU cannot see instance errors. Roughly twenty experiments were then
+compared on **single runs**, with differences as small as 0.02 `pred/label` written up as
+findings and dose-response curves. No configuration had ever been run twice.
+
+Re-running the default config with a different seed gave: IoU |Δ| **0.0030**, merge |Δ|
+**0.0495**, `pred/label` |Δ| **0.0597**.
+
+**Why the instance metrics are so much noisier.** `pred/label` is a ratio of connected-component
+**counts**. A probability shift of a few thousandths near a boundary either joins two blobs or
+does not, and each event moves the count by one. Pixel IoU averages over ~450 M pixels;
+component counts do not average at all. **The sensitivity that makes a metric worth reporting is
+the same sensitivity that makes it noisy** — and only the first half of that was ever thought
+through.
+
+**What it cost.** A retroactive audit put three conclusions at or below the floor, including one
+(`E02 vs E04`, 0.4× the floor) whose "monotone dose-response across all four metrics" reading was
+pure over-reading of noise.
+
+**Shape.** Pattern A at the level of experimental design: with n=1 per arm, *no* comparison could
+have detected that the differences were noise. Every single-run comparison was a check that
+could not fail.
+
+**Rule.** Before elevating a metric over a standard one, **measure its run-to-run spread**, and
+state every subsequent difference as a multiple of that floor. Any arm whose result will be
+quoted gets ≥2 seeds. Consistency across several independent comparisons (e.g. three matched
+operating points all moving one way) is real evidence that a pairwise noise estimate does not
+capture — but it has to be argued explicitly, not assumed.
+
 ## 4. Pre-existing, still open
 
 - **BDAPPV has zero negative crops** (`MASTER_CONTEXT` C1). `prep_bdappv.py:85` drops

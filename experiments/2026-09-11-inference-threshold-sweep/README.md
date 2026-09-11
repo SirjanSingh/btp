@@ -5,6 +5,15 @@
 | **Status** | ✅ done — complements, not substitutes; follow-up launched |
 | **Date** | 2026-09-11 |
 
+> ⚠️ **Noise-floor caveat (added 2026-09-11).** A same-config seed replicate measured
+> run-to-run spread of **0.0597 `pred/label`** and **0.0495 merge** — see
+> [`../2026-09-11-seed-variance/`](../2026-09-11-seed-variance/). Differences below
+> that scale in this write-up are **not supported by a single pair of runs**.
+> Specifically: the E04-curve-vs-teacher-curve gap (~0.07) is 1.2x the floor. The
+> eroded-vs-un-eroded comparison is stronger (1.5-2.5x) and is further supported by three
+> matched points all moving the same way, which a pairwise noise estimate does not capture.
+
+
 ## Question
 
 Every instance metric in this repo is computed at a **fixed inference threshold of 0.5**, and

@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 07:29 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 07:54 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -206,7 +206,7 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
 | 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Erosion is necessary.** Eroded model wins recall *and* counting at every matched merge; un-eroded `pred/label` tops out at 0.9119 |
 | 2026-09-11 | [`2026-09-11-mit-b5`](2026-09-11-mit-b5/) | running | — |
-| 2026-09-11 | [`2026-09-11-seed-variance`](2026-09-11-seed-variance/) | running | — |
+| 2026-09-11 | [`2026-09-11-seed-variance`](2026-09-11-seed-variance/) | ★ done — instance metrics have a ±0.06 floor; several claims weakened | ★ **±0.0597 `pred/label`, ±0.0495 merge, ±0.0030 IoU.** Three prior conclusions sit at or below it |
 | 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | ❌ negative — diagnosis confirmed, teacher still wins | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins |
 
 ### Why each was run, and what was expected
@@ -328,8 +328,10 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 **[`2026-09-11-mit-b5`](2026-09-11-mit-b5/)** — running
 > **Why:** the median Jaipur building is ~30×30 px (D2/D3: 913 px against AIRS's 21,084). Small-object segmentation is usually capacity- and receptive-field-limited, and MiT-B5 has a wider global receptive field — the property that made B2 exploit label gaps ResNet could not.
 
-**[`2026-09-11-seed-variance`](2026-09-11-seed-variance/)** — running
+**[`2026-09-11-seed-variance`](2026-09-11-seed-variance/)** — ★ done — instance metrics have a ±0.06 floor; several claims weakened
 > **Why:** it retroactively determines which of tonight's conclusions are real. Three in particular hinge on it:
+>
+> **Expected:** Two runs of the identical configuration differ by 0.0495 merge and 0.0597 `pred/label` — larger than several differences already written up as findings. IoU is the *stable* metric here, at 0.0030; the metrics this project elevated over IoU precisely because they capture instance structure are the ones that swing.
 
 **[`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/)** — ❌ negative — diagnosis confirmed, teacher still wins
 > **Why:** it decides whether "self-training fails on Stage 1" is a fact about the method or an artefact of one fixable implementation detail. R5's conclusion is currently the stronger claim and this is the test that could weaken it.
@@ -343,10 +345,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-153 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+154 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  19 commits
+### 2026-09-11  ·  20 commits
 
+- `07:29` **5085ae9** Regenerate ledger and timeline (seed-43 ep23 at 0.6412, MiT-B5 ep6)
 - `07:00` **49e57c2** Regenerate ledger and timeline (seed-43 ep11, MiT-B5 ep2)
 - `06:59` **02c12b9** Quota recovery: delete 13 epoch snapshots, keep every best.pth
 - `06:31` **47ce1e3** Launch seed-variance replicate and MiT-B5

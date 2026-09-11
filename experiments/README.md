@@ -15,6 +15,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | 2026-09-11 | Does eroding the pseudo-labels repair R5? | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins | ❌ |
+| [`2026-09-11-seed-variance`](2026-09-11-seed-variance/) | 2026-09-11 | How big is the noise floor everything is compared against? | ★ **±0.0597 `pred/label`, ±0.0495 merge, ±0.0030 IoU.** Three prior conclusions sit at or below it | ⚠️ |
 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | 2026-09-11 | Threshold vs erosion vs self-training — which actually helps? | **Erosion is necessary.** Eroded model wins recall *and* counting at every matched merge; un-eroded `pred/label` tops out at 0.9119 | ✅ |
 | [`2026-09-10-jaipur-selftrain`](2026-09-10-jaipur-selftrain/) | 2026-09-10 | Does the solar self-training recipe transfer to Jaipur rooftops? | **No.** +0.004 IoU but `pred/label` 0.9914 → 0.9134 — self-training discards the label erosion | ❌ |
 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | 2026-09-10 | Is the split rate blind, and what is the 0.8 m damage? | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments | ✅ |
