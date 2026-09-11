@@ -162,3 +162,83 @@ wrapped around.
    tuning on Jaipur is guessing with extra steps.
 4. **Re-read the weak-supervision headline.** "0.6483 IoU" reads far better than "half the
    buildings merged, 21 % under-counted" — and the second sentence is the true one.
+
+---
+
+## Day 2 — what I was thinking (2026-09-11)
+
+### The reversal
+
+Day 1 ended with a settled segmentation pipeline and a list of things to try next. Day 2 spent
+its first half finishing that list — self-training rejected on four arms, MiT-B5 rejected on
+cost, erosion confirmed properly — and its second half discovering that **none of it mattered
+much**.
+
+The turn came from asking a question nobody had asked: *the project's goal is energy, so which
+term actually controls the energy figure?* The chain is a product, so relative variances add,
+and the answer took ten minutes to compute: **`k_usable` 68 %, segmentation 2 %.** Driving
+segmentation error to zero moves the deliverable by a tenth of a percentage point.
+
+That is a strange thing to discover after two days of segmentation work, and the honest reading
+is not "the work was wasted" — the instance-counting result stands on its own, and the pipeline
+had to be settled before anything downstream was meaningful — but **the effort allocation was
+never checked against the goal.** `MASTER_CONTEXT` §7.4 had *said* `k_usable` was the cheapest
+contribution available. Nobody quantified it, so it read as advice rather than as a priority.
+
+### The seed result, which I should have run twenty experiments earlier
+
+No configuration in this project had ever been run twice. I had written "inside seed noise" and
+"far too large to be noise" repeatedly, and **not one of those statements was measured.**
+
+Three seeds gave `pred/label` 2 sd = **0.0763** — larger than several differences already written
+up as findings. The mechanism is obvious in hindsight and I did not think about it once:
+`pred/label` counts *connected components*, and a component either exists or does not. Pixel IoU
+averages over 450 million pixels; a count averages over nothing.
+
+**The sensitivity that makes a metric worth reporting is the same sensitivity that makes it
+noisy**, and I had only ever thought through the first half. Three claims went to "unsupported",
+including one — R5b's dose-response curve — that I had predicted in advance would be the most
+exposed, which is the only reason the retraction reads as a result rather than an embarrassment.
+
+### Five cheap diagnostics beat one expensive experiment
+
+D8–D13 each cost minutes of inference. Between them they **cancelled a 3-hour resolution
+experiment plus a code change**, by establishing in sequence that misses are size-dependent
+(D8), that OB's confidence cannot tell us whether small labels are real (D9), that the largest
+"misses" are OB drawing walls around empty plots (D10), that an inherited constant inflates the
+miss rate 1.77× (D11), and finally that the model emits 1.8× *more* small components than the
+labels contain (D12) — which refutes the capacity hypothesis outright.
+
+I would have run the resolution arm. It was the obvious next step, it was well-motivated, and it
+would have measured a limit the model does not have.
+
+**The pattern worth keeping: before buying an expensive experiment, spend ten minutes asking
+whether the thing it assumes is true.**
+
+### Three errors I found, one of which was mine
+
+- **`PVOUT × PR` double-counts losses** — 22.5 % underestimate, sitting in the plan because the
+  chain had never been run end to end. Formulas that are never executed do not get checked.
+- **The ≥50 % overlap rule** was inherited on day one and never examined. It inflates the miss
+  rate 1.77×, and against labels that systematically over-cover it converts *correct* partial
+  detections into misses.
+- **My own un-erosion correction** inflated the first capacity figure by 14.3 %. The reasoning
+  was sound — the model trains on eroded labels, so un-erode its output — and the script printed
+  the two numbers that refute it *two lines above the line that applied it*.
+
+That last one is the one I want to remember. **I wrote the check and then did not read it.**
+The fix was not the value but the script: it now computes the ratio and refuses the correction,
+and I tested the guard in both directions afterwards, because an untested guard is the same trap.
+
+### What I would tell someone picking this up
+
+1. **Quote no instance metric without its error bar.** ±0.08 on `pred/label`, ±0.05 on merge.
+2. **Every Jaipur number is agreement with Open Buildings**, and OB is wrong in both directions —
+   it draws compound walls as buildings *and* misses real small structures. The hand labels
+   adjudicate between two imperfect sources; they are not a reference to grade the model against.
+3. **Do not spend GPU on segmentation for the energy deliverable.** It is 2 % of the budget.
+   If a segmentation result is worth having, justify it on the per-building counting claim
+   instead, which is a separate and defensible contribution.
+4. **The three highest-value actions are all human-hours, not compute.** That was true for most
+   of day 2 and I kept looking for GPU work anyway, because idle GPUs feel like waste. Idle GPUs
+   are only waste if there is something worth running.
