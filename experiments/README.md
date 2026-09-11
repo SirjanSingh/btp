@@ -15,6 +15,7 @@ Newest first. Keep this table current — it is the first thing anyone reads.
 | ID | Date | Question | Headline result | Status |
 |---|---|---|---|---|
 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | 2026-09-11 | Does eroding the pseudo-labels repair R5? | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins | ❌ |
+| [`2026-09-11-d10-missed-gallery`](2026-09-11-d10-missed-gallery/) | 2026-09-11 | What does a "missed building" look like? | **OB error at the tail, real failure mid-range.** Largest misses are compounds/bare plots; "missed" almost always means partial detection | ✅ |
 | [`2026-09-11-d9-confidence-is-size`](2026-09-11-d9-confidence-is-size/) | 2026-09-11 | Can OB's own confidence validate its small polygons? | **No — confidence *is* a size proxy.** At conf≥0.85 only 20 small polygons remain city-wide; `min_conf 0.75` keeps 11 % of small vs 93 % of large | ✅ |
 | [`2026-09-11-d8-missed-by-size`](2026-09-11-d8-missed-by-size/) | 2026-09-11 | Which buildings does the model miss? | **Small ones — 10.5× higher miss rate, 70 % of misses under 900 px.** Erosion ruled out; resolution-vs-OB-error blocked on R12 | ✅ |
 | [`2026-09-11-replication`](2026-09-11-replication/) | 2026-09-11 | Do the two marginal claims survive a second seed? | **Erosion: yes, 1.7–2.2× pooled noise at 4 matched points.** Self-training regression: direction only (d/SE 1.78) | ✅ |

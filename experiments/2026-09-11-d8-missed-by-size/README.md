@@ -118,6 +118,12 @@ small. **Erosion is eliminated as the explanation.**
 - **(a) The model genuinely fails on small buildings** — a resolution/receptive-field problem.
   A 200-px building is ~14×14 px, and a /32-downsampling encoder sees it across well under one
   feature-map cell.
+> **Corrected 2026-09-11 by [D10](../2026-09-11-d10-missed-gallery/):** the framing below
+> treats *large*-polygon misses as trustworthy. They are not. Rendering the largest misses
+> shows Open Buildings drawing **compound walls and plot boundaries as buildings** — two of
+> the three largest are polygons over bare ground and vegetation with no roof at all. OB
+> error contaminates **both** ends of the size range, not just the small end.
+
 - **(b) Open Buildings invents small polygons** that were never buildings — vegetation, shade
   structures, noise. Small OB polygons are precisely the ones most likely to be false positives.
 

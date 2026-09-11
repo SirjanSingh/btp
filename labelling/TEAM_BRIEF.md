@@ -85,6 +85,7 @@ Draw around **each roof as seen from above**. One polygon per building.
 | **Stairwell / water tank on the roof** | Leave it **inside** the roof polygon. Don't cut it out. |
 | **Under construction** | Has walls → label it. Bare foundation slab → skip. |
 | **Tiny shed / awning** | If you'd call it a building from the air, label it. |
+| **Walled compound / plot boundary** | Trace the **roofs inside it**, never the boundary wall. A walled yard with no building in it gets **nothing**. This is the single place the machine is most often wrong, so your call here is especially valuable. |
 | **Crop looks empty** | That's expected — 3 of your crops have no buildings. If you *do* spot one, label it; that's a real finding. |
 
 ### ⭐ Why touching buildings matter so much
