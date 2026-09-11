@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-11 14:00 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-11 14:23 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**93 runs · 33 checkpoints currently on disk**
+**94 runs · 33 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -66,6 +66,7 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `r5_t080` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `r5b_e02` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `r5b_e04` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `rep_st050_s43` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `resnet34` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `resnet34_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s1_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -138,6 +139,7 @@ Kept deliberately — a crashed configuration is evidence too.
 - `r5_t080` (diagnostics/r5_t080.json)
 - `r5b_e02` (diagnostics/r5b_e02.json)
 - `r5b_e04` (diagnostics/r5b_e04.json)
+- `rep_st050_s43` (diagnostics/rep_st050_s43.json)
 - `resnet34` (diagnostics/merge_split/resnet34.json)
 - `resnet34_eroded` (diagnostics/merge_split/resnet34_eroded.json)
 - `s1_crossdomain` (diagnostics/s1_crossdomain.json)

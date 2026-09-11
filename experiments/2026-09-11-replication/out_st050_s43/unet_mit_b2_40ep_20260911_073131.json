@@ -214,7 +214,109 @@
       "lr": 6.944282990207194e-05,
       "elapsed_s": 237.0,
       "note": ""
+    },
+    {
+      "epoch": 16,
+      "tr_loss": 0.085527,
+      "va_loss": 0.365663,
+      "iou": 0.636241,
+      "f1": 0.777686,
+      "precision": 0.779693,
+      "recall": 0.775689,
+      "lr": 6.57963412215599e-05,
+      "elapsed_s": 215.8,
+      "note": ""
+    },
+    {
+      "epoch": 17,
+      "tr_loss": 0.084304,
+      "va_loss": 0.374119,
+      "iou": 0.637523,
+      "f1": 0.778643,
+      "precision": 0.780519,
+      "recall": 0.776777,
+      "lr": 6.205554551086731e-05,
+      "elapsed_s": 213.4,
+      "note": ""
+    },
+    {
+      "epoch": 18,
+      "tr_loss": 0.082166,
+      "va_loss": 0.370827,
+      "iou": 0.639899,
+      "f1": 0.780413,
+      "precision": 0.776026,
+      "recall": 0.784849,
+      "lr": 5.824350601949142e-05,
+      "elapsed_s": 149.7,
+      "note": ""
+    },
+    {
+      "epoch": 19,
+      "tr_loss": 0.081173,
+      "va_loss": 0.375972,
+      "iou": 0.639413,
+      "f1": 0.780051,
+      "precision": 0.777507,
+      "recall": 0.782612,
+      "lr": 5.438372523852832e-05,
+      "elapsed_s": 146.4,
+      "note": ""
+    },
+    {
+      "epoch": 20,
+      "tr_loss": 0.08037,
+      "va_loss": 0.371528,
+      "iou": 0.641179,
+      "f1": 0.781364,
+      "precision": 0.776193,
+      "recall": 0.786605,
+      "lr": 5.0499999999999994e-05,
+      "elapsed_s": 147.0,
+      "note": ""
+    },
+    {
+      "epoch": 21,
+      "tr_loss": 0.078996,
+      "va_loss": 0.379398,
+      "iou": 0.637867,
+      "f1": 0.778899,
+      "precision": 0.782715,
+      "recall": 0.775121,
+      "lr": 4.6616274761471674e-05,
+      "elapsed_s": 146.3,
+      "note": ""
+    },
+    {
+      "epoch": 22,
+      "tr_loss": 0.078383,
+      "va_loss": 0.39315,
+      "iou": 0.641457,
+      "f1": 0.78157,
+      "precision": 0.774128,
+      "recall": 0.789157,
+      "lr": 4.275649398050858e-05,
+      "elapsed_s": 146.3,
+      "note": ""
+    },
+    {
+      "epoch": 23,
+      "tr_loss": 0.077581,
+      "va_loss": 0.387177,
+      "iou": 0.639452,
+      "f1": 0.78008,
+      "precision": 0.780342,
+      "recall": 0.779819,
+      "lr": 3.894445448913268e-05,
+      "elapsed_s": 146.8,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.644164,
+    "best_epoch": 8,
+    "checkpoint": "experiments/2026-09-11-replication/ckpt_st050_s43/unet_mit_b2_40ep_20260911_073131/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.254836
+  }
 }

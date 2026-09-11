@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | claim 2 done · claim 1 running |
 | **Date** | 2026-09-11 |
 
 ## Question
@@ -56,7 +56,49 @@ Scored on the same val tiles with IoU plus the full instance set at threshold 0.
 
 ## Results
 
-*pending*
+### Claim 2 — self-training regresses counting: **direction survives, precision does not**
+
+| run | IoU | merge | missed | **pred/label** |
+|---|---|---|---|---|
+| teacher seed 42 / 43 / 44 | 0.6393 / 0.6423 / 0.6434 | — | — | 0.9914 / 0.9317 / 1.0027 |
+| **teacher mean (n=3)** | 0.6417 | 0.3378 | 0.3125 | **0.9753** (sd 0.0382) |
+| self-train t050 seed 42 | 0.6432 | 0.3371 | 0.3156 | 0.9134 |
+| **self-train t050 seed 43** | 0.6442 | 0.4501 | 0.2680 | **0.7702** |
+| **self-train mean (n=2)** | 0.6437 | 0.3936 | 0.2918 | **0.8418** (sd 0.1013) |
+
+**Prediction missed, and in the direction opposite to my worry.** I predicted seed 43 would land
+0.88–0.99 and feared the regression would evaporate. It came in at **0.7702** — below the range,
+making the regression *larger*, not smaller.
+
+**Difference of means 0.1335, SE 0.0749, d/SE = 1.78.** Suggestive, not conclusive at n=3 vs n=2.
+
+**The more interesting result: self-training is 2.7× noisier.** The t050 arm's `pred/label` sd is
+**0.1013** against the teacher's **0.0382**, from a 0.1432 range across just two seeds. Both arms
+trained on the *same fixed* pseudo-label set — generated once from the seed-42 teacher — so this
+is not pseudo-label variability. **Training a student on noisy pseudo-labels amplifies its
+sensitivity to initialisation.** Worth stating carefully at n=2, but the gap is large.
+
+**Revised claim for R5.** "Self-training regresses `pred/label` from 0.9914 to 0.9134" was a
+single-run comparison and overstated its precision. The supportable version is: **self-training
+lowers counting accuracy (0.9753 → 0.8418 across seeds, d/SE 1.78) and makes it markedly less
+reproducible.** R5's *decision* — reject self-training — was never in doubt, since no arm beat
+the teacher on any seed.
+
+### An error in every write-up, found while collecting this
+
+`rooftop/train.py` defaults to **`--patience 15`**: training halts 15 epochs after the best
+score. Every experiment in this repo describes itself as *"40 epochs"*; the true figure is
+**up to 40, early-stopped**. Actual stopping points vary widely — this arm stopped at **epoch 23
+with its best at epoch 8**, while the un-eroded run went to 40 with its best at 35.
+
+This matters twice: the write-ups are inaccurate as stated, and **variable stopping is itself a
+contributor to the seed spread** measured yesterday — a run that peaks early trains for
+substantially less time. The seed-variance figures remain valid as a *total* run-to-run floor,
+which is the quantity comparisons need, but the mechanism is not purely initialisation.
+
+## Results — claim 1 (erosion)
+
+*pending — un-eroded seed 43 still training*
 
 ## Threats to validity
 
