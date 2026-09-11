@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 19:01 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 19:29 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -393,10 +393,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-183 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+184 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  49 commits
+### 2026-09-11  ·  50 commits
 
+- `19:01` **5adc382** Regenerate ledger and timeline
 - `19:00` **8f80c64** Regenerate ledger and timeline (results briefing published; no compute this tick)
 - `18:31` **3383d14** Close D16's in-sample caveat; stage the superstructure pass as a standalone doc
 - `18:13` **7567a0a** Confirm D16 figures and test the un-erosion guard
