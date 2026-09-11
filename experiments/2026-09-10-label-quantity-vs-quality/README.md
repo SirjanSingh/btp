@@ -130,3 +130,30 @@ circular by construction.
 - Both label sets are footprints, not roofs. Unchanged caveat.
 - Single seed. A confidence *sweep* (0.0 / 0.5 / 0.75 / 0.9) would be the fuller answer; this
   is the two-point version.
+
+---
+
+## Addendum (2026-09-11) — the confounding has a measured mechanism
+
+This write-up's own premise said Open Buildings *"is least confident about buildings that are
+small, irregular, or densely packed"*. [`D9`](../2026-09-11-d9-confidence-is-size/) measured it,
+and the effect is much stronger than "least confident" suggests:
+
+| size (px) | mean OB confidence | frac < 0.75 |
+|---|---|---|
+| 50–200 | 0.6998 | 0.8900 |
+| 400–900 | 0.7509 | 0.5006 |
+| 2000+ | 0.8347 | 0.0677 |
+
+**The confidence threshold is a size filter.** `min_conf 0.75` keeps **11 %** of the smallest
+buildings and **93 %** of the largest. So the two arms compared here were not "same task, more
+or less label noise" — the conf ≥ 0.0 arm was trained on a label set containing ~9× more small
+buildings than the conf ≥ 0.75 arm.
+
+**That is the confounding, named.** Each model wins on its own val set not merely because the
+label distributions differ, but because they differ *in building size*, and miss rate varies
+10.5× across the size range (D8). The comparison was across two different size regimes, scored
+each on its own.
+
+It also means the threshold cannot be "tuned for label quality" independently of deciding which
+buildings the model is meant to find. Those are the same decision.
