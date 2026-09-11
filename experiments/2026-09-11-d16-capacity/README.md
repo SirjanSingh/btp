@@ -101,9 +101,11 @@ whole estimate to roughly ±9 %.
 
 - **PVOUT is secondary-source and not citable** (D15). The central value moves the headline
   linearly.
-- **Partly in-sample:** 7,371 of 9,072 crops were training data. Val-only fg is 0.2015 against
-  train 0.2330 — a difference driven mainly by which tiles fell in each split rather than by
-  memorisation, but the total is not an out-of-sample estimate.
+- **Partly in-sample — tested and not detectable.** 7,371 of 9,072 crops were training data,
+  so the total is formally not out-of-sample. But area agreement on the **held-out** crops is
+  **0.9934** against **0.9830** on the seen ones: the unseen split agrees *better*, which is
+  the opposite of memorisation. Any in-sample area inflation is under ~1 %, against a total
+  uncertainty of 15.2 %. Downgraded from a live caveat to a bounded one.
 - **Agreement with Open Buildings, not accuracy.** D10 showed OB over-covers by drawing compound
   walls as buildings, so true roof area is plausibly *lower*. This is a systematic bias absent
   from the ±15.2 %.
