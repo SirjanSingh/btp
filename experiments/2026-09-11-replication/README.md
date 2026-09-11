@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | claim 2 done · claim 1 running |
+| **Status** | ✅ done — claim 1 promoted to solid, claim 2 demoted to directional |
 | **Date** | 2026-09-11 |
 
 ## Question
@@ -96,9 +96,62 @@ contributor to the seed spread** measured yesterday — a run that peaks early t
 substantially less time. The seed-variance figures remain valid as a *total* run-to-run floor,
 which is the quantity comparisons need, but the mechanism is not purely initialisation.
 
-## Results — claim 1 (erosion)
+## Results — claim 1: erosion is necessary. **Supported, and strengthened.**
 
-*pending — un-eroded seed 43 still training*
+Un-eroded seed 43 reached IoU **0.6575** against seed 42's **0.6580** — inside my predicted
+0.652–0.662.
+
+**Un-eroded reproducibility, swept at three thresholds:**
+
+| thr | merge \|Δ\| | missed \|Δ\| | `pred/label` \|Δ\| |
+|---|---|---|---|
+| 0.5 | 0.0173 | 0.0090 | 0.0106 |
+| 0.7 | 0.0223 | 0.0136 | 0.0220 |
+| 0.8 | 0.0211 | 0.0190 | 0.0368 |
+
+Mean `pred/label` seed-to-seed difference **0.0231** — the un-eroded model is roughly **3×
+more reproducible** than the eroded one (teacher 2 sd 0.0763). That is not a flaw in erosion: the
+eroded model sits near `pred/label` 1.0, where small probability shifts flip components either
+way, while the un-eroded model under-counts so consistently (0.74) that there is little to
+flip. **Noise is state-dependent, not a property of the metric alone** — worth carrying into how
+error bars are quoted.
+
+**Matched-merge comparison, now with both un-eroded seeds against the eroded curve:**
+
+| merge | un-eroded `pred/label` | eroded `pred/label` | gap |
+|---|---|---|---|
+| 0.3335 (s42) | 0.8285 | 0.9718 | **+0.1433** |
+| 0.3558 (s43) | 0.8065 | 0.9476 | **+0.1411** |
+| 0.2402 (s42) | 0.9119 | 1.0817 | **+0.1698** |
+| 0.2613 (s43) | 0.8751 | 1.0564 | **+0.1813** |
+
+Pooled 2 sd for the difference is √(0.0763² + 0.0327²) = **0.0830**. The four gaps are
+**1.7×–2.2×** that, **all the same sign, with consistent magnitude across two independent
+seeds**. My prediction was that the gap would stay ≥ 1.5× a pooled 2 sd — **hit**.
+
+## Conclusion
+
+**Claim 1 (erosion is necessary) is supported.** It was previously a 3-seed distribution against
+a single run at 1.2–1.9× 2 sd; it is now two distributions compared at four matched operating
+points, every one clearing the pooled noise floor in the same direction. This is the project's
+central methodological result and it now rests on replicated evidence.
+
+**Claim 2 (self-training regresses counting) survives in direction only**, at d/SE 1.78, and must
+be stated as "lowers counting accuracy and makes it markedly less reproducible" rather than with
+a four-decimal delta.
+
+**Net:** one claim promoted from marginal to solid, one demoted from precise to directional.
+Both outcomes were pre-registered as possibilities before either run started.
+
+## Decision
+
+- [x] **Erosion stays the default**, now on replicated evidence rather than a single un-eroded run.
+- [x] **R5's headline restated** in its own write-up to the directional form.
+- [x] **Record that noise is state-dependent** — a model sitting near `pred/label` 1.0 is
+      intrinsically noisier there than one that under-counts consistently. Error bars should not
+      be quoted as a single global figure.
+- [x] Replication of marginal claims is worth the GPU time: 2 runs converted the project's
+      central claim from "probably" to "measured".
 
 ## Threats to validity
 

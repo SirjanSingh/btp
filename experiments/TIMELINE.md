@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 14:30 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 14:47 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -206,7 +206,7 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
 | 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Erosion is necessary.** Eroded model wins recall *and* counting at every matched merge; un-eroded `pred/label` tops out at 0.9119 |
 | 2026-09-11 | [`2026-09-11-mit-b5`](2026-09-11-mit-b5/) | ❌ negative — +0.0063 IoU (1.5× noise) for 3.6× compute; B2 stays | **Not worth it.** +0.0063 IoU (1.5× noise) for 3.6× compute; every other metric inside noise |
-| 2026-09-11 | [`2026-09-11-replication`](2026-09-11-replication/) | claim 2 done · claim 1 running | — |
+| 2026-09-11 | [`2026-09-11-replication`](2026-09-11-replication/) | ✅ done — claim 1 promoted to solid, claim 2 demoted to directional | **Erosion: yes, 1.7–2.2× pooled noise at 4 matched points.** Self-training regression: direction only (d/SE 1.78) |
 | 2026-09-11 | [`2026-09-11-seed-variance`](2026-09-11-seed-variance/) | ★ done (n=3) — `pred/label` 2 sd = 0.076; flagship number needs an error bar | ★ **n=3: 2sd = 0.076 `pred/label`, 0.050 merge, 0.004 IoU.** Flagship 0.9914 is really 0.99 ± 0.08; three claims unsupported |
 | 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | ❌ negative — diagnosis confirmed, teacher still wins | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins |
 
@@ -331,7 +331,7 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** against the B2 mean (+0.0087 against seed 42 alone) ✅. "`pred/label` will move less than IoU" — ambiguous as I wrote it: in absolute terms it moved *more* (0.0756 vs 0.0063), but relative to each metric's own noise it moved **less** (1.0× vs 1.5× its 2 sd). The intended meaning holds; the wording did not.
 
-**[`2026-09-11-replication`](2026-09-11-replication/)** — claim 2 done · claim 1 running
+**[`2026-09-11-replication`](2026-09-11-replication/)** — ✅ done — claim 1 promoted to solid, claim 2 demoted to directional
 > **Why:** every remaining backlog item is blocked (R12 on hand labels, S3 on absent data) or low-value (R7, since the AIRS seed was shown worthless). Turning the project's central claim from "probably" into "measured" is worth more than another arm.
 >
 > **Expected:** The more interesting result: self-training is 2.7× noisier.** The t050 arm's `pred/label` sd is **0.1013** against the teacher's **0.0382**, from a 0.1432 range across just two seeds. Both arms trained on the *same fixed* pseudo-label set — generated once from the seed-42 teacher — so this is not pseudo-label variability. **Training a student on noisy pseudo-labels amplifies its sensitivity to ini
@@ -353,10 +353,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-166 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+167 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  32 commits
+### 2026-09-11  ·  33 commits
 
+- `14:30` **ae94c01** Regenerate ledger and timeline (un-eroded s43 ep32)
 - `14:23` **252be15** Replication, claim 2: direction survives, precision does not, and self-training is 2.7x noisier
 - `14:00` **868829f** Regenerate ledger and timeline (replication: un-eroded s43 ep21, st050 s43 ep15)
 - `13:58` **563226d** Regenerate ledger and timeline (replication: un-eroded s43 ep20, st050 s43 ep14)

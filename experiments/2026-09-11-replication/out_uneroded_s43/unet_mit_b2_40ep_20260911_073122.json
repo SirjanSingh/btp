@@ -430,7 +430,73 @@
       "lr": 8.294311864472434e-06,
       "elapsed_s": 145.6,
       "note": ""
+    },
+    {
+      "epoch": 34,
+      "tr_loss": 0.243144,
+      "va_loss": 0.245439,
+      "iou": 0.657178,
+      "f1": 0.793129,
+      "precision": 0.757623,
+      "recall": 0.832127,
+      "lr": 6.395177052675792e-06,
+      "elapsed_s": 145.8,
+      "note": ""
+    },
+    {
+      "epoch": 35,
+      "tr_loss": 0.243245,
+      "va_loss": 0.246114,
+      "iou": 0.656684,
+      "f1": 0.792769,
+      "precision": 0.754731,
+      "recall": 0.834845,
+      "lr": 4.767963140691305e-06,
+      "elapsed_s": 145.9,
+      "note": ""
+    },
+    {
+      "epoch": 36,
+      "tr_loss": 0.243039,
+      "va_loss": 0.245765,
+      "iou": 0.656165,
+      "f1": 0.792391,
+      "precision": 0.759394,
+      "recall": 0.828385,
+      "lr": 3.4227024433898994e-06,
+      "elapsed_s": 146.6,
+      "note": ""
+    },
+    {
+      "epoch": 37,
+      "tr_loss": 0.242718,
+      "va_loss": 0.24562,
+      "iou": 0.656981,
+      "f1": 0.792985,
+      "precision": 0.757112,
+      "recall": 0.832428,
+      "lr": 2.36768894031501e-06,
+      "elapsed_s": 145.7,
+      "note": ""
+    },
+    {
+      "epoch": 38,
+      "tr_loss": 0.242576,
+      "va_loss": 0.246108,
+      "iou": 0.655997,
+      "f1": 0.792268,
+      "precision": 0.759211,
+      "recall": 0.828336,
+      "lr": 1.6094271405406857e-06,
+      "elapsed_s": 145.5,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.657519,
+    "best_epoch": 23,
+    "checkpoint": "experiments/2026-09-11-replication/ckpt_uneroded_s43/unet_mit_b2_40ep_20260911_073122/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.241481
+  }
 }

@@ -1,10 +1,10 @@
 # Run ledger — every training and evaluation run, consolidated
 
-Generated 2026-09-11 14:30 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
+Generated 2026-09-11 14:47 by `scripts/build_run_ledger.py`. Rebuild it after every run, and **always before deleting a checkpoint**.
 
 Weights get deleted when the 40 GB quota runs low; these numbers do not. Full per-epoch curves for every run are in `RUN_LEDGER.json` — this table is just the summary.
 
-**94 runs · 33 checkpoints currently on disk**
+**97 runs · 33 checkpoints currently on disk**
 
 | Run | Stage | Kind | Epochs | Best IoU | @ep | F1 | Prec | Rec |
 |---|---|---|---|---|---|---|---|---|
@@ -67,6 +67,9 @@ Weights get deleted when the 40 GB quota runs low; these numbers do not. Full pe
 | `r5b_e02` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `r5b_e04` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `rep_st050_s43` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `rep_uneroded_s43_thr0.5` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `rep_uneroded_s43_thr0.7` | diagnostic | diagnostic | 0 | — | — | — | — | — |
+| `rep_uneroded_s43_thr0.8` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `resnet34` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `resnet34_eroded` | diagnostic | diagnostic | 0 | — | — | — | — | — |
 | `s1_crossdomain` | diagnostic | diagnostic | 0 | — | — | — | — | — |
@@ -140,6 +143,9 @@ Kept deliberately — a crashed configuration is evidence too.
 - `r5b_e02` (diagnostics/r5b_e02.json)
 - `r5b_e04` (diagnostics/r5b_e04.json)
 - `rep_st050_s43` (diagnostics/rep_st050_s43.json)
+- `rep_uneroded_s43_thr0.5` (diagnostics/rep_uneroded_s43_thr0.5.json)
+- `rep_uneroded_s43_thr0.7` (diagnostics/rep_uneroded_s43_thr0.7.json)
+- `rep_uneroded_s43_thr0.8` (diagnostics/rep_uneroded_s43_thr0.8.json)
 - `resnet34` (diagnostics/merge_split/resnet34.json)
 - `resnet34_eroded` (diagnostics/merge_split/resnet34_eroded.json)
 - `s1_crossdomain` (diagnostics/s1_crossdomain.json)
