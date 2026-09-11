@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 06:31 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 06:59 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -343,10 +343,11 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 
 ## 2. Full commit history, newest first
 
-150 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+151 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  16 commits
+### 2026-09-11  ·  17 commits
 
+- `06:31` **47ce1e3** Launch seed-variance replicate and MiT-B5
 - `06:28` **5ac635f** Un-eroded curve settles it: erosion is necessary, not redundant with thresholding
 - `06:00` **5927321** Regenerate ledger and timeline (un-eroded ep32 at 0.6571)
 - `05:58` **a45ea00** Regenerate ledger and timeline (un-eroded retrain ep31 at 0.6559)
