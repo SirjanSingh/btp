@@ -1,6 +1,6 @@
 # Timeline — what was run, what wasn't, and in what order
 
-*Generated 2026-09-11 12:40 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
+*Generated 2026-09-11 12:59 by `scripts/build_timeline.py`. Do not edit by hand — rerun the script.*
 
 This answers the question the other documents do not: **what was tried, in what order, and what came of it?** Months later, when writing up, the hard question is usually not "what did X score" but "did we ever actually test X, or did we just plan to?" — so §3 records what was **never run**, and why, as deliberately as §2 records what was.
 
@@ -206,6 +206,7 @@ wrapped around.
 | 2026-09-10 | [`2026-09-10-split-metric-audit`](2026-09-10-split-metric-audit/) | ✅ done — metric vindicated, interpretation corrected | **Metric sound; strict def is 0.0 everywhere.** 0.8 m *hallucinates* buildings (30 % of preds touch no label), not fragments |
 | 2026-09-11 | [`2026-09-11-inference-threshold-sweep`](2026-09-11-inference-threshold-sweep/) | ✅ done — complements, not substitutes; follow-up launched | **Erosion is necessary.** Eroded model wins recall *and* counting at every matched merge; un-eroded `pred/label` tops out at 0.9119 |
 | 2026-09-11 | [`2026-09-11-mit-b5`](2026-09-11-mit-b5/) | ❌ negative — +0.0063 IoU (1.5× noise) for 3.6× compute; B2 stays | **Not worth it.** +0.0063 IoU (1.5× noise) for 3.6× compute; every other metric inside noise |
+| 2026-09-11 | [`2026-09-11-replication`](2026-09-11-replication/) | running | — |
 | 2026-09-11 | [`2026-09-11-seed-variance`](2026-09-11-seed-variance/) | ★ done (n=3) — `pred/label` 2 sd = 0.076; flagship number needs an error bar | ★ **n=3: 2sd = 0.076 `pred/label`, 0.050 merge, 0.004 IoU.** Flagship 0.9914 is really 0.99 ± 0.08; three claims unsupported |
 | 2026-09-11 | [`2026-09-11-selftrain-eroded-pseudo`](2026-09-11-selftrain-eroded-pseudo/) | ❌ negative — diagnosis confirmed, teacher still wins | **Diagnosis yes, method no.** `pred/label` 0.9134→0.9672, but recall falls and the teacher still wins |
 
@@ -330,6 +331,9 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 >
 > **Expected:** against the B2 mean (+0.0087 against seed 42 alone) ✅. "`pred/label` will move less than IoU" — ambiguous as I wrote it: in absolute terms it moved *more* (0.0756 vs 0.0063), but relative to each metric's own noise it moved **less** (1.0× vs 1.5× its 2 sd). The intended meaning holds; the wording did not.
 
+**[`2026-09-11-replication`](2026-09-11-replication/)** — running
+> **Why:** every remaining backlog item is blocked (R12 on hand labels, S3 on absent data) or low-value (R7, since the AIRS seed was shown worthless). Turning the project's central claim from "probably" into "measured" is worth more than another arm.
+
 **[`2026-09-11-seed-variance`](2026-09-11-seed-variance/)** — ★ done (n=3) — `pred/label` 2 sd = 0.076; flagship number needs an error bar
 > **Why:** it retroactively determines which of tonight's conclusions are real. Three in particular hinge on it:
 >
@@ -341,16 +345,17 @@ The rationale in each experiment's own words — extracted, not retyped, so it c
 > **Expected:** Eroding the pseudo-labels recovers most of what raw self-training threw away: `pred/label` **0.9134 → 0.9672** (under-counting 8.7 % → 3.3 %) and merge **0.3371 → 0.2666**, now *better* than the teacher's 0.3155. The mechanism proposed in R5 — that self-training discards the label erosion — is confirmed by repairing exactly that and watching both metrics move back.
 
 
-**26 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
+**27 experiments written up.** Status legend: ✅ done · ❌ negative result (kept deliberately) · ⚠️ confounded or unresolved · running.
 
 ---
 
 ## 2. Full commit history, newest first
 
-159 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
+160 commits. Each is a unit of work — a run launched, a result recorded, a bug found, a document corrected.
 
-### 2026-09-11  ·  25 commits
+### 2026-09-11  ·  26 commits
 
+- `12:40` **7c1e9e6** MiT-B5: +0.0063 IoU at 1.5x noise for 3.6x compute -- B2 stays the default
 - `12:32` **4399f9e** Seed variance at n=3: the flagship pred/label number needs an error bar
 - `08:29` **e29b7db** Regenerate ledger and timeline (seed-44 ep13, MiT-B5 ep13)
 - `08:00` **08e9f55** Regenerate ledger and timeline (seed-44 ep1, MiT-B5 ep9)
