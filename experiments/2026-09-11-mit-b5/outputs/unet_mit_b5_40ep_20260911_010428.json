@@ -502,7 +502,25 @@
       "lr": 1.1525919802101657e-06,
       "elapsed_s": 531.1,
       "note": ""
+    },
+    {
+      "epoch": 40,
+      "tr_loss": 0.244793,
+      "va_loss": 0.253476,
+      "iou": 0.637909,
+      "f1": 0.778931,
+      "precision": 0.795318,
+      "recall": 0.763206,
+      "lr": 1e-06,
+      "elapsed_s": 518.3,
+      "note": ""
     }
   ],
-  "summary": {}
+  "summary": {
+    "best_val_iou": 0.648049,
+    "best_epoch": 25,
+    "checkpoint": "experiments/2026-09-11-mit-b5/ckpt/unet_mit_b5_40ep_20260911_010428/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.250951
+  }
 }

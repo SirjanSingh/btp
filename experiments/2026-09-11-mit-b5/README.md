@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | running |
+| **Status** | ❌ negative — +0.0063 IoU (1.5× noise) for 3.6× compute; B2 stays |
 | **Date** | 2026-09-11 |
 
 ## Question
@@ -42,7 +42,63 @@ them and is not being run yet.
 
 ## Results
 
-*pending*
+**Compared against the three-seed MiT-B2 distribution**, not a single run — the first arm in
+this project able to do that.
+
+| | IoU | merge | split | frag/label | missed | pred/label |
+|---|---|---|---|---|---|---|
+| MiT-B2, seed 42 | 0.6393 | 0.3155 | 0.0840 | 0.9203 | 0.3257 | 0.9914 |
+| MiT-B2, seed 43 | 0.6423 | 0.3650 | 0.0634 | 0.8962 | 0.3074 | 0.9317 |
+| MiT-B2, seed 44 | 0.6434 | 0.3329 | 0.0793 | 0.9310 | 0.3045 | 1.0027 |
+| **MiT-B2 mean** | **0.6417** | 0.3378 | 0.0756 | 0.9158 | 0.3125 | **0.9753** |
+| **MiT-B5** | **0.6480** | 0.3070 | 0.0922 | 0.9438 | 0.3063 | **1.0509** |
+| | **+0.0063** | −0.0308 | +0.0166 | +0.0280 | −0.0062 | +0.0756 |
+| *as × 2 sd* | **1.5×** | 0.6× | 0.8× | 0.8× | 0.3× | **1.0×** |
+
+**Prediction scorecard.** IoU +0.000 to +0.010 → **+0.0063** against the B2 mean (+0.0087
+against seed 42 alone) ✅. "`pred/label` will move less than IoU" — ambiguous as I wrote it:
+in absolute terms it moved *more* (0.0756 vs 0.0063), but relative to each metric's own noise
+it moved **less** (1.0× vs 1.5× its 2 sd). The intended meaning holds; the wording did not.
+
+## Interpretation
+
+**A real but small gain that does not justify the cost.** +0.0063 IoU is **1.5× the B2 2 sd** —
+above noise, but not comfortably, and it rests on a **single B5 run whose own variance is
+unmeasured**. If B5 varies like B2, a second seed could plausibly halve or double it.
+
+**Every other metric is inside noise.** merge 0.6×, split 0.8×, frag 0.8×, missed 0.3×. The
+counting behaviour is unchanged, as predicted — it is set by label erosion, not encoder capacity.
+
+**The cost side is decisive.** B5 runs at **530 s/epoch against B2's 147 s** (3.6×) and writes a
+**971 MB checkpoint against 315 MB** (3.1×) — the checkpoint that nearly breached the quota
+floor this morning. Paying 3.6× compute and 3× storage for a 1.5×-noise IoU gain, on a metric
+this project has explicitly demoted below `pred/label`, is a bad trade.
+
+**And `pred/label` moves the wrong way.** B5's 1.0509 is further from 1.0 than the B2 mean's
+0.9753 (0.051 vs 0.025 absolute error) — within noise, so not a finding, but certainly not an
+argument for B5 either.
+
+**The batch confound is unresolved.** B5 ran at batch 8 and B2 at batch 12, for VRAM. A
+batch-8 B2 control would separate encoder from batch size, and is not worth running given the
+cost verdict above.
+
+## Decision
+
+- [x] **MiT-B2 stays the default.** B5's gain is 1.5× noise, single-seed, confounded with batch
+      size, and costs 3.6× compute for it.
+- [x] **`MASTER_CONTEXT`'s "swap to MiT-B5" prerequisite is answered for *this* stage**: the
+      capacity is not what limits Jaipur rooftops. Small buildings are not a capacity problem
+      here — erosion and label quality dominate.
+- [ ] If the DAFormer/HRDA/MIC family is attempted later it may need B5 for its own reasons;
+      that is a separate question from whether B5 helps the current model.
+
+## Threats to validity
+
+- **Single B5 seed against a 3-seed B2 distribution.** The comparison uses the baseline's
+  variance, which is the right thing to do, but says nothing about B5's own.
+- Batch-size confound (8 vs 12).
+- Agreement with Open Buildings, not accuracy (R12).
+- 40 epochs may suit B2 better than B5; no schedule tuning was attempted.
 
 ## Threats to validity
 

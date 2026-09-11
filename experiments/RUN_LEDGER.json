@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-11T12:32:47",
- "n_runs": 92,
+ "generated": "2026-09-11T12:40:08",
+ "n_runs": 93,
  "checkpoints_on_disk": [
   "experiments/2026-09-09-boundary-relaxed-loss/checkpoints/unet_resnet34_40ep_20260909_173651/best.pth",
   "experiments/2026-09-09-does-the-airs-seed-help/checkpoints/unet_resnet34_40ep_20260909_171814/best.pth",
@@ -10753,13 +10753,19 @@
     "gpu_name": "Tesla V100-SXM2-32GB",
     "cuda_version": "12.4"
    },
-   "n_epochs": 39,
+   "n_epochs": 40,
    "best_epoch": 25,
    "best_iou": 0.648049,
    "best_f1": 0.786444,
    "best_precision": 0.777293,
    "best_recall": 0.795813,
-   "summary": {},
+   "summary": {
+    "best_val_iou": 0.648049,
+    "best_epoch": 25,
+    "checkpoint": "experiments/2026-09-11-mit-b5/ckpt/unet_mit_b5_40ep_20260911_010428/best.pth",
+    "baseline_pspnet_iou": 0.899,
+    "gap_vs_baseline": -0.250951
+   },
    "threshold_sweep": null,
    "results": null,
    "epochs": [
@@ -11229,6 +11235,18 @@
      "recall": 0.759436,
      "lr": 1.1525919802101657e-06,
      "elapsed_s": 531.1,
+     "note": ""
+    },
+    {
+     "epoch": 40,
+     "tr_loss": 0.244793,
+     "va_loss": 0.253476,
+     "iou": 0.637909,
+     "f1": 0.778931,
+     "precision": 0.795318,
+     "recall": 0.763206,
+     "lr": 1e-06,
+     "elapsed_s": 518.3,
      "note": ""
     }
    ]
@@ -12102,6 +12120,25 @@
   {
    "run_name": "mit_b2_eroded_rerun",
    "log": "diagnostics/merge_split/mit_b2_eroded_rerun.json",
+   "stage": "diagnostic",
+   "kind": "diagnostic",
+   "timestamp": "",
+   "config": {},
+   "hardware": {},
+   "n_epochs": 0,
+   "best_epoch": null,
+   "best_iou": null,
+   "best_f1": null,
+   "best_precision": null,
+   "best_recall": null,
+   "summary": {},
+   "threshold_sweep": null,
+   "results": null,
+   "epochs": []
+  },
+  {
+   "run_name": "mit_b5",
+   "log": "diagnostics/mit_b5.json",
    "stage": "diagnostic",
    "kind": "diagnostic",
    "timestamp": "",
