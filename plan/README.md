@@ -21,6 +21,8 @@ segmentation models — which were trained on **New Zealand (AIRS)** and **Frenc
 | 6 | [`06-implementation-plan.md`](06-implementation-plan.md) | Task-by-task, executable, with code |
 | 7 | [`07-risks-licensing-ethics.md`](07-risks-licensing-ethics.md) | What can go wrong, and the imagery-licensing problem |
 | 8 | [`08-sources.md`](08-sources.md) | Every source cited, with links |
+| 9 | [`09-sam3-implementation.md`](09-sam3-implementation.md) | SAM 3 zero-shot baseline plan |
+| 10 | [`10-do-and-dont-oct-2026.md`](10-do-and-dont-oct-2026.md) | **Start here for current status:** what to do next, what not to do, and how to use the campus image |
 
 ---
 

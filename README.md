@@ -65,6 +65,10 @@ piece of work. The complete research report, gap analysis, pipeline design,
 compute budget, and task-by-task implementation plan live in
 [**`plan/`**](plan/) — start with [`plan/README.md`](plan/README.md).
 
+**Latest status (Oct 2026):** [`plan/10-do-and-dont-oct-2026.md`](plan/10-do-and-dont-oct-2026.md)
+lists what to work on next, what to stop doing, and whether the new Jev 1.14 image model helps, and how to use the LNMIIT campus
+image `daraset/projs.tif` as a test site.
+
 Three things to know if you only read this section:
 
 1. The Jaipur imagery in `daraset/` is **26.6 cm/px** on the ground, not 10 cm.
