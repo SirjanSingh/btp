@@ -1,7 +1,7 @@
 # 10. What to do, what not to do (updated 19 Oct 2026)
 
-This page answers three questions: **what should we work on next**, **can the new Jev 1.14
-image model help** (section 3), and **how to use the campus image (`daraset/projs.tif`)**
+This page answers four questions: **what should we work on next**, **which paper to use as
+the baseline** (section 4), **can the new Jev 1.14 image model help** (section 3), and **how to use the campus image (`daraset/projs.tif`)**
 (section 2). It builds on the measured results from September
 (`experiments/` and `.planning/MASTER_CONTEXT.md` on `origin/feat/init-project-setup`) and on
 `plan/01`–`09`.
@@ -184,7 +184,70 @@ a source of ground truth.
 
 ---
 
-## 4. DO: in this order
+## 4. Which paper to use as the baseline (checked 19 Oct 2026)
+
+Our claim is: **solar energy for a whole Indian city, with zero target labels.** No single
+paper does all of that, so use **one main paper to build on** and **one or two reference
+points** for the parts it doesn't cover.
+
+### Main baseline to build on: Kasmi et al. 2025
+
+**G. Kasmi, L. Dubus, Y.-M. Saint-Drenan, P. Blanc, "Space-scale exploration of the poor
+reliability of deep learning models: the case of the remote sensing of rooftop
+photovoltaic systems", *Environmental Data Science*, 2025**
+([arXiv 2408.07828](https://arxiv.org/abs/2408.07828),
+[journal](https://www.cambridge.org/core/product/3415C8A022E481B7C955FE284D4DC0E5)).
+
+Why this one:
+- **Same data.** It uses **BDAPPV**, our Stage 2 training set, from the same group that
+  released BDAPPV ([Kasmi et al. 2023, *Scientific Data*](https://arxiv.org/abs/2209.03726)).
+- **Same problem.** It is about models breaking when the imagery changes. Trained on Google
+  images, their ResNet-50 gets F1 **0.98** on Google but **0.46** on IGN, because recall
+  drops to 0.32. That is the same Google→IGN shift we already measured (our IoU went from
+  0.561 to 0.617 with self-training), and the same failure we expect going from France to
+  Jaipur.
+- **Same conclusion as our data.** Their fix is **augmentation**, not heavy adaptation
+  methods: blurring raises F1 on IGN from 0.44 to 0.74, though with many false positives.
+  We also found simple methods beat FDA, histogram matching and CBST.
+- **Everything is public**, so we can reproduce it, not just quote it:
+  [code](https://github.com/gabrielkasmi/robust_pv_mapping),
+  [model weights](https://zenodo.org/records/12179554),
+  [BDAPPV data](https://zenodo.org/records/7358126).
+- **It is a classifier** ("is there PV in this image?"), which is exactly the
+  PV / water-heater decision stage from section 3.
+
+How to work on it:
+1. **Reproduce their Table 1 / Table 3 numbers** (Google→IGN F1) with their code and
+   weights. This checks our setup against a published number.
+2. **Run their model on Jaipur and on the campus**, with hand-checked PV and water-heater
+   roofs as the test set. That gives the first published-method number on Indian imagery.
+3. **Add what they don't have**: a pixel mask (our Stage 2 U-Net) for panel area, hard
+   negatives such as water heaters and tanks, and the energy chain on top.
+4. **Our extension** is then easy to state: their reliability study goes from France to an
+   Indian city, and from detection to kWh/yr with a measured `k_usable`.
+
+### Reference points for the other parts (compare against these, don't build on them)
+
+| Part of the pipeline | Compare against | What it gives us |
+|---|---|---|
+| Rooftop segmentation | **Google Open Buildings itself**, turned into a mask ([Sirko et al. 2021, arXiv 2107.12283](https://arxiv.org/abs/2107.12283)) | Costs nothing. Our model is trained on these footprints, so it **must beat them** against the hand labels, or training it was pointless. |
+| Rooftop segmentation, zero-shot | **SAM 3** (`plan/09`, Priyal) | The strongest no-training baseline |
+| The final energy number | **Joshi et al. 2021, *Nature Communications*** ([paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8492708/)), a global rooftop PV potential estimate | An independent check of our 7.62 TWh/yr for Jaipur. Check whether their gridded data can be downloaded for the Jaipur area. |
+| Old source-domain number | AIRS / PSPNet 0.899 (Chen et al. 2019) | Background only. It is a different city and resolution, so **not** our baseline any more. |
+
+### Papers not to use as the baseline
+
+| Paper | Why not |
+|---|---|
+| Singla, arXiv 2411.04610 (Indian cities, satellite + DEM) | Needs a 1 m DEM and IMD ground-station data we don't have. The abstract reports no segmentation metrics. Licence CC BY-NC-ND. Cite it in related work only. |
+| "Rooftop Solar Potential of an Indian Metropolis" (IEEE 9553088, cited in `MASTER_CONTEXT`) | **Could not be found on 19 Oct 2026.** Don't cite it until someone opens the actual paper. |
+| Reliance Industries, arXiv 2501.02840 (rooftop PV in Maharashtra) | Classification on internal, unreleased data, so it can't be reproduced. Related work only. |
+| DAFormer / HRDA / MIC | Built for street scenes. Our measurements say heavy domain adaptation lost to weak labels. Keep at most one as a comparator if DGX time is spare. |
+| AIRS (Chen et al. 2019) as "the number to beat" | That was the old framing. The project is now about energy in Jaipur, not IoU on Christchurch. |
+
+---
+
+## 5. DO: in this order
 
 | # | Task | Why | Effort |
 |---|---|---|---|
@@ -195,13 +258,14 @@ a source of ground truth.
 | 5 | **Get the 30 staged Jaipur crops labelled** (`labelling/r12_batch1`) | Dense residential ground truth, which the campus cannot give | split between both of us |
 | 6 | **Read PVOUT / GTI / OPTA for Jaipur from Global Solar Atlas** and fix the PVOUT × PR double count | Still marked TODO; currently the losses are counted twice | 1 h |
 | 7 | **Fix the BDAPPV zero-negatives bug** (`prep_bdappv.py` drops panel-free images), then start the solar stage | Every solar metric so far measures the wrong task | half a day plus a retrain |
+| 7b | **Reproduce Kasmi et al. 2025** (Google→IGN F1 with their public code and weights), then run their model on campus and Jaipur PV roofs (section 4) | Our main baseline: a published, reproducible number to beat | 1–2 days |
 | 8 | **Run SAM 3 zero-shot (`plan/09`) on the campus and the labelled crops** | Strong, cheap baseline. Meaningful only once steps 2 and 5 exist. | 1 day |
 | 9 | **Pilot Jev 1.14 as a PV vs water-heater checker** on campus roof crops, then try its `k_usable` score against the hand-measured values (section 3). Pin `jev-1.14.0`. | Cheap precision filter for Stage 2; might give city-wide `k_usable`. Meaningful only once steps 2–4 exist. | 1 day |
 | 10 | **Decide the imagery licence question** (drone, Bhuvan/Cartosat, or written permission) and write an "imagery provenance and licence" paragraph for the report | First question any reviewer will ask; the repo is public | ask the supervisor |
 
 ---
 
-## 5. DON'T
+## 6. DON'T
 
 | Don't | Why |
 |---|---|
