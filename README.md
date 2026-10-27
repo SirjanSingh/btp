@@ -4,6 +4,10 @@ Semantic segmentation pipeline for detecting **rooftop areas** (Stage 1) and **s
 from aerial/satellite imagery. Built for DGX multi-GPU training using
 [segmentation-models-pytorch](https://github.com/qubvel/segmentation_models.pytorch).
 
+> **New to the project? Read [`HANDOFF.md`](HANDOFF.md) first.** It explains the current goal
+> (solar energy estimation for Jaipur), what has been measured, what is still open, and why
+> the September experiments live on a different branch (`feat/init-project-setup`).
+
 ---
 
 ## Repository Structure
