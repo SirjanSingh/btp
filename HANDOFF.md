@@ -15,7 +15,22 @@ the other. Keep running `git fetch --all` before you describe the project state,
 stale checkout once made a session declare that `plan/` did not exist.
 
 | Where the work was done | What it is |
-|---
+|---|---|
+| Started on `master` | `plan/` docs 01 to 11, including the SAM 3 plan (`09`), the Oct 2026 do/don't page (`10`), the domain adaptation baselines (`11`), and the reading list |
+| Started on `feat/init-project-setup` | **All the September experiments** (168 commits, 9 to 12 Sep, run on the DGX): `experiments/`, `diagnostics/`, `scripts/`, `labelling/`, `docs/sessions/`, `docs/PITFALLS.md`, `.planning/MASTER_CONTEXT.md` |
+
+Both are now on `master`. The old `feat/init-project-setup` branch is still on GitHub, but
+nothing new needs to go there. Do new work on `master` (pull with `--rebase` before you push).
+Where this file says "on the feat branch", read it as "on `master`".
+
+To read a file from an older ref without switching branches (in Git Bash on Windows, set
+`MSYS_NO_PATHCONV=1` first or the `ref:path` argument gets mangled):
+
+```bash
+git show origin/feat/init-project-setup:.planning/MASTER_CONTEXT.md
+```
+
+---
 
 ## 2. What the project is now
 
