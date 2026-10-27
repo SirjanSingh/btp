@@ -23,6 +23,7 @@ segmentation models — which were trained on **New Zealand (AIRS)** and **Frenc
 | 8 | [`08-sources.md`](08-sources.md) | Every source cited, with links |
 | 9 | [`09-sam3-implementation.md`](09-sam3-implementation.md) | SAM 3 zero-shot baseline plan |
 | 10 | [`10-do-and-dont-oct-2026.md`](10-do-and-dont-oct-2026.md) | **Start here for current status:** what to do next, what not to do, and how to use the campus image |
+| 10 (also) | [`10-sam2.md`](10-sam2.md) | Sep 2026 note on where SAM 2 / SAM 3 fit (label-making helper, not a baseline). It shares the number 10 with the Oct page above; `11` later lists SAM 3 zero-shot as a comparison row, so read both |
 | 11 | [`11-domain-adaptation-baselines.md`](11-domain-adaptation-baselines.md) | Domain adaptation papers: which baseline to use and which method to build on |
 
 ---

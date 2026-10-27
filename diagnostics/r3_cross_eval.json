@@ -1,0 +1,22 @@
+{
+  "conf0.75 on val@0.75": {
+    "iou": 0.6483,
+    "precision": 0.7363,
+    "recall": 0.8444
+  },
+  "conf0.75 on val@0.00": {
+    "iou": 0.6769,
+    "precision": 0.8352,
+    "recall": 0.7813
+  },
+  "conf0.00 on val@0.75": {
+    "iou": 0.6281,
+    "precision": 0.677,
+    "recall": 0.8968
+  },
+  "conf0.00 on val@0.00": {
+    "iou": 0.7205,
+    "precision": 0.8063,
+    "recall": 0.8713
+  }
+}

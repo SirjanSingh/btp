@@ -8,10 +8,30 @@ solar_panel/bdappv/
 solar_panel/bdappv_crops/
 airs/
 test_indian/
+# data/ is the canonical dataset dir on this server (~9 GB: AIRS, the Jaipur
+# mosaic, Open Buildings). Ignore its contents but keep the README that explains
+# what is supposed to live there — without this rule a `git add -A` stages 8 GB
+# of GeoTIFFs.
+data/*
+!data/README.md
 
 # ── Model weights (too large) ────────────────────────
+# Blanket rule. The previous pattern was `**/checkpoints/**/*.pth`, which only
+# matches directories named EXACTLY "checkpoints" -- an experiment writing to
+# `checkpoints_mit/` slipped two 280 MB files into git and GitHub rejected the
+# push (100 MB file limit, GH001). Weights are never worth committing: they are
+# regenerable, and their statistics live in experiments/RUN_LEDGER.json.
+*.pth
+**/checkpoints/**/*.pth
 rooftop/checkpoints/*.pth
 solar_panel/checkpoints/*.pth
+
+# ── Container deps / scratch (live on /home, never in git) ───
+# See run_docker.sh: deps install into .pydeps as PYTHONUSERBASE and the
+# container's /tmp is bind-mounted to .tmp, because host / is full.
+.pydeps/
+.venv-docker/
+.tmp/
 
 # ── Generated outputs ────────────────────────────────
 rooftop/infer_results/
@@ -27,6 +47,12 @@ __pycache__/
 *.pyc
 *.pyo
 .ipynb_checkpoints/
+
+# ── Framework caches ─────────────────────────────────
+# Docker runs with HOME=/workspace, so torch/HF download their pretrained
+# weights INTO the repo (~178 MB) instead of the real home. Regenerable, and
+# it counts against the 40 GB quota.
+.cache/
 
 # ── IDE ───────────────────────────────────────────────
 .vscode/

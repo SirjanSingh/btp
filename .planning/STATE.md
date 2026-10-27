@@ -6,16 +6,21 @@ See: .planning/PROJECT.md (updated 2026-03-30)
 
 **Core value:** Given an aerial image, produce accurate rooftop masks and solar panel masks — and
 translate pixel counts into actionable solar capacity estimates.
-**Current focus:** Phase 1 — Data Foundation
+**Current focus:** Phase 1 — Data Foundation (restore) + diagnostics D1–D7
+
+> **This file is the GSD phase tracker and lags the code.** The authoritative, disk-reconciled
+> picture is `.planning/MASTER_CONTEXT.md` (read its §0 first). The project has since been
+> reframed as **unsupervised domain adaptation with zero target labels**; the Phase 1–5 roadmap
+> below predates that framing (see MASTER_CONTEXT C4).
 
 ## Current Position
 
-Phase: 1 of 5 (Data Foundation)
+Phase: 1 of 5 (Data Foundation) — but Stage 1 and Stage 2 baselines already trained
 Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-30 — Roadmap created; Phase 1 is immediately actionable
+Status: Blocked on the AIRS restore; diagnostics partially run
+Last activity: 2026-09-09 — D1 run; MASTER_CONTEXT §0 reconciled against disk
 
-Progress: [██░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 0% *(plan-completion metric only; not a measure of work done)*
 
 ## Performance Metrics
 
@@ -47,7 +52,16 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+1. **Decide the source domain — this is now a decision, not a download.** AIRS cannot be
+   restored from Drive: it holds 75 labelled pairs against `train.txt`'s 857 (`plan/01` §2).
+   Options: fetch real AIRS from airs-dataset.com (~28 GB), switch to Inria +
+   SpaceNet-Khartoum (MASTER_CONTEXT §333 argues this on morphology *and* licensing), or
+   commit to weak supervision on Open Buildings (`plan/` calls it the biggest win) where the
+   source set matters much less. Blocks D2, D3, D5 and every training run.
+2. **The 0.8784 baseline is not reproducible** — trained on 2,000 crops from a deleted
+   `/tmp`. Re-establish it once the source domain is settled, before it is quoted anywhere.
+3. Diagnostics D4 (Open Buildings half) and D7 (hand-inspection) are runnable now.
+4. Fix the BDAPPV zero-negatives bug (MASTER_CONTEXT C1) before quoting any Stage 2 number.
 
 ### Blockers/Concerns
 
@@ -57,6 +71,17 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30
-Stopped at: Roadmap and STATE.md written; no plans created yet
-Resume file: None
+Last session: 2026-09-09
+Stopped at: D1 run to completion (`diagnostics/d1/`); D6 already complete from 2026-09-08;
+  MASTER_CONTEXT §0, `data/README.md` and this file reconciled against disk.
+Resume file: `.planning/MASTER_CONTEXT.md` §6.3 (diagnostics status table)
+
+### Session log
+
+- **2026-09-08** — Datasets restored to `data/` (Jaipur 16 tiles ✅, Open Buildings ✅,
+  AIRS ⚠️ interrupted at 50/857). `run_docker.sh` written (no `docker build`; deps in
+  `.pydeps` on /home). `MASTER_CONTEXT.md` written and reconciled. D6 seed probe run over
+  640 crops. D1 written; started but did not complete.
+- **2026-09-09** — D1's per-tile reprojection replaced with a single batched transform;
+  fixed a crash on the 2 MULTIPOLYGON rows that had left the previous run with no output.
+  D1 run to completion. Docs above brought in line with disk.

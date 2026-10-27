@@ -166,7 +166,8 @@ class RunLogger:
 class FolderDataset(Dataset):
     """Load pre-tiled crops from images/ + masks/ subdirectories."""
 
-    def __init__(self, data_dir: str, transform=None, max_samples: int = None):
+    def __init__(self, data_dir: str, transform=None, max_samples: int = None,
+                 cache_ram: bool = False):
         self.img_dir  = Path(data_dir) / "images"
         self.msk_dir  = Path(data_dir) / "masks"
         self.paths    = sorted(self.img_dir.glob("*.png"))
@@ -176,6 +177,30 @@ class FolderDataset(Dataset):
         if not self.paths:
             raise FileNotFoundError(f"No .png files found in {self.img_dir}")
 
+        # Measured on this node: PNG decode costs 11.6 ms/image, so one worker
+        # sustains ~86 img/s and three sustain far less under a load average of
+        # 200+. GPU utilisation was a 0->97->0 sawtooth: the GPU idles waiting
+        # for the dataloader. Decoding once into RAM removes that entirely --
+        # 7,371 crops is 7.7 GB against ~397 GB free, and DataLoader workers are
+        # forked, so the arrays are copy-on-write shared rather than duplicated.
+        self.cache = None
+        if cache_ram:
+            n = len(self.paths)
+            print(f"Caching {n} crops into RAM "
+                  f"(~{n * 512 * 512 * 4 / 1e9:.1f} GB) ...", flush=True)
+            imgs = np.empty((n, 512, 512, 3), np.uint8)
+            msks = np.empty((n, 512, 512), np.uint8)
+            for i, ip in enumerate(self.paths):
+                im = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
+                mk = cv2.imread(str(self.msk_dir / ip.name), cv2.IMREAD_GRAYSCALE)
+                imgs[i] = im if im.shape[:2] == (512, 512) else cv2.resize(im, (512, 512))
+                msks[i] = mk if mk.shape[:2] == (512, 512) else cv2.resize(
+                    mk, (512, 512), interpolation=cv2.INTER_NEAREST)
+                if (i + 1) % 2000 == 0:
+                    print(f"  cached {i+1}/{n}", flush=True)
+            self.cache = (imgs, msks)
+            print("Cache ready.", flush=True)
+
     def __len__(self):
         return len(self.paths)
 
@@ -183,8 +208,11 @@ class FolderDataset(Dataset):
         ip = self.paths[idx]
         mp = self.msk_dir / ip.name
 
-        img  = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
-        mask = cv2.imread(str(mp), cv2.IMREAD_GRAYSCALE)
+        if self.cache is not None:
+            img, mask = self.cache[0][idx], self.cache[1][idx]
+        else:
+            img  = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
+            mask = cv2.imread(str(mp), cv2.IMREAD_GRAYSCALE)
         # Handle both 0/1 masks (AIRS default) and 0/255 masks
         if mask.max() <= 1:
             mask = (mask > 0).astype(np.float32)
@@ -307,10 +335,46 @@ def build_model(arch: str, encoder: str, encoder_weights: str = "imagenet") -> n
 
 _bce  = smp.losses.SoftBCEWithLogitsLoss()
 _dice = smp.losses.DiceLoss(mode="binary", from_logits=True)
+_bce_px   = smp.losses.SoftBCEWithLogitsLoss(reduction="none")
+_dice_prob = smp.losses.DiceLoss(mode="binary", from_logits=False)
+
+# Set from --boundary_relax. 0 disables, restoring the original loss exactly.
+BOUNDARY_RELAX_PX = 0
+
+
+def _boundary_band(target, px):
+    """1 inside a ±px band around every label edge, 0 elsewhere.
+
+    Morphological gradient: max-pool dilates, negated max-pool erodes, and the
+    difference is the boundary ring.
+    """
+    k = 2 * px + 1
+    dil = torch.nn.functional.max_pool2d(target, k, stride=1, padding=px)
+    ero = -torch.nn.functional.max_pool2d(-target, k, stride=1, padding=px)
+    return dil - ero
 
 
 def combined_loss(pred, target, bce_w=0.5, dice_w=0.5):
-    return bce_w * _bce(pred, target) + dice_w * _dice(pred, target)
+    """Weighted BCE + Dice, optionally ignoring a band around label edges.
+
+    WHY the band: the weak labels are Open Buildings GROUND FOOTPRINTS while the
+    model predicts ROOF outlines, and off-nadir at 26.6 cm those disagree by
+    roughly 8 px (MASTER_CONTEXT Gap 4). Measured in the first weak-supervision
+    run: recall ran ~0.11 above precision for all 40 epochs, i.e. the model was
+    penalised for roof area that is genuinely there but sits outside the
+    footprint. Excluding the band stops the loss teaching the model to shrink
+    roofs to footprint size, which is a label artifact rather than the task.
+    """
+    px = BOUNDARY_RELAX_PX
+    if px <= 0:
+        return bce_w * _bce(pred, target) + dice_w * _dice(pred, target)
+
+    keep = 1.0 - _boundary_band(target, px)          # 0 inside the band
+    bce = (_bce_px(pred, target) * keep).sum() / keep.sum().clamp(min=1.0)
+    # Dice must be masked AFTER the sigmoid: scaling logits by 0 maps to 0.5,
+    # not to background, which would quietly poison the term.
+    dice = _dice_prob(torch.sigmoid(pred) * keep, target * keep)
+    return bce_w * bce + dice_w * dice
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -408,15 +472,18 @@ def main(args):
         train_ds = CSVDataset(args.train_csv, args.image_dir, args.mask_dir, train_aug())
         val_ds   = CSVDataset(args.val_csv,   args.image_dir, args.mask_dir, val_aug())
     else:
-        train_ds = FolderDataset(args.train_dir, train_aug(simulate_low_res=args.simulate_low_res), max_samples=args.max_samples)
-        val_ds   = FolderDataset(args.val_dir,   val_aug(),   max_samples=val_cap)
+        train_ds = FolderDataset(args.train_dir, train_aug(simulate_low_res=args.simulate_low_res), max_samples=args.max_samples, cache_ram=args.cache_ram)
+        val_ds   = FolderDataset(args.val_dir,   val_aug(),   max_samples=val_cap, cache_ram=args.cache_ram)
 
+    # persistent_workers avoids tearing down and re-forking the worker pool every
+    # epoch; with a RAM cache that re-fork would also re-touch the shared pages.
+    _extra = dict(persistent_workers=True, prefetch_factor=4) if args.workers else {}
     train_loader = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True,
-        num_workers=args.workers, pin_memory=True, drop_last=True)
+        num_workers=args.workers, pin_memory=True, drop_last=True, **_extra)
     val_loader = DataLoader(
         val_ds, batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, pin_memory=True)
+        num_workers=args.workers, pin_memory=True, **_extra)
 
     print(f"Train   : {len(train_ds)} crops  ({len(train_loader)} batches)")
     print(f"Val     : {len(val_ds)} crops  ({len(val_loader)} batches)")
@@ -455,6 +522,12 @@ def main(args):
     writer    = SummaryWriter(log_dir=str(Path(args.log_dir) / run_logger.stem / "tb"))
 
     # ── Resume ───────────────────────────────────────────────────────────────
+    global BOUNDARY_RELAX_PX
+    BOUNDARY_RELAX_PX = args.boundary_relax
+    if BOUNDARY_RELAX_PX:
+        print(f"Boundary-relaxed loss: ignoring +/-{BOUNDARY_RELAX_PX} px "
+              f"around every label edge")
+
     start_epoch   = 1
     best_val_iou  = 0.0
     patience_left = args.patience
@@ -467,6 +540,20 @@ def main(args):
         start_epoch  = ckpt["epoch"] + 1
         best_val_iou = ckpt.get("val_iou", 0.0)
         print(f"Resumed from {args.resume} (epoch {ckpt['epoch']}, IoU {best_val_iou:.4f})")
+
+    elif args.init_weights and Path(args.init_weights).exists():
+        # Weights only — NOT --resume. Resuming carries over epoch counter,
+        # optimizer state and best_val_iou, all of which are wrong when the new
+        # run trains on a different dataset: start_epoch would skip the run
+        # entirely, and inheriting a 0.8784 bar set on clean AIRS labels means no
+        # checkpoint ever gets written against noisier targets.
+        ckpt = torch.load(args.init_weights, map_location=device)
+        base_model = model.module if isinstance(model, nn.DataParallel) else model
+        base_model.load_state_dict(ckpt["model_state"])
+        print(f"Initialised weights from {args.init_weights} "
+              f"(source epoch {ckpt.get('epoch','?')}, source IoU "
+              f"{ckpt.get('val_iou', float('nan')):.4f}); "
+              f"optimizer and epoch counter reset")
 
     # ── Training loop ────────────────────────────────────────────────────────
     train_metrics = GlobalMetrics(args.threshold)
@@ -557,6 +644,10 @@ def parse_args():
     g = p.add_argument_group("Data — folder mode (pre-tiled crops)")
     g.add_argument("--train_dir",    default=None, help="Dir with images/ masks/ for training")
     g.add_argument("--val_dir",      default=None, help="Dir with images/ masks/ for validation")
+    g.add_argument("--cache_ram", action="store_true",
+                   help="decode the whole crop set into RAM once. Measured: PNG "
+                        "decode is 11.6 ms/image on this node and the GPU idles "
+                        "in a 0->97%% sawtooth waiting for it")
     g.add_argument("--max_samples",  type=int, default=None,
                    help="Cap training samples (val capped proportionally). E.g. 2000 for quick test")
 
@@ -588,11 +679,19 @@ def parse_args():
     g5 = p.add_argument_group("Checkpoints")
     g5.add_argument("--ckpt_dir",   default="./checkpoints")
     g5.add_argument("--resume",     default=None,  help="Path to checkpoint to resume from")
+    g5.add_argument("--init_weights", default=None,
+                    help="Load model weights only from this checkpoint and reset "
+                         "optimizer/epoch/best-IoU. Use for fine-tuning onto a "
+                         "different dataset; --resume is for continuing a run.")
     g5.add_argument("--save_every", type=int, default=10,
                     help="Save a crash-recovery checkpoint every N epochs")
 
     # ── Domain adaptation ────────────────────────────────────────────────────
     g6 = p.add_argument_group("Domain adaptation")
+    g6.add_argument("--boundary_relax", type=int, default=0,
+                    help="Ignore a +/-N px band around each label edge in the "
+                         "loss. Targets the roof-vs-footprint offset in weakly "
+                         "supervised runs (Gap 4). 0 = off.")
     g6.add_argument("--simulate_low_res", action="store_true",
                     help="Add resolution simulation augmentation (Downscale 25-50%%). "
                          "Use when target domain is ~30cm/px (e.g. Indian govt imagery) "

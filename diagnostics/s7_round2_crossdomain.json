@@ -1,0 +1,89 @@
+{
+  "checkpoint": "experiments/2026-09-10-selftrain-round2/ckpt/unet_resnet34_30ep_20260910_142120/best.pth",
+  "results": {
+    "google_val (source)": {
+      "0.1": {
+        "iou": 0.8675,
+        "precision": 0.9137,
+        "recall": 0.9449
+      },
+      "0.2": {
+        "iou": 0.8695,
+        "precision": 0.9212,
+        "recall": 0.9394
+      },
+      "0.3": {
+        "iou": 0.8703,
+        "precision": 0.9256,
+        "recall": 0.9358
+      },
+      "0.4": {
+        "iou": 0.8707,
+        "precision": 0.929,
+        "recall": 0.9328
+      },
+      "0.5": {
+        "iou": 0.8708,
+        "precision": 0.9321,
+        "recall": 0.9298
+      },
+      "0.6": {
+        "iou": 0.8707,
+        "precision": 0.935,
+        "recall": 0.9268
+      },
+      "0.7": {
+        "iou": 0.8704,
+        "precision": 0.9381,
+        "recall": 0.9234
+      },
+      "0.8": {
+        "iou": 0.8695,
+        "precision": 0.9418,
+        "recall": 0.9189
+      }
+    },
+    "ign_val (TARGET)": {
+      "0.1": {
+        "iou": 0.6134,
+        "precision": 0.7904,
+        "recall": 0.7326
+      },
+      "0.2": {
+        "iou": 0.6129,
+        "precision": 0.8018,
+        "recall": 0.7224
+      },
+      "0.3": {
+        "iou": 0.6121,
+        "precision": 0.8088,
+        "recall": 0.7157
+      },
+      "0.4": {
+        "iou": 0.6113,
+        "precision": 0.8141,
+        "recall": 0.7104
+      },
+      "0.5": {
+        "iou": 0.6104,
+        "precision": 0.8191,
+        "recall": 0.7055
+      },
+      "0.6": {
+        "iou": 0.6093,
+        "precision": 0.824,
+        "recall": 0.7004
+      },
+      "0.7": {
+        "iou": 0.6079,
+        "precision": 0.8292,
+        "recall": 0.6949
+      },
+      "0.8": {
+        "iou": 0.6059,
+        "precision": 0.8358,
+        "recall": 0.6878
+      }
+    }
+  }
+}

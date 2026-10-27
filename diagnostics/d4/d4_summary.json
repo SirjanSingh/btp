@@ -1,0 +1,12 @@
+{
+  "source": "Google Open Buildings v3, Jaipur AOI",
+  "n_polygons": 318207,
+  "min_confidence": 0.75,
+  "tolerance_m": 0.5,
+  "adjacency_rate": 0.77972,
+  "mean_neighbours": 1.522,
+  "median_neighbours": 1,
+  "p90_neighbours": 3,
+  "max_neighbours": 9,
+  "frac_with_3plus": 0.19583
+}

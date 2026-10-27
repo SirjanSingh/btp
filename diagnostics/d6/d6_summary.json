@@ -1,0 +1,92 @@
+{
+  "gsd_true_m_per_px": 0.26618,
+  "gsd_gap_vs_airs": 3.549,
+  "n_crops_scored": 640,
+  "n_blank_skipped": 0,
+  "crop_px": 512,
+  "checkpoint": "rooftop/checkpoints/unet_resnet34_best.pth",
+  "ref_threshold": 0.35,
+  "predicted_fg_fraction": {
+    "0.05": {
+      "mean": 0.10192,
+      "median": 0.08695,
+      "p10": 0.00067,
+      "p90": 0.21825,
+      "frac_crops_empty": 0.0891
+    },
+    "0.1": {
+      "mean": 0.08139,
+      "median": 0.06623,
+      "p10": 0.00026,
+      "p90": 0.17753,
+      "frac_crops_empty": 0.0969
+    },
+    "0.2": {
+      "mean": 0.06645,
+      "median": 0.0515,
+      "p10": 4e-05,
+      "p90": 0.14878,
+      "frac_crops_empty": 0.1047
+    },
+    "0.3": {
+      "mean": 0.0594,
+      "median": 0.0449,
+      "p10": 0.0,
+      "p90": 0.13242,
+      "frac_crops_empty": 0.1125
+    },
+    "0.35": {
+      "mean": 0.05687,
+      "median": 0.04246,
+      "p10": 0.0,
+      "p90": 0.1268,
+      "frac_crops_empty": 0.1156
+    },
+    "0.4": {
+      "mean": 0.05468,
+      "median": 0.04051,
+      "p10": 0.0,
+      "p90": 0.12272,
+      "frac_crops_empty": 0.1187
+    },
+    "0.5": {
+      "mean": 0.05082,
+      "median": 0.03649,
+      "p10": 0.0,
+      "p90": 0.11572,
+      "frac_crops_empty": 0.1203
+    },
+    "0.6": {
+      "mean": 0.04713,
+      "median": 0.03269,
+      "p10": 0.0,
+      "p90": 0.10974,
+      "frac_crops_empty": 0.1203
+    },
+    "0.7": {
+      "mean": 0.0431,
+      "median": 0.02895,
+      "p10": 0.0,
+      "p90": 0.10139,
+      "frac_crops_empty": 0.1328
+    }
+  },
+  "per_tile_mean_fg": {
+    "map67_1-1.tif": 0.11011,
+    "map67_1-2.tif": 0.10805,
+    "map67_1-3.tif": 0.07021,
+    "map67_1-4.tif": 0.04094,
+    "map67_2-1.tif": 0.06011,
+    "map67_2-2.tif": 0.05846,
+    "map67_2-3.tif": 0.04219,
+    "map67_2-4.tif": 0.07706,
+    "map67_3-1.tif": 0.04037,
+    "map67_3-2.tif": 0.07732,
+    "map67_3-3.tif": 0.07274,
+    "map67_3-4.tif": 0.05887,
+    "map67_4-1.tif": 0.0095,
+    "map67_4-2.tif": 0.04081,
+    "map67_4-3.tif": 0.01415,
+    "map67_4-4.tif": 0.02904
+  }
+}

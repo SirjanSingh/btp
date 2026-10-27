@@ -1,0 +1,17 @@
+{
+  "checkpoint": "experiments/2026-09-11-selftrain-eroded-pseudo/ckpt_e04/unet_mit_b2_40ep_20260910_210834/best.pth",
+  "encoder": "mit_b2",
+  "val_dir": "data/jaipur_weak/val",
+  "threshold": 0.7,
+  "min_overlap": 0.5,
+  "min_area_px": 50,
+  "n_label_components": 27918,
+  "n_pred_components": 27349,
+  "merge_rate": 0.2427,
+  "split_rate": 0.0926,
+  "split_rate_strict": 0.0,
+  "fragments_per_label": 0.8963,
+  "split_overlap": 0.1,
+  "missed_rate": 0.4231,
+  "pred_per_label": 0.9796
+}

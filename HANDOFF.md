@@ -6,38 +6,16 @@ the source is named next to it.
 
 ---
 
-## 1. Read this before anything else: the work is on two branches
+## 1. Branches (updated: merged on 27 Oct 2026)
 
-The repo has two branches that have **diverged**, and neither contains the other.
+`feat/init-project-setup` has now been merged into `master`, so a fresh checkout of `master`
+contains both the plan docs and the September experiments. The table below describes where each
+set of work was done; before the merge the two branches had **diverged** and neither contained
+the other. Keep running `git fetch --all` before you describe the project state, because a
+stale checkout once made a session declare that `plan/` did not exist.
 
-| Branch | What is on it |
-|---|---|
-| `master` (default) | `plan/` docs 01 to 11, including the SAM 3 plan (`09`), the Oct 2026 do/don't page (`10`), the domain adaptation baselines (`11`), and the reading list |
-| `feat/init-project-setup` | **All the September experiments** (168 commits, 9 to 12 Sep, run on the DGX): `experiments/`, `diagnostics/`, `scripts/`, `labelling/`, `docs/sessions/`, `docs/PITFALLS.md`, `.planning/MASTER_CONTEXT.md` |
-
-If you only check out `master` you will not see any experiment results, and it will look like
-the project has no code beyond the first rooftop and solar scripts. That mistake has already
-been made twice. Do this first:
-
-```bash
-git fetch --all
-git log --oneline origin/master..origin/feat/init-project-setup | wc -l   # 168
-git log --oneline origin/feat/init-project-setup..origin/master | wc -l   # 9
-```
-
-To read a file from the other branch without switching:
-
-```bash
-git show origin/feat/init-project-setup:.planning/MASTER_CONTEXT.md
-```
-
-(In Git Bash on Windows, set `MSYS_NO_PATHCONV=1` first or the `ref:path` argument gets mangled.)
-
-The two branches need merging in both directions. Until that is done, treat
-`origin/feat/init-project-setup` as the source of truth for results and `master` as the source
-of truth for the plan.
-
----
+| Where the work was done | What it is |
+|---
 
 ## 2. What the project is now
 

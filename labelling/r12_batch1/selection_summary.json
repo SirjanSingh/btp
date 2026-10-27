@@ -1,0 +1,43 @@
+{
+  "generated_from": "/tmp/btp_data/jaipur_weak",
+  "seed": 42,
+  "n_total_crops_scanned": 9072,
+  "n_selected": 30,
+  "n_working": 20,
+  "n_sealed": 10,
+  "per_bin_target": 6,
+  "bin_population": {
+    "dense": 1626,
+    "empty": 833,
+    "moderate": 2015,
+    "sparse": 2344,
+    "very_dense": 2254
+  },
+  "bin_selected": {
+    "empty": 6,
+    "sparse": 6,
+    "moderate": 6,
+    "dense": 6,
+    "very_dense": 6
+  },
+  "tiles_covered": [
+    "map67_1-1",
+    "map67_1-2",
+    "map67_1-3",
+    "map67_1-4",
+    "map67_2-1",
+    "map67_2-2",
+    "map67_2-3",
+    "map67_2-4",
+    "map67_3-1",
+    "map67_3-2",
+    "map67_3-3",
+    "map67_3-4",
+    "map67_4-1",
+    "map67_4-2",
+    "map67_4-3",
+    "map67_4-4"
+  ],
+  "ob_fg_fraction_selected_mean": 0.20508,
+  "protocol": "labels/ starts EMPTY and must be drawn without consulting openbuildings_reference/ -- pre-filling makes the OB accuracy question unanswerable by construction"
+}
