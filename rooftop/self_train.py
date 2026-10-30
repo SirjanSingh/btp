@@ -42,6 +42,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import segmentation_models_pytorch as smp
 from albumentations.pytorch import ToTensorV2
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
@@ -191,6 +192,127 @@ def adabn(model, loader, device, n_batches):
     model.eval()
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# BLDA — Balanced Learning for Domain Adaptation (Li et al., ICML 2025),
+# online logits adjustment (Sec. 3.3.4 / Algorithm 1) + cumulative density
+# estimation loss (Sec. 3.3.5), written for this repo's 1-logit binary model.
+#
+# Binary reduction: a sigmoid logit z is the 2-class softmax with logits
+# (bg, roof) = (-z/2, +z/2). Let v = z/2. Then
+#   P_11 = dist(v | y=1)  (roof positive)     P_01 = dist(v | y=0)  (roof negative)
+#   P_00 = mirror of P_01 (bg positive)        P_10 = mirror of P_11 (bg negative)
+#   anchor P_p = pooled positives {v|y=1} U {-v|y=0}, anchor P_n = mirror of P_p.
+# Working Algorithm 1 through, the bg offset is minus the roof offset, so the
+# adjusted softmax is exactly a binary logit  z_adj = z - 2*tau*delta(v, y)  with
+#   delta(v, 1) = Fp^-1(F_11(v)) - v
+#   delta(v, 0) = Fn^-1(F_01(v)) - v = -Fp^-1(1 - F_01(v)) - v
+# and the CDE regression target d = F_11(v) for y=1, 1 - F_01(v) for y=0.
+# Paper settings used as defaults: K=5, momentum 0.99, T=3 EM loops, tau 0.1,
+# lambda 0.2. N_min (minimum samples to update a GMM) is not given numerically
+# in the paper; 1000 is our choice.
+# ─────────────────────────────────────────────────────────────────────────────
+
+class GMM1D:
+    """1-D Gaussian mixture, momentum-based EM (Algorithm 1, lines 11-16)."""
+
+    def __init__(self, k=5, momentum=0.99, em_loops=3, n_min=1000, max_samples=20000):
+        self.k, self.m, self.t, self.n_min, self.max_s = k, momentum, em_loops, n_min, max_samples
+        self.mu = self.sig = self.pi = None
+        self.stale = 0  # iterations since last update (n in the paper)
+
+    @property
+    def ready(self):
+        return self.mu is not None
+
+    @torch.no_grad()
+    def update(self, x):
+        self.stale += 1
+        x = x.detach().float().flatten()
+        if x.numel() < self.n_min:
+            return
+        if x.numel() > self.max_s:
+            x = x[torch.randint(0, x.numel(), (self.max_s,), device=x.device)]
+        if self.mu is None:
+            q = (torch.arange(self.k, device=x.device, dtype=torch.float32) + 0.5) / self.k
+            mu = torch.quantile(x, q)
+            sig = x.std().clamp(min=1e-2).repeat(self.k)
+            pi = torch.full((self.k,), 1.0 / self.k, device=x.device)
+        else:
+            mu, sig, pi = self.mu.clone(), self.sig.clone(), self.pi.clone()
+        for _ in range(self.t):
+            logp = -0.5 * ((x[:, None] - mu) / sig) ** 2 - torch.log(sig) + torch.log(pi)
+            r = torch.softmax(logp, dim=1)
+            nk = r.sum(0) + 1e-6
+            pi = nk / nk.sum()
+            mu = (r * x[:, None]).sum(0) / nk
+            sig = torch.sqrt((r * (x[:, None] - mu) ** 2).sum(0) / nk).clamp(min=1e-3)
+        if self.mu is None:
+            self.mu, self.sig, self.pi = mu, sig, pi
+        else:
+            w = self.m ** self.stale
+            self.mu = (1 - w) * mu + w * self.mu
+            self.sig = (1 - w) * sig + w * self.sig
+            self.pi = (1 - w) * pi + w * self.pi
+        self.stale = 0
+
+    def cdf(self, z):
+        return (self.pi * torch.special.ndtr((z[..., None] - self.mu) / self.sig)).sum(-1)
+
+    def icdf(self, u, n_grid=2048):
+        lo = (self.mu - 6 * self.sig).min()
+        hi = (self.mu + 6 * self.sig).max()
+        g = torch.linspace(lo.item(), hi.item(), n_grid, device=u.device)
+        c = self.cdf(g)
+        c = torch.cummax(c, 0).values  # guard monotonicity
+        u = u.clamp(c[0], c[-1])
+        idx = torch.searchsorted(c, u.contiguous()).clamp(1, n_grid - 1)
+        c0, c1, g0, g1 = c[idx - 1], c[idx], g[idx - 1], g[idx]
+        return g0 + (u - c0) / (c1 - c0).clamp(min=1e-12) * (g1 - g0)
+
+
+class BLDABinary:
+    def __init__(self, a, device):
+        mk = lambda: GMM1D(a.blda_k, a.blda_momentum, a.blda_em, a.blda_nmin)
+        self.src = {1: mk(), 0: mk()}
+        self.tgt = {1: mk(), 0: mk()}
+        self.anchor = mk()  # P_p; P_n is its mirror image
+        self.tau = a.blda_tau
+
+    @torch.no_grad()
+    def update(self, v_src, y_src, v_tgt, y_tgt, valid_tgt):
+        pos, neg = y_src > 0.5, y_src <= 0.5
+        self.src[1].update(v_src[pos]); self.src[0].update(v_src[neg])
+        self.anchor.update(torch.cat([v_src[pos], -v_src[neg]]))
+        tp, tn = valid_tgt & (y_tgt > 0.5), valid_tgt & (y_tgt <= 0.5)
+        self.tgt[1].update(v_tgt[tp]); self.tgt[0].update(v_tgt[tn])
+
+    def ready(self, dom):
+        g = self.src if dom == "src" else self.tgt
+        return g[1].ready and g[0].ready and self.anchor.ready
+
+    @torch.no_grad()
+    def offset_and_cde(self, v, y, dom):
+        g = self.src if dom == "src" else self.tgt
+        pos = y > 0.5
+        f1 = g[1].cdf(v).clamp(1e-6, 1 - 1e-6)
+        f0 = g[0].cdf(v).clamp(1e-6, 1 - 1e-6)
+        d_pos = self.anchor.icdf(f1) - v
+        d_neg = -self.anchor.icdf(1 - f0) - v
+        delta = torch.where(pos, d_pos, d_neg)
+        cde = torch.where(pos, f1, 1 - f0)
+        return delta, cde
+
+
+def forward_with_features(model, x):
+    """smp Unet forward that also returns the decoder output (for the CDE head)."""
+    feats = model.encoder(x)
+    dec = model.decoder(*feats)
+    return model.segmentation_head(dec), dec
+
+
+_DICE = smp.losses.DiceLoss(mode="binary", from_logits=True)
+
+
 def pseudo_label_loss(student_logits, teacher_logits, hi, lo):
     """BCE on confident teacher pixels only. Returns (loss, kept_frac, pos_frac)."""
     p = torch.sigmoid(teacher_logits.detach())
@@ -241,11 +363,20 @@ def main(a):
     for p in teacher.parameters():
         p.requires_grad_(False)
 
-    opt = torch.optim.AdamW([
+    groups = [
         {"params": student.encoder.parameters(), "lr": a.lr * 0.1},
         {"params": student.decoder.parameters(), "lr": a.lr},
         {"params": student.segmentation_head.parameters(), "lr": a.lr},
-    ], weight_decay=1e-4)
+    ]
+    blda, cde_head = None, None
+    if a.blda:
+        blda = BLDABinary(a, device)
+        dec_ch = student.segmentation_head[0].in_channels
+        cde_head = nn.Conv2d(dec_ch, 1, kernel_size=1).to(device)  # CDE regression head (Sec. 3.3.5)
+        groups.append({"params": cde_head.parameters(), "lr": a.lr})
+        print(f"BLDA on: K={a.blda_k} momentum={a.blda_momentum} T={a.blda_em} "
+              f"tau={a.blda_tau} lambda={a.blda_lambda} start={a.blda_start}")
+    opt = torch.optim.AdamW(groups, weight_decay=1e-4)
     scaler = torch.cuda.amp.GradScaler(enabled=(device.type == "cuda"))
 
     # ── logging ──
@@ -284,7 +415,9 @@ def main(a):
         snapshot(0, {"tag": "adabn"})
 
     src_it, tgt_it = infinite(src_loader), infinite(tgt_loader)
-    best, run_stats = -1.0, {"kept": 0.0, "pos": 0.0, "lt": 0.0, "ls": 0.0, "n": 0}
+    fresh_stats = lambda: {"kept": 0.0, "pos": 0.0, "lt": 0.0, "ls": 0.0, "n": 0,
+                           "delta_roof": 0.0, "cde": 0.0, "blda_on": 0.0}
+    best, run_stats = -1.0, fresh_stats()
     t0 = time.time()
     pbar = tqdm(range(1, a.iters + 1), dynamic_ncols=True)
     for it in pbar:
@@ -297,9 +430,46 @@ def main(a):
         with torch.cuda.amp.autocast(enabled=(device.type == "cuda")):
             with torch.no_grad():
                 t_logits = teacher(tw)
-            l_src = combined_loss(student(sx), sy)
-            l_tgt, kept, pos = pseudo_label_loss(student(ts), t_logits, a.pl_hi, a.pl_lo)
+            if blda is None:
+                l_src = combined_loss(student(sx), sy)
+                l_tgt, kept, pos = pseudo_label_loss(student(ts), t_logits, a.pl_hi, a.pl_lo)
+                loss = l_src + lam * l_tgt
+            else:
+                s_logits, s_dec = forward_with_features(student, sx)
+                u_logits, u_dec = forward_with_features(student, ts)
+
+        if blda is not None:
+            # BLDA losses in fp32 (GMM/CDF maths is not fp16-safe)
+            s_logits, u_logits = s_logits.float(), u_logits.float()
+            p_t = torch.sigmoid(t_logits.float())
+            y_t = (p_t >= a.pl_hi).float()
+            valid = (p_t >= a.pl_hi) | (p_t <= a.pl_lo)
+            v_s, v_u = s_logits / 2, u_logits / 2
+            blda.update(v_s, sy, v_u, y_t, valid)
+            vf = valid.float(); nv = vf.sum().clamp(min=1.0)
+            kept = vf.mean().item()
+            pos = ((y_t * vf).sum() / nv).item()
+            on = it >= a.blda_start and blda.ready("src") and blda.ready("tgt")
+            if on:
+                d_s, c_s = blda.offset_and_cde(v_s.detach(), sy, "src")
+                d_u, c_u = blda.offset_and_cde(v_u.detach(), y_t, "tgt")
+                z_s = s_logits - 2 * blda.tau * d_s
+                z_u = u_logits - 2 * blda.tau * d_u
+            else:
+                z_s, z_u = s_logits, u_logits
+            l_src = 0.5 * F.binary_cross_entropy_with_logits(z_s, sy) \
+                + 0.5 * _DICE(s_logits, sy)
+            bce_u = F.binary_cross_entropy_with_logits(z_u, y_t, reduction="none")
+            l_tgt = (bce_u * vf).sum() / nv
             loss = l_src + lam * l_tgt
+            if on:
+                r_s = torch.sigmoid(cde_head(s_dec.float()))
+                r_u = torch.sigmoid(cde_head(u_dec.float()))
+                l_cde = ((r_s - c_s) ** 2).mean() + (((r_u - c_u) ** 2) * vf).sum() / nv
+                loss = loss + a.blda_lambda * l_cde
+                run_stats["delta_roof"] += (d_u * y_t * vf).sum().item() / max((y_t * vf).sum().item(), 1.0)
+                run_stats["cde"] += l_cde.item()
+            run_stats["blda_on"] += float(on)
 
         opt.zero_grad()
         scaler.scale(loss).backward()
@@ -318,7 +488,12 @@ def main(a):
                      "pseudo_label_kept_frac": round(run_stats["kept"] / n, 4),
                      "pseudo_label_roof_frac": round(run_stats["pos"] / n, 4),
                      "elapsed_min": round((time.time() - t0) / 60, 1)}
-            run_stats = {"kept": 0.0, "pos": 0.0, "lt": 0.0, "ls": 0.0, "n": 0}
+            if blda is not None:
+                on = max(run_stats["blda_on"], 1.0)
+                extra.update({"blda_active_frac": round(run_stats["blda_on"] / n, 3),
+                              "blda_mean_roof_offset": round(run_stats["delta_roof"] / on, 4),
+                              "blda_avg_cde_loss": round(run_stats["cde"] / on, 4)})
+            run_stats = fresh_stats()
             row = snapshot(it, extra)
             score = row["teacher_target"]["best_iou"] if "teacher_target" in row else it
             torch.save({"model_state": teacher.state_dict(), "iter": it}, ckpt_dir / "last_teacher.pth")
@@ -357,6 +532,16 @@ def parse_args():
     g.add_argument("--pl_lo", type=float, default=0.2, help="p<=lo -> pseudo background")
     g.add_argument("--lam", type=float, default=1.0, help="Weight of target pseudo-label loss")
     g.add_argument("--warmup", type=int, default=500, help="Iterations to ramp lam from 0")
+    g = p.add_argument_group("BLDA (Li et al., ICML 2025) — defaults are the paper's")
+    g.add_argument("--blda", action="store_true", help="Enable BLDA logit adjustment + CDE loss")
+    g.add_argument("--blda_k", type=int, default=5, help="Gaussian components per GMM")
+    g.add_argument("--blda_momentum", type=float, default=0.99)
+    g.add_argument("--blda_em", type=int, default=3, help="EM loops per iteration")
+    g.add_argument("--blda_tau", type=float, default=0.1, help="Scaling/temperature on the offset")
+    g.add_argument("--blda_lambda", type=float, default=0.2, help="CDE regression loss weight")
+    g.add_argument("--blda_nmin", type=int, default=1000, help="Min samples to update a GMM (our choice)")
+    g.add_argument("--blda_start", type=int, default=100, help="Iteration to start applying offsets")
+    g = p.add_argument_group("Self-training (cont.)")
     g.add_argument("--adabn_batches", type=int, default=0,
                    help="If >0, recompute BN stats on this many target batches before self-training")
     g.add_argument("--eval_every", type=int, default=500)
