@@ -173,6 +173,24 @@ def ema_update(teacher, student, alpha):
         bt.copy_(bs)
 
 
+@torch.no_grad()
+def adabn(model, loader, device, n_batches):
+    """AdaBN: recompute BatchNorm running statistics on unlabelled target tiles.
+    No gradients, no labels. Cumulative average over n_batches (momentum=None)."""
+    bns = [m for m in model.modules() if isinstance(m, nn.modules.batchnorm._BatchNorm)]
+    for m in bns:
+        m.reset_running_stats()
+        m.momentum = None
+    model.train()
+    for i, (weak, _) in enumerate(loader):
+        if i >= n_batches:
+            break
+        model(weak.to(device))
+    for m in bns:
+        m.momentum = 0.1
+    model.eval()
+
+
 def pseudo_label_loss(student_logits, teacher_logits, hi, lo):
     """BCE on confident teacher pixels only. Returns (loss, kept_frac, pos_frac)."""
     p = torch.sigmoid(teacher_logits.detach())
@@ -198,7 +216,7 @@ def main(a):
     val_names = ()
     val_loader = None
     if a.val_target_dir:
-        val_ds = FolderDataset(a.val_target_dir, val_aug())
+        val_ds = FolderDataset(a.val_target_dir, val_aug(), a.max_val)
         val_names = [p.name for p in val_ds.paths]
         val_loader = DataLoader(val_ds, batch_size=a.batch_size, shuffle=False,
                                 num_workers=a.workers)
@@ -258,7 +276,12 @@ def main(a):
         return row
 
     print("\n-- Iteration 0 = source-only baseline (no adaptation) --")
-    snapshot(0)
+    snapshot(0, {"tag": "source_only"})
+    if a.adabn_batches > 0:
+        print(f"\n-- AdaBN on {a.adabn_batches} unlabelled target batches (no labels) --")
+        adabn(student, tgt_loader, device, a.adabn_batches)
+        teacher.load_state_dict(student.state_dict())
+        snapshot(0, {"tag": "adabn"})
 
     src_it, tgt_it = infinite(src_loader), infinite(tgt_loader)
     best, run_stats = -1.0, {"kept": 0.0, "pos": 0.0, "lt": 0.0, "ls": 0.0, "n": 0}
@@ -317,6 +340,7 @@ def parse_args():
                    help="Hand-labelled target crops (images/ masks/). MEASURE ONLY, excluded from training.")
     g.add_argument("--max_src", type=int, default=None)
     g.add_argument("--max_src_val", type=int, default=None)
+    g.add_argument("--max_val", type=int, default=None, help="Cap target val crops (smoke tests only)")
     g.add_argument("--max_target", type=int, default=None)
     g.add_argument("--crop", type=int, default=512)
     g.add_argument("--simulate_low_res", action="store_true",
@@ -333,6 +357,8 @@ def parse_args():
     g.add_argument("--pl_lo", type=float, default=0.2, help="p<=lo -> pseudo background")
     g.add_argument("--lam", type=float, default=1.0, help="Weight of target pseudo-label loss")
     g.add_argument("--warmup", type=int, default=500, help="Iterations to ramp lam from 0")
+    g.add_argument("--adabn_batches", type=int, default=0,
+                   help="If >0, recompute BN stats on this many target batches before self-training")
     g.add_argument("--eval_every", type=int, default=500)
     g = p.add_argument_group("Misc")
     g.add_argument("--workers", type=int, default=4)
