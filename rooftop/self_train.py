@@ -314,6 +314,22 @@ _DICE = smp.losses.DiceLoss(mode="binary", from_logits=True)
 
 
 @torch.no_grad()
+def ratio_thresholds(t_logits, r0, lo_default):
+    """Label-free class-ratio anchor: pick the roof threshold so the batch's roof
+    pseudo-labels make up a fraction r0 of pixels, where r0 is the roof share the
+    adapted model itself predicted on UNLABELLED target tiles before training (no
+    Open Buildings or other labels). Background keeps lo_default, or sits just
+    below the roof threshold if that falls under it."""
+    p = torch.sigmoid(t_logits.float()).flatten()
+    if p.numel() > 2 ** 24:
+        p = p[torch.randint(0, p.numel(), (2 ** 24,), device=p.device)]
+    hi = float(torch.quantile(p, 1.0 - r0).item()) if r0 > 0 else 1.0
+    hi = min(max(hi, 1e-3), 0.99)
+    lo = min(lo_default, hi - 1e-6)
+    return hi, lo
+
+
+@torch.no_grad()
 def mix_batch(sx, sy, ts, t_logits, hi, lo, mode="dacs"):
     """DACS-style cross-domain mixing (Tranheden et al., WACV 2021), binary form.
 
@@ -394,6 +410,8 @@ def main(a):
         {"params": student.decoder.parameters(), "lr": a.lr},
         {"params": student.segmentation_head.parameters(), "lr": a.lr},
     ]
+    if a.pl_ratio_anchor and not a.mix:
+        raise SystemExit("--pl_ratio_anchor is implemented for the --mix path only")
     if a.mix and a.blda:
         raise SystemExit("--mix with --blda is not implemented yet; run them separately")
     blda, cde_head = None, None
@@ -441,10 +459,15 @@ def main(a):
         adabn(student, tgt_loader, device, a.adabn_batches)
         teacher.load_state_dict(student.state_dict())
         snapshot(0, {"tag": "adabn"})
+    r0 = None
+    if a.pl_ratio_anchor:
+        r0 = unlabelled_stats(teacher, tgt_loader, device, max_batches=a.anchor_batches)["pred_roof_fraction"]
+        record["pl_ratio_anchor_r0"] = r0
+        print(f"Pseudo-label ratio anchor r0 = {r0:.4f} (model's own roof share on unlabelled target)")
 
     src_it, tgt_it = infinite(src_loader), infinite(tgt_loader)
     fresh_stats = lambda: {"kept": 0.0, "pos": 0.0, "lt": 0.0, "ls": 0.0, "n": 0,
-                           "delta_roof": 0.0, "cde": 0.0, "blda_on": 0.0, "mix_paste": 0.0}
+                           "delta_roof": 0.0, "cde": 0.0, "blda_on": 0.0, "mix_paste": 0.0, "pl_hi_used": 0.0}
     best, run_stats = -1.0, fresh_stats()
     t0 = time.time()
     pbar = tqdm(range(1, a.iters + 1), dynamic_ncols=True)
@@ -460,8 +483,12 @@ def main(a):
                 t_logits = teacher(tw)
             if blda is None and a.mix:
                 l_src = combined_loss(student(sx), sy)
+                hi_b, lo_b = a.pl_hi, a.pl_lo
+                if r0 is not None:
+                    hi_b, lo_b = ratio_thresholds(t_logits, r0, a.pl_lo)
+                    run_stats["pl_hi_used"] += hi_b
                 xm, ym, vm, pasted, n_tv, n_tpos = mix_batch(sx, sy, ts, t_logits,
-                                                              a.pl_hi, a.pl_lo, a.mix_mode)
+                                                              hi_b, lo_b, a.mix_mode)
                 bce_m = F.binary_cross_entropy_with_logits(student(xm).float(), ym, reduction="none")
                 l_tgt = (bce_m * vm).sum() / vm.sum().clamp(min=1.0)
                 loss = l_src + lam * l_tgt
@@ -530,6 +557,8 @@ def main(a):
                      "elapsed_min": round((time.time() - t0) / 60, 1)}
             if a.mix:
                 extra["mix_pasted_frac"] = round(run_stats["mix_paste"] / n, 4)
+            if a.pl_ratio_anchor:
+                extra["pl_hi_used_mean"] = round(run_stats["pl_hi_used"] / n, 4)
             if blda is not None:
                 on = max(run_stats["blda_on"], 1.0)
                 extra.update({"blda_active_frac": round(run_stats["blda_on"] / n, 3),
@@ -577,6 +606,10 @@ def parse_args():
     g = p.add_argument_group("BLDA (Li et al., ICML 2025) — defaults are the paper's")
     g.add_argument("--mix", action="store_true",
                    help="DACS-style mixing: paste source class regions (true labels) into target images")
+    g.add_argument("--pl_ratio_anchor", action="store_true",
+                   help="Per batch, set the roof pseudo-label threshold so roof share = r0, the model's "
+                        "own roof fraction on unlabelled target after AdaBN (label-free)")
+    g.add_argument("--anchor_batches", type=int, default=20, help="Unlabelled batches used to measure r0")
     g.add_argument("--mix_mode", choices=["dacs", "roof"], default="dacs",
                    help="dacs = paste roof OR background (random per pair); roof = always paste roofs")
     g.add_argument("--blda", action="store_true", help="Enable BLDA logit adjustment + CDE loss")
