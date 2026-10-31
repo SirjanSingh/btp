@@ -313,6 +313,32 @@ def forward_with_features(model, x):
 _DICE = smp.losses.DiceLoss(mode="binary", from_logits=True)
 
 
+@torch.no_grad()
+def mix_batch(sx, sy, ts, t_logits, hi, lo, mode="dacs"):
+    """DACS-style cross-domain mixing (Tranheden et al., WACV 2021), binary form.
+
+    Per pair, a class-mask M is taken from the SOURCE label: in "dacs" mode one of the
+    two classes (roof or background) is chosen at random, as DACS selects half of the
+    classes present; in "roof" mode M is always the source roof pixels. Source pixels
+    under M are pasted onto the target image together with their TRUE labels; the rest
+    keep the teacher's pseudo-labels (confident pixels only, ignore band in between).
+    Returns mixed image, mixed label, valid mask, and the pasted fraction."""
+    B = sx.shape[0]
+    if mode == "roof":
+        m = (sy > 0.5).float()
+    else:
+        pick_roof = (torch.rand(B, 1, 1, 1, device=sx.device) < 0.5).float()
+        roof = (sy > 0.5).float()
+        m = pick_roof * roof + (1 - pick_roof) * (1 - roof)
+    p_t = torch.sigmoid(t_logits.float())
+    y_t = (p_t >= hi).float()
+    valid_t = ((p_t >= hi) | (p_t <= lo)).float()
+    xm = m * sx + (1 - m) * ts
+    ym = m * sy + (1 - m) * y_t
+    valid = torch.clamp(m + (1 - m) * valid_t, 0, 1)
+    return xm, ym, valid, m.mean().item(), ((1 - m) * valid_t).sum().item(), ((1 - m) * y_t * valid_t).sum().item()
+
+
 def pseudo_label_loss(student_logits, teacher_logits, hi, lo):
     """BCE on confident teacher pixels only. Returns (loss, kept_frac, pos_frac)."""
     p = torch.sigmoid(teacher_logits.detach())
@@ -368,6 +394,8 @@ def main(a):
         {"params": student.decoder.parameters(), "lr": a.lr},
         {"params": student.segmentation_head.parameters(), "lr": a.lr},
     ]
+    if a.mix and a.blda:
+        raise SystemExit("--mix with --blda is not implemented yet; run them separately")
     blda, cde_head = None, None
     if a.blda:
         blda = BLDABinary(a, device)
@@ -416,7 +444,7 @@ def main(a):
 
     src_it, tgt_it = infinite(src_loader), infinite(tgt_loader)
     fresh_stats = lambda: {"kept": 0.0, "pos": 0.0, "lt": 0.0, "ls": 0.0, "n": 0,
-                           "delta_roof": 0.0, "cde": 0.0, "blda_on": 0.0}
+                           "delta_roof": 0.0, "cde": 0.0, "blda_on": 0.0, "mix_paste": 0.0}
     best, run_stats = -1.0, fresh_stats()
     t0 = time.time()
     pbar = tqdm(range(1, a.iters + 1), dynamic_ncols=True)
@@ -430,7 +458,19 @@ def main(a):
         with torch.cuda.amp.autocast(enabled=(device.type == "cuda")):
             with torch.no_grad():
                 t_logits = teacher(tw)
-            if blda is None:
+            if blda is None and a.mix:
+                l_src = combined_loss(student(sx), sy)
+                xm, ym, vm, pasted, n_tv, n_tpos = mix_batch(sx, sy, ts, t_logits,
+                                                              a.pl_hi, a.pl_lo, a.mix_mode)
+                bce_m = F.binary_cross_entropy_with_logits(student(xm).float(), ym, reduction="none")
+                l_tgt = (bce_m * vm).sum() / vm.sum().clamp(min=1.0)
+                loss = l_src + lam * l_tgt
+                # stats over the TARGET-origin pixels only (comparable with unmixed runs)
+                n_t = (1.0 - pasted) * ym.numel()
+                kept = n_tv / max(n_t, 1.0)
+                pos = n_tpos / max(n_tv, 1.0)
+                run_stats["mix_paste"] += pasted
+            elif blda is None:
                 l_src = combined_loss(student(sx), sy)
                 l_tgt, kept, pos = pseudo_label_loss(student(ts), t_logits, a.pl_hi, a.pl_lo)
                 loss = l_src + lam * l_tgt
@@ -488,6 +528,8 @@ def main(a):
                      "pseudo_label_kept_frac": round(run_stats["kept"] / n, 4),
                      "pseudo_label_roof_frac": round(run_stats["pos"] / n, 4),
                      "elapsed_min": round((time.time() - t0) / 60, 1)}
+            if a.mix:
+                extra["mix_pasted_frac"] = round(run_stats["mix_paste"] / n, 4)
             if blda is not None:
                 on = max(run_stats["blda_on"], 1.0)
                 extra.update({"blda_active_frac": round(run_stats["blda_on"] / n, 3),
@@ -533,6 +575,10 @@ def parse_args():
     g.add_argument("--lam", type=float, default=1.0, help="Weight of target pseudo-label loss")
     g.add_argument("--warmup", type=int, default=500, help="Iterations to ramp lam from 0")
     g = p.add_argument_group("BLDA (Li et al., ICML 2025) — defaults are the paper's")
+    g.add_argument("--mix", action="store_true",
+                   help="DACS-style mixing: paste source class regions (true labels) into target images")
+    g.add_argument("--mix_mode", choices=["dacs", "roof"], default="dacs",
+                   help="dacs = paste roof OR background (random per pair); roof = always paste roofs")
     g.add_argument("--blda", action="store_true", help="Enable BLDA logit adjustment + CDE loss")
     g.add_argument("--blda_k", type=int, default=5, help="Gaussian components per GMM")
     g.add_argument("--blda_momentum", type=float, default=0.99)
