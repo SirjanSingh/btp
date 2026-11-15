@@ -1,5 +1,7 @@
 # R12 batch 2: 200 Jaipur crops for hand-labelling (100 each)
 
+> **Priyal:** start with [`PRIYAL_GUIDE.md`](PRIYAL_GUIDE.md) (tool setup, rules, how to send results back).
+
 Generated on the DGX on 2026-10-28 by `scripts/export_label_batches.py` (seed 7).
 None of these crops are in batch 1.
 
