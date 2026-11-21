@@ -112,10 +112,12 @@ again underestimates by about 22%.
    crop set contains **zero negative (no-panel) crops** because `prep_bdappv.py` skips images
    without masks. Every Stage 2 precision number so far measures the wrong task. The raw BDAPPV
    data is not on the DGX, so it has to be re-downloaded to fix this.
-5. **The AIRS source set is incomplete.** Only about 75 labelled pairs are on Drive against the
-   857 in the official split, and the 0.8784 baseline came from a deleted `/tmp`, so it is not
-   reproducible. Either fetch real AIRS (about 28 GB from airs-dataset.com), switch source set,
-   or lean fully on weak supervision, where the source set matters much less.
+5. **The AIRS source set is not on the DGX yet.** The full set (857 train + 94 val images with
+   labels) **is** on the master Drive folder: an earlier note claiming only ~75 pairs came from a
+   listing capped at 50 files per folder. On 2026-10-30 it started streaming to the DGX as crops
+   (`experiments/2026-10-30-annotation-free-selftrain/fetch_airs_crops.py`). The 0.8784 baseline
+   came from a deleted `/tmp`, so it stays unreproduced until a retrain on those crops.
+   `airs-dataset.com` now redirects to what looks like a parked domain; do not download from it.
 6. **Imagery licence is unresolved.** The Jaipur tiles look Google-sourced, and Google's terms
    forbid using Maps content to train, test or validate ML models. See `plan/07`. Labels are
    fine (Open Buildings is CC BY 4.0 or ODbL). The final report needs an explicit imagery

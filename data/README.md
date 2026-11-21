@@ -24,11 +24,14 @@ data/
 interrupted; re-run `scripts/fetch_drive_folder.py <folder> data/airs` (it skips
 files that already completed), then tile.
 
-**Do not try to finish the AIRS pull from Drive — it is not there.** The master Drive
-folder holds 75 unique labelled AIRS pairs against `train.txt`'s 857, and each
-`label/` folder is half `_vis` previews. Verified 2026-09-09 with gdown's 50-file
-cap raised; full enumeration and folder IDs in `plan/01-situation-and-assets.md` §2.
-Real AIRS comes from <https://www.airs-dataset.com/> (~28 GB) — but read
-`.planning/STATE.md` todo 1 first, because switching source domain is on the table.
+**Correction (2026-10-30): the full AIRS train set IS on Drive.** The full listing in
+`docs/drive_folder_listing.json` shows `DAtaset/dataset/train/image` = 857 images with
+their labels (each `label/` folder also holds a `_vis` preview per mask), plus 94 val.
+An earlier note here said only 75 pairs existed; that came from a listing still capped
+at 50 files per folder. The 857 train labels are already in `data/airs_full/`. Images
+are being streamed from Drive as 512×512 crops by
+`experiments/2026-10-30-annotation-free-selftrain/fetch_airs_crops.py` (into
+`data/airs_crops_v2/`, or `/tmp/btp_data/airs_crops_v2/` to stay outside the quota).
+Do not download from `airs-dataset.com`: it now redirects to what looks like a parked domain.
 
 Stage-2 (BDAPPV solar) data, when needed, goes in `data/bdappv/` and `data/bdappv_crops/`.
