@@ -1,0 +1,38 @@
+{
+ "raw": {
+  "calib": 0.5195,
+  "test": 0.5078
+ },
+ "global": {
+  "calib": 0.5506,
+  "test": 0.5348
+ },
+ "perbldg_pred": {
+  "calib": 0.5671,
+  "test": 0.5489
+ },
+ "perbldg_oracle": {
+  "calib": 0.609,
+  "test": 0.5838
+ },
+ "shift_stats_pred": {
+  "n_buildings": 2513,
+  "median_dy": 7.0,
+  "median_dx": -3.0,
+  "std_dy": 6.26,
+  "std_dx": 5.21,
+  "share_within_2px_of_global": 0.311
+ },
+ "shift_stats_oracle": {
+  "n_buildings": 2513,
+  "median_dy": 7.0,
+  "median_dx": -3.0,
+  "std_dy": 7.91,
+  "std_dx": 7.06,
+  "share_within_2px_of_global": 0.263
+ },
+ "oracle_dy_small_vs_large_bldgs": [
+  7.0,
+  7.0
+ ]
+}

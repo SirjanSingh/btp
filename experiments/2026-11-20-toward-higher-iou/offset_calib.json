@@ -1,0 +1,15 @@
+{
+ "half": "calib",
+ "n_crops_used": 58,
+ "n_crops": 76,
+ "median_dy": 7.0,
+ "median_dx": -3.0,
+ "iqr_dy": [
+  5.0,
+  10.0
+ ],
+ "iqr_dx": [
+  -5.0,
+  -1.25
+ ]
+}

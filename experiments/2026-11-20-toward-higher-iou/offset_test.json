@@ -1,0 +1,15 @@
+{
+ "half": "test",
+ "n_crops_used": 62,
+ "n_crops": 76,
+ "median_dy": 7.5,
+ "median_dx": -3.0,
+ "iqr_dy": [
+  5.0,
+  9.0
+ ],
+ "iqr_dx": [
+  -4.0,
+  -0.25
+ ]
+}

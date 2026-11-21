@@ -1,0 +1,105 @@
+{
+ "baseline": "r34_c0_shift",
+ "chosen_on_calib": "ft_B",
+ "best_on_test_ORACLE": "ft_B+tta",
+ "configs": {
+  "ft_B+tta": {
+   "thr": 0.5,
+   "calib_iou": 0.7696,
+   "test_iou": 0.688,
+   "test_area": 1.2298,
+   "diff_vs_baseline": [
+    0.03167615575304336,
+    0.021728880711161466,
+    0.04225457320171315
+   ]
+  },
+  "ens(r34_c0_shift,ft_B)+tta": {
+   "thr": 0.4,
+   "calib_iou": 0.7473,
+   "test_iou": 0.6827,
+   "test_area": 1.2618,
+   "diff_vs_baseline": [
+    0.02642221553023896,
+    0.019844230345833637,
+    0.034110190587052794
+   ]
+  },
+  "ft_B": {
+   "thr": 0.55,
+   "calib_iou": 0.7706,
+   "test_iou": 0.6819,
+   "test_area": 1.2275,
+   "diff_vs_baseline": [
+    0.025503974914179963,
+    0.01478509424272155,
+    0.03724709256354282
+   ]
+  },
+  "ens(r34_c0_shift,ft_B)": {
+   "thr": 0.4,
+   "calib_iou": 0.7486,
+   "test_iou": 0.6758,
+   "test_area": 1.2762,
+   "diff_vs_baseline": [
+    0.019493389141468906,
+    0.01308322682737564,
+    0.02682853788142105
+   ]
+  },
+  "r34_c0_shift+tta": {
+   "thr": 0.3,
+   "calib_iou": 0.7094,
+   "test_iou": 0.6665,
+   "test_area": 1.2775,
+   "diff_vs_baseline": [
+    0.010113749029714118,
+    0.00762864748953668,
+    0.013082129301912587
+   ]
+  },
+  "r34_c0_shift": {
+   "thr": 0.25,
+   "calib_iou": 0.7013,
+   "test_iou": 0.6564,
+   "test_area": 1.2961,
+   "diff_vs_baseline": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "budget": {
+  "ft_B": {
+   "iou_ignore_0px_band": 0.6818744476272808,
+   "iou_ignore_1px_band": 0.7067646451516192,
+   "iou_ignore_2px_band": 0.7253451671546798,
+   "iou_ignore_3px_band": 0.7380669985917211,
+   "error_px": 1910273,
+   "share_missed_buildings": 0.013839906652085853,
+   "share_false_buildings": 0.10118501386974532,
+   "share_boundary_partial": 0.8849750794781688
+  },
+  "ft_B+tta": {
+   "iou_ignore_0px_band": 0.6879788657893472,
+   "iou_ignore_1px_band": 0.7134094149372447,
+   "iou_ignore_2px_band": 0.7323856589292677,
+   "iou_ignore_3px_band": 0.7451798659140094,
+   "error_px": 1868742,
+   "share_missed_buildings": 0.008955222283225827,
+   "share_false_buildings": 0.09302996347275333,
+   "share_boundary_partial": 0.8980148142440209
+  },
+  "r34_c0_shift": {
+   "iou_ignore_0px_band": 0.656414542801038,
+   "iou_ignore_1px_band": 0.6777169896570686,
+   "iou_ignore_2px_band": 0.6941393202647168,
+   "iou_ignore_3px_band": 0.7057497469316384,
+   "error_px": 2159314,
+   "share_missed_buildings": 0.007463481457536977,
+   "share_false_buildings": 0.08295041851254611,
+   "share_boundary_partial": 0.9095861000299169
+  }
+ }
+}

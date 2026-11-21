@@ -1,0 +1,9 @@
+tag,group,ckpt
+r34_c0_shift,weak,experiments/2026-11-19-hand-label-model-scoring/ckpt/r34_c0_shift/unet_resnet34_40ep_20261119_172916/best.pth
+edge,overnight,data/iou/ckpt/edge/unet_resnet34_40ep_20261120_182358/best.pth
+dino,overnight,data/iou/ckpt/dino/unet_tu-convnext_tiny.dinov3_lvd1689m_40ep_20261120_175602/best.pth
+lab_align,overnight,data/iou/ckpt/lab_align/unet_resnet34_40ep_20261120_212248/best.pth
+lab_sam,overnight,data/iou/ckpt/lab_sam/unet_resnet34_40ep_20261120_212459/best.pth
+lab_align_sam,overnight,data/iou/ckpt/lab_align_sam/unet_resnet34_40ep_20261120_214318/best.pth
+st_soft_pred,overnight,data/iou/ckpt/st_soft_pred/unet_resnet34_40ep_20261120_215340/best.pth
+st_soft_fuse08,overnight,data/iou/ckpt/st_soft_fuse08/unet_resnet34_40ep_20261120_215644/best.pth
