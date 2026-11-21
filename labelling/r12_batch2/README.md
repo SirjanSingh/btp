@@ -31,3 +31,21 @@ Labelling rules are the same as batch 1 (see `../r12_batch1/README.md` and
 
 The imagery appears to be Google-sourced and its licence is unresolved, so do not
 push these images to the public repo.
+
+## Progress (19 Nov 2026): 152 crops, frozen as the eval set
+
+Labels come back as zips (not through GitHub) and are copied into each person's folder.
+A crop only counts as labelled once `labels/<name>` exists.
+
+| Folder | Crops | Labelled | Who drew them | Still open |
+|---|---|---|---|---|
+| `khushi/` | 50 | 50 | Khushi | none (7 blank crops added as empty: Open Buildings is empty there too) |
+| `priyal/` 1-50 | 50 | 50 | Priyal (LabelMe 6.3.1) | none |
+| `priyal/` 51-100 | 50 | 45 | Khushi, masks made with her `masks_with_gaps.py` (cuts a 2 px gap between touching buildings) | 9 blank crops added as empty (OB empty too); 5 blank crops dropped because OB has buildings there (`map67_3-1_002048_002560`, `map67_4-1_009216_008704`, `map67_4-2_001536_005120`, `map67_4-2_003584_000000`, `map67_4-2_004096_002560`) |
+| `sirjan/` | 50 | 7 | Sirjan | `map67_1-1_007680_004608` has a .json but is left out (may be unfinished) |
+
+Score against Open Buildings: `python scripts/eval_hand_labels.py score --batches labelling/r12_batch2`
+(writes `diagnostics/hand_labels/score.json`). On the labelled crops: IoU 0.50,
+precision 0.74, recall 0.61. Open Buildings sits about 6 px (1.6 m) north and 2 to 4 px east
+of the hand-drawn roofs for every annotator, and hand-drawn roof area is 1.0 to 1.4 times the
+Open Buildings area depending on the annotator.
