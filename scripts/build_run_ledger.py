@@ -43,7 +43,11 @@ JSON_GLOBS = [
     "experiments/*/outputs*/*.json",
     "diagnostics/*.json",
     "diagnostics/*/*.json",
+    # Iteration-logged UDA runs from 2026-10-30 on (self_train*.py, duda.py).
+    "experiments/*/logs/*.json",
 ]
+# Which history key holds the deployable network's target score, per script.
+HISTORY_TARGET_KEYS = ("small_target", "teacher_target")
 # " 12    0.2788    0.2622   0.6350   0.7767   0.7181   0.8458   8.26e-05  <- best"
 TXT_ROW = re.compile(
     r"^\s*(\d+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)")
@@ -79,6 +83,21 @@ def parse_txt(path):
     return rows
 
 
+def history_as_epochs(history):
+    """self_train*.py / duda.py log every N iterations, not per epoch. Map each
+    eval row to an epoch-shaped record at threshold 0.5 so curves stay comparable."""
+    rows = []
+    for h in history:
+        key = next((k for k in HISTORY_TARGET_KEYS if k in h), None)
+        if key is None:
+            continue
+        m = h[key]["by_threshold"]["0.5"]
+        rows.append({"epoch": h.get("iter"), "iou": m["iou"], "f1": m.get("f1"),
+                     "precision": m.get("precision"), "recall": m.get("recall"),
+                     "stage": h.get("stage", "")})
+    return rows
+
+
 def collect():
     seen, runs = set(), []
     for g in JSON_GLOBS:
@@ -98,6 +117,10 @@ def collect():
                 continue
             rel = os.path.relpath(path, ROOT)
             epochs = d.get("epochs") or []
+            last = None
+            if not epochs and isinstance(d.get("history"), list):
+                epochs = history_as_epochs(d["history"])
+                last = epochs[-1] if epochs else None
             best = max(epochs, key=lambda e: e.get("iou", -1)) if epochs else {}
             # Eval runs have no epoch list; their scores sit in a threshold sweep.
             # Without this they render as blank rows and look like failures.
@@ -124,6 +147,10 @@ def collect():
                 "threshold_sweep": d.get("threshold_sweep"),
                 "results": d.get("results"),
                 "epochs": epochs,
+                # For iteration-logged runs the agreed primary number is the LAST
+                # evaluation; best_* is then an oracle (selected on the eval set).
+                "last_iter": last and last["epoch"],
+                "last_iou": last and last["iou"],
             })
 
     # .txt logs with no JSON sibling — crashed runs live here, and a run that
@@ -213,6 +240,18 @@ def main():
             f"{iou} | {r['best_epoch'] or '—'} | — | — | — |")
         if r["best_f1"]:
             lines[-1] += f" {r['best_precision']:.4f} | {r['best_recall']:.4f} |"
+
+    uda = [r for r in runs if r.get("last_iou") is not None]
+    if uda:
+        lines += ["", "## Annotation-free UDA runs (iteration-logged)", "",
+                  "Primary number = **last** evaluation, fixed before the runs. `Best` is "
+                  "selected on the eval set, so it is an oracle upper bound only. Eval "
+                  "labels are Open Buildings footprints: these are agreement, not accuracy.", "",
+                  "| Run | Log | Evals | Last iter | **Last IoU@0.5** | Oracle best |",
+                  "|---|---|---|---|---|---|"]
+        for r in uda:
+            lines.append(f"| `{r['run_name']}` | `{r['log']}` | {r['n_epochs']} | "
+                         f"{r['last_iter']} | **{r['last_iou']:.4f}** | {r['best_iou']:.4f} |")
 
     crashed = [r for r in runs if r["n_epochs"] == 0]
     if crashed:

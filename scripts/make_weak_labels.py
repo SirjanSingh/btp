@@ -97,6 +97,18 @@ def main(a):
                                   transform=src.transform, fill=0,
                                   dtype=np.uint8) if shapes else \
                 np.zeros((src.height, src.width), np.uint8)
+            if a.shift_px != [0, 0]:
+                # Move the whole burned label by (dy, dx) pixels, zero-filling
+                # the edge it leaves. Hand labels (Nov 2026, 152 crops) put the
+                # Open Buildings footprints a median 7 px north and 3 px east of
+                # the roofs seen in the image, the same on every tile, so
+                # --shift_px 7 -3 moves the labels back onto the roofs.
+                dy, dx = a.shift_px
+                sh = np.zeros_like(mask_full)
+                H, W = mask_full.shape
+                sh[max(dy, 0):H + min(dy, 0), max(dx, 0):W + min(dx, 0)] = \
+                    mask_full[max(-dy, 0):H + min(-dy, 0), max(-dx, 0):W + min(-dx, 0)]
+                mask_full = sh
 
             n_here = 0
             for top in range(0, src.height - a.crop + 1, a.stride):
@@ -137,6 +149,7 @@ def main(a):
         "crop_px": a.crop,
         "stride": a.stride,
         "min_confidence": a.min_conf,
+        "shift_px_dy_dx": a.shift_px,
         "val_tiles": sorted(VAL_TILES),
         "label_semantics": "Open Buildings GROUND FOOTPRINTS, not roof outlines "
                            "(MASTER_CONTEXT Gap 4) — targets are noisy",
@@ -169,6 +182,9 @@ if __name__ == "__main__":
     p.add_argument("--masks_only", action="store_true",
                    help="write masks but not images (symlink images from an "
                         "existing set; they are identical across cutoffs)")
+    p.add_argument("--shift_px", type=int, nargs=2, default=[0, 0], metavar=("DY", "DX"),
+                   help="shift the rasterised labels by DY rows (+ = south) and DX "
+                        "columns (+ = east); 7 -3 matches the hand labels")
     p.add_argument("--limit_tiles", type=int, default=0,
                    help="only process the first N tiles (smoke test)")
     a = p.parse_args()
