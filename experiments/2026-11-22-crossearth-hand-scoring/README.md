@@ -113,6 +113,33 @@ at ~0.70-0.71 whichever teacher is used; the 95% CI is about +-0.027, so none of
 (<= 0.01) is resolved. Test IoU was flat from epoch ~5 of the 15-epoch runs. S2A maps:
 `data/jaipur_teacher_s2a` on the DGX. JSONs: `diagnostics/hand_labels/student_a2s_soft{,_s1,_s2}.json`.
 
+### Self-training CrossEarth itself (2026-11-23)
+Fine-tune CrossEarth's Reins adapters + Mask2Former head (DINOv2-L stays frozen), starting from
+WHU-Building-A2S, on 8,920 unlabelled Jaipur tiles with hard pseudo-labels from the averaged A2S+S2A
+teacher (8-way TTA). Pseudo-label cut-offs were set on the CALIB half only: roof where teacher >= 0.50
+(82 % precise), background where <= 0.30 (98.6 % precise), 255 (ignored) in between; result 23 % roof,
+16 % ignored. 6,000 iterations, batch 2, AdamW lr 2e-5, random resize 0.75-1.5 + 512 crop + flip +
+colour jitter, ~65 min on one V100. No Jaipur label of any kind, no Open Buildings. Files:
+`jaipur_ce_selftrain_512.py`, `jaipur_pseudo_dataset.py` (this folder), `scripts/make_ce_pseudolabels.py`,
+`scripts/merge_peft_checkpoint.py`; result `diagnostics/hand_labels/crossearth_selftrain_r1.json`.
+
+| Model | Thr | Calib IoU | **Test IoU** (95% CI) | Area |
+|---|---|---|---|---|
+| CrossEarth A2S, zero-shot, plain | 0.35 | 0.616 | 0.647 (0.616-0.677) | 1.07 |
+| CrossEarth A2S, zero-shot, + TTA | 0.50 | 0.666 | 0.677 (0.650-0.704) | 0.95 |
+| ResNet34 student on soft maps, + TTA (3 seeds) | 0.55 | 0.674 | 0.706 +- 0.005 | 1.02 |
+| **Self-trained CrossEarth, plain** | 0.50 | 0.674 | **0.711** (0.685-0.738) | 1.05 |
+| **Self-trained CrossEarth, + 8-way TTA** | 0.50 | 0.680 | **0.717** (0.689-0.745) | 1.07 |
+
+Self-training lifts CrossEarth itself by +0.064 plain / +0.040 TTA over zero-shot and is the best
+label-free number so far, +0.011 over the ResNet student (within the CI, one seed, so not resolved).
+Two gotchas, both mine: (1) the teacher "probabilities" are softmax over Mask2Former scores that are
+already in [0,1], so they are squeezed into [0.27, 0.73] (background sits at 1/(1+e) = 0.269);
+thresholds for pseudo-labels must be taken from calib data, not assumed (my first cut-offs 0.25/0.55
+labelled 81 % of pixels as ignored and I stopped that run after ~4 min). (2) mmengine's checkpoint holds
+only the trained tensors; scoring it directly runs a random backbone (test IoU 0.278, area 3.5, a pure
+artifact). `merge_peft_checkpoint.py` overlays the trained keys on the full A2S checkpoint.
+
 ### Stronger teacher attempt: SAM refinement of the teacher (negative, 2026-11-22)
 No larger CrossEarth building checkpoint exists (the released building ones are only WHU A2S and S2A).
 Instead I tried sharpening the averaged A2S+S2A teacher with SAM ViT-H (weights already on the DGX in
