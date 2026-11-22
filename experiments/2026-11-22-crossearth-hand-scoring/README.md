@@ -112,3 +112,16 @@ it (0.69-0.70 plain, 0.70-0.71 TTA) are no better than A2S-only students. Studen
 at ~0.70-0.71 whichever teacher is used; the 95% CI is about +-0.027, so none of these differences
 (<= 0.01) is resolved. Test IoU was flat from epoch ~5 of the 15-epoch runs. S2A maps:
 `data/jaipur_teacher_s2a` on the DGX. JSONs: `diagnostics/hand_labels/student_a2s_soft{,_s1,_s2}.json`.
+
+### Stronger teacher attempt: SAM refinement of the teacher (negative, 2026-11-22)
+No larger CrossEarth building checkpoint exists (the released building ones are only WHU A2S and S2A).
+Instead I tried sharpening the averaged A2S+S2A teacher with SAM ViT-H (weights already on the DGX in
+`data/iou`), prompting with the teacher's own connected-component boxes (no Open Buildings), accepting
+SAM's outline by IoU / area-ratio, and blending it into the soft map (`scripts/sam_refine_teacher.py`,
+gate mode on the 152 hand crops; JSON `diagnostics/hand_labels/sam_refine_gate.json`).
+
+Plain averaged teacher: calib 0.675, test 0.701. Refined, 12 settings (blob thr 0.3/0.4/0.5, tau 0.4/0.6,
+blend w 0.5/1.0): calib 0.539-0.652, test 0.599-0.687. Every setting is worse on calib and test, so no
+student was trained from refined maps. This agrees with the earlier repo finding that SAM labels (0.629
+calib) are worse than the model's own prediction. Likely cause: SAM outlines on shadowed or textured roofs
+disagree with the annotators' boundaries, and ~93 % of the error is on edges.
