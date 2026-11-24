@@ -69,3 +69,7 @@ adapt/cache/
 *.pdf
 rooftop/*.tif
 rooftop/eval_results/*.png
+
+# Batch 2 labelling crops: Google-sourced imagery, licence unresolved, keep off the public repo
+labelling/r12_batch2/*/
+labelling/r12_batch2_*.zip

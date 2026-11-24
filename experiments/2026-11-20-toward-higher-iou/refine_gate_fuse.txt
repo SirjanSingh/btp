@@ -1,0 +1,83 @@
+[run_docker] parked data: 2 dataset(s) from /tmp/btp_data
+[run_docker] image  : nvcr.io/nvidia/pytorch:24.05-py3
+[run_docker] gpus   : 5
+[run_docker] pydeps : /home/23ucs715/btp/.pydeps
+[run_docker] as     : 1205:1206
+
+=============
+== PyTorch ==
+=============
+
+NVIDIA Release 24.05 (build 91431255)
+PyTorch Version 2.4.0a0+07cecf4
+Container image Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+Copyright (c) 2014-2024 Facebook Inc.
+Copyright (c) 2011-2014 Idiap Research Institute (Ronan Collobert)
+Copyright (c) 2012-2014 Deepmind Technologies    (Koray Kavukcuoglu)
+Copyright (c) 2011-2012 NEC Laboratories America (Koray Kavukcuoglu)
+Copyright (c) 2011-2013 NYU                      (Clement Farabet)
+Copyright (c) 2006-2010 NEC Laboratories America (Ronan Collobert, Leon Bottou, Iain Melvin, Jason Weston)
+Copyright (c) 2006      Idiap Research Institute (Samy Bengio)
+Copyright (c) 2001-2004 Idiap Research Institute (Ronan Collobert, Samy Bengio, Johnny Mariethoz)
+Copyright (c) 2015      Google Inc.
+Copyright (c) 2015      Yangqing Jia
+Copyright (c) 2013-2016 The Caffe contributors
+All rights reserved.
+
+Various files include modifications (c) NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
+
+This container image and its contents are governed by the NVIDIA Deep Learning Container License.
+By pulling and using the container, you accept the terms and conditions of this license:
+https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
+/opt/nvidia/entrypoint.d/50-gpu-driver-check.sh: line 5: ldconfig: command not found
+
+WARNING: The NVIDIA Driver was not detected.  GPU functionality will not be available.
+   Use the NVIDIA Container Toolkit to start this container with GPU support; see
+   https://docs.nvidia.com/datacenter/cloud-native/ .
+
+NOTE: Mellanox network driver detected, but NVIDIA peer memory driver not
+      detected.  Multi-node communication performance may be reduced.
+
+Device: cuda
+{
+ "pred": {
+  "calib": 0.6887,
+  "test": 0.7233
+ },
+ "fuse0.8_pad10_tau0.3": {
+  "calib": 0.6883,
+  "test": 0.7138
+ },
+ "fuse0.9_pad10_tau0.3": {
+  "calib": 0.6879,
+  "test": 0.715
+ },
+ "fuse0.7_pad10_tau0.3": {
+  "calib": 0.6858,
+  "test": 0.7095
+ },
+ "fuse0.6_pad10_tau0.3": {
+  "calib": 0.6776,
+  "test": 0.6987
+ },
+ "align_sam_pad10_tau0.3": {
+  "calib": 0.6287,
+  "test": 0.6502
+ },
+ "fuse0.5_pad10_tau0.3": {
+  "calib": 0.6287,
+  "test": 0.6502
+ },
+ "sam_pad10_tau0.3": {
+  "calib": 0.6152,
+  "test": 0.642
+ },
+ "align": {
+  "calib": 0.5983,
+  "test": 0.6097
+ },
+ "global": {
+  "calib": 0.5889,
+  "test": 0.6058
+ }
+}

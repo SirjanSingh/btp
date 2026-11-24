@@ -1,0 +1,44 @@
+{
+ "meta": {
+  "config": "/home/23ucs715/crossearth_work/CrossEarth/configs/jaipur_building_512.py",
+  "checkpoint": "/home/23ucs715/crossearth_work/CrossEarth/checkpoints/WHU-Building-S2A.pth",
+  "roof_class_ids": [
+   0
+  ],
+  "classes": [
+   "Building",
+   "Background"
+  ],
+  "logit_mode": "softmax",
+  "n_crops": 152,
+  "n_calib": 76,
+  "n_test": 76,
+  "note": "zero-shot, no Jaipur data used; thr from calib, IoU on test"
+ },
+ "results": {
+  "crossearth_whu_s2a_c0": {
+   "thr": 0.3,
+   "calib_iou": 0.6165682891803121,
+   "test_iou": 0.6479605732297786,
+   "test_area_ratio": 1.1257378669687232,
+   "test_iou_boot95": [
+    0.6254260549019719,
+    0.6703274620408675
+   ],
+   "iou_at_0_5_all": 0.45654807615890075,
+   "oracle_best_thr_all": 0.3
+  },
+  "crossearth_whu_s2a_c0+tta": {
+   "thr": 0.3,
+   "calib_iou": 0.6321986260181974,
+   "test_iou": 0.6636638244313571,
+   "test_area_ratio": 1.2069985875349782,
+   "test_iou_boot95": [
+    0.6373572899206538,
+    0.6910837691832559
+   ],
+   "iou_at_0_5_all": 0.4860143394225892,
+   "oracle_best_thr_all": 0.3
+  }
+ }
+}

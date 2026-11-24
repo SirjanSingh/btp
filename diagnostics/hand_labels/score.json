@@ -1,0 +1,1426 @@
+{
+  "compared": "openbuildings_reference",
+  "tag": "openbuildings",
+  "labelled": 136,
+  "total_crops": 200,
+  "min_area_px": 50,
+  "overall": {
+    "crops": 136,
+    "iou": 0.5036,
+    "precision": 0.7435,
+    "recall": 0.6094,
+    "false_positive_px": 2119388,
+    "buildings_hand": 2191,
+    "buildings_pred": 2701
+  },
+  "by_bin": {
+    "dense": {
+      "crops": 32,
+      "iou": 0.5019,
+      "precision": 0.7571,
+      "recall": 0.5983,
+      "false_positive_px": 638832,
+      "buildings_hand": 706,
+      "buildings_pred": 861
+    },
+    "empty": {
+      "crops": 15,
+      "iou": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "false_positive_px": 322,
+      "buildings_hand": 13,
+      "buildings_pred": 2
+    },
+    "moderate": {
+      "crops": 30,
+      "iou": 0.4405,
+      "precision": 0.6595,
+      "recall": 0.5701,
+      "false_positive_px": 571957,
+      "buildings_hand": 517,
+      "buildings_pred": 604
+    },
+    "sparse": {
+      "crops": 30,
+      "iou": 0.3554,
+      "precision": 0.6272,
+      "recall": 0.4505,
+      "false_positive_px": 234527,
+      "buildings_hand": 255,
+      "buildings_pred": 350
+    },
+    "very_dense": {
+      "crops": 29,
+      "iou": 0.5789,
+      "precision": 0.7974,
+      "recall": 0.6787,
+      "false_positive_px": 673750,
+      "buildings_hand": 700,
+      "buildings_pred": 884
+    }
+  },
+  "note": "hand labels trace ROOF outlines; OB traces ground footprints",
+  "per_crop": [
+    {
+      "name": "map67_1-1_009728_009728.png",
+      "bin": "dense",
+      "group": "khushi",
+      "tp": 59259,
+      "fp": 28027,
+      "fn": 32010,
+      "n_hand": 23,
+      "n_pred": 36
+    },
+    {
+      "name": "map67_1-2_009728_000000.png",
+      "bin": "dense",
+      "group": "khushi",
+      "tp": 54099,
+      "fp": 22795,
+      "fn": 22258,
+      "n_hand": 24,
+      "n_pred": 33
+    },
+    {
+      "name": "map67_1-2_010752_007168.png",
+      "bin": "very_dense",
+      "group": "khushi",
+      "tp": 60309,
+      "fp": 35799,
+      "fn": 28567,
+      "n_hand": 34,
+      "n_pred": 27
+    },
+    {
+      "name": "map67_1-2_013312_002048.png",
+      "bin": "dense",
+      "group": "khushi",
+      "tp": 59380,
+      "fp": 24888,
+      "fn": 26919,
+      "n_hand": 19,
+      "n_pred": 29
+    },
+    {
+      "name": "map67_1-3_004608_000000.png",
+      "bin": "sparse",
+      "group": "khushi",
+      "tp": 27617,
+      "fp": 10869,
+      "fn": 17258,
+      "n_hand": 12,
+      "n_pred": 17
+    },
+    {
+      "name": "map67_1-3_004608_004608.png",
+      "bin": "sparse",
+      "group": "khushi",
+      "tp": 15162,
+      "fp": 7563,
+      "fn": 37709,
+      "n_hand": 9,
+      "n_pred": 14
+    },
+    {
+      "name": "map67_1-4_001536_003584.png",
+      "bin": "moderate",
+      "group": "khushi",
+      "tp": 41529,
+      "fp": 20517,
+      "fn": 15098,
+      "n_hand": 12,
+      "n_pred": 10
+    },
+    {
+      "name": "map67_1-4_002560_009728.png",
+      "bin": "moderate",
+      "group": "khushi",
+      "tp": 42315,
+      "fp": 24360,
+      "fn": 23247,
+      "n_hand": 30,
+      "n_pred": 28
+    },
+    {
+      "name": "map67_1-4_009728_002048.png",
+      "bin": "sparse",
+      "group": "khushi",
+      "tp": 0,
+      "fp": 2130,
+      "fn": 3887,
+      "n_hand": 2,
+      "n_pred": 1
+    },
+    {
+      "name": "map67_1-4_012288_001024.png",
+      "bin": "sparse",
+      "group": "khushi",
+      "tp": 7867,
+      "fp": 3892,
+      "fn": 7715,
+      "n_hand": 4,
+      "n_pred": 6
+    },
+    {
+      "name": "map67_2-1_002048_002560.png",
+      "bin": "moderate",
+      "group": "khushi",
+      "tp": 15767,
+      "fp": 39219,
+      "fn": 5693,
+      "n_hand": 4,
+      "n_pred": 9
+    },
+    {
+      "name": "map67_2-1_004608_006656.png",
+      "bin": "sparse",
+      "group": "khushi",
+      "tp": 6676,
+      "fp": 4894,
+      "fn": 3912,
+      "n_hand": 3,
+      "n_pred": 2
+    },
+    {
+      "name": "map67_2-1_009216_002048.png",
+      "bin": "very_dense",
+      "group": "khushi",
+      "tp": 64169,
+      "fp": 36260,
+      "fn": 29028,
+      "n_hand": 32,
+      "n_pred": 38
+    },
+    {
+      "name": "map67_2-1_012800_002048.png",
+      "bin": "sparse",
+      "group": "khushi",
+      "tp": 3205,
+      "fp": 2171,
+      "fn": 4222,
+      "n_hand": 4,
+      "n_pred": 6
+    },
+    {
+      "name": "map67_2-1_013312_005632.png",
+      "bin": "moderate",
+      "group": "khushi",
+      "tp": 32762,
+      "fp": 12313,
+      "fn": 27619,
+      "n_hand": 15,
+      "n_pred": 15
+    },
+    {
+      "name": "map67_2-2_002560_008192.png",
+      "bin": "moderate",
+      "group": "khushi",
+      "tp": 27713,
+      "fp": 37696,
+      "fn": 31775,
+      "n_hand": 13,
+      "n_pred": 10
+    },
+    {
+      "name": "map67_2-2_003584_004608.png",
+      "bin": "empty",
+      "group": "khushi",
+      "tp": 0,
+      "fp": 0,
+      "fn": 3150,
+      "n_hand": 1,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_2-2_007680_007168.png",
+      "bin": "very_dense",
+      "group": "khushi",
+      "tp": 68636,
+      "fp": 44603,
+      "fn": 51556,
+      "n_hand": 50,
+      "n_pred": 62
+    },
+    {
+      "name": "map67_2-3_001536_007680.png",
+      "bin": "dense",
+      "group": "khushi",
+      "tp": 50231,
+      "fp": 23065,
+      "fn": 44992,
+      "n_hand": 19,
+      "n_pred": 31
+    },
+    {
+      "name": "map67_2-3_002560_005632.png",
+      "bin": "very_dense",
+      "group": "khushi",
+      "tp": 64966,
+      "fp": 35479,
+      "fn": 21322,
+      "n_hand": 31,
+      "n_pred": 31
+    },
+    {
+      "name": "map67_2-3_002560_009216.png",
+      "bin": "dense",
+      "group": "khushi",
+      "tp": 38663,
+      "fp": 38250,
+      "fn": 38925,
+      "n_hand": 34,
+      "n_pred": 39
+    },
+    {
+      "name": "map67_2-3_012288_003584.png",
+      "bin": "moderate",
+      "group": "khushi",
+      "tp": 16624,
+      "fp": 29405,
+      "fn": 19219,
+      "n_hand": 16,
+      "n_pred": 40
+    },
+    {
+      "name": "map67_2-4_000512_003584.png",
+      "bin": "empty",
+      "group": "khushi",
+      "tp": 0,
+      "fp": 0,
+      "fn": 11166,
+      "n_hand": 3,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_2-4_001024_005120.png",
+      "bin": "very_dense",
+      "group": "khushi",
+      "tp": 74749,
+      "fp": 31790,
+      "fn": 32329,
+      "n_hand": 31,
+      "n_pred": 29
+    },
+    {
+      "name": "map67_2-4_002560_007680.png",
+      "bin": "moderate",
+      "group": "khushi",
+      "tp": 33714,
+      "fp": 21716,
+      "fn": 42844,
+      "n_hand": 28,
+      "n_pred": 12
+    },
+    {
+      "name": "map67_2-4_012288_001536.png",
+      "bin": "sparse",
+      "group": "khushi",
+      "tp": 9304,
+      "fp": 16728,
+      "fn": 19018,
+      "n_hand": 11,
+      "n_pred": 12
+    },
+    {
+      "name": "map67_3-1_000512_003072.png",
+      "bin": "moderate",
+      "group": "khushi",
+      "tp": 26503,
+      "fp": 16502,
+      "fn": 42060,
+      "n_hand": 29,
+      "n_pred": 21
+    },
+    {
+      "name": "map67_3-1_001536_002560.png",
+      "bin": "empty",
+      "group": "khushi",
+      "tp": 0,
+      "fp": 0,
+      "fn": 710,
+      "n_hand": 1,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_3-1_002560_008192.png",
+      "bin": "very_dense",
+      "group": "khushi",
+      "tp": 64623,
+      "fp": 36436,
+      "fn": 33931,
+      "n_hand": 44,
+      "n_pred": 45
+    },
+    {
+      "name": "map67_3-1_004096_008192.png",
+      "bin": "dense",
+      "group": "khushi",
+      "tp": 55894,
+      "fp": 31266,
+      "fn": 28228,
+      "n_hand": 53,
+      "n_pred": 17
+    },
+    {
+      "name": "map67_3-2_002560_000000.png",
+      "bin": "dense",
+      "group": "khushi",
+      "tp": 48745,
+      "fp": 44930,
+      "fn": 49317,
+      "n_hand": 53,
+      "n_pred": 45
+    },
+    {
+      "name": "map67_3-2_004608_004608.png",
+      "bin": "very_dense",
+      "group": "khushi",
+      "tp": 69541,
+      "fp": 36458,
+      "fn": 48019,
+      "n_hand": 39,
+      "n_pred": 54
+    },
+    {
+      "name": "map67_3-3_008704_002560.png",
+      "bin": "very_dense",
+      "group": "khushi",
+      "tp": 77291,
+      "fp": 41999,
+      "fn": 26131,
+      "n_hand": 41,
+      "n_pred": 45
+    },
+    {
+      "name": "map67_3-3_009216_000512.png",
+      "bin": "moderate",
+      "group": "khushi",
+      "tp": 28487,
+      "fp": 32666,
+      "fn": 29212,
+      "n_hand": 29,
+      "n_pred": 34
+    },
+    {
+      "name": "map67_3-4_007680_000512.png",
+      "bin": "sparse",
+      "group": "khushi",
+      "tp": 0,
+      "fp": 4322,
+      "fn": 5739,
+      "n_hand": 8,
+      "n_pred": 10
+    },
+    {
+      "name": "map67_4-1_006144_010240.png",
+      "bin": "dense",
+      "group": "khushi",
+      "tp": 56023,
+      "fp": 31273,
+      "fn": 27510,
+      "n_hand": 25,
+      "n_pred": 21
+    },
+    {
+      "name": "map67_4-1_007680_000000.png",
+      "bin": "sparse",
+      "group": "khushi",
+      "tp": 9272,
+      "fp": 6385,
+      "fn": 20412,
+      "n_hand": 15,
+      "n_pred": 24
+    },
+    {
+      "name": "map67_4-2_012288_004608.png",
+      "bin": "very_dense",
+      "group": "khushi",
+      "tp": 82352,
+      "fp": 31415,
+      "fn": 30404,
+      "n_hand": 23,
+      "n_pred": 20
+    },
+    {
+      "name": "map67_4-3_001536_008192.png",
+      "bin": "very_dense",
+      "group": "khushi",
+      "tp": 91885,
+      "fp": 20904,
+      "fn": 28084,
+      "n_hand": 18,
+      "n_pred": 20
+    },
+    {
+      "name": "map67_4-3_007168_004096.png",
+      "bin": "dense",
+      "group": "khushi",
+      "tp": 55699,
+      "fp": 29101,
+      "fn": 33187,
+      "n_hand": 30,
+      "n_pred": 31
+    },
+    {
+      "name": "map67_4-4_000512_007168.png",
+      "bin": "dense",
+      "group": "khushi",
+      "tp": 43655,
+      "fp": 43010,
+      "fn": 19428,
+      "n_hand": 17,
+      "n_pred": 20
+    },
+    {
+      "name": "map67_4-4_004096_005632.png",
+      "bin": "moderate",
+      "group": "khushi",
+      "tp": 39361,
+      "fp": 28805,
+      "fn": 20287,
+      "n_hand": 23,
+      "n_pred": 20
+    },
+    {
+      "name": "map67_4-4_012288_002560.png",
+      "bin": "sparse",
+      "group": "khushi",
+      "tp": 0,
+      "fp": 10531,
+      "fn": 1002,
+      "n_hand": 1,
+      "n_pred": 11
+    },
+    {
+      "name": "map67_1-1_008192_002560.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 50014,
+      "fp": 10570,
+      "fn": 5087,
+      "n_hand": 9,
+      "n_pred": 5
+    },
+    {
+      "name": "map67_1-1_008192_005632.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 94162,
+      "fp": 23516,
+      "fn": 34692,
+      "n_hand": 19,
+      "n_pred": 23
+    },
+    {
+      "name": "map67_1-1_011264_004096.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 38689,
+      "fp": 20119,
+      "fn": 30617,
+      "n_hand": 12,
+      "n_pred": 21
+    },
+    {
+      "name": "map67_1-2_000000_002560.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 17262,
+      "fp": 4716,
+      "fn": 9075,
+      "n_hand": 5,
+      "n_pred": 10
+    },
+    {
+      "name": "map67_1-2_000512_003072.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 7830,
+      "fp": 4945,
+      "fn": 19124,
+      "n_hand": 8,
+      "n_pred": 11
+    },
+    {
+      "name": "map67_1-2_000512_008192.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 23449,
+      "fp": 12413,
+      "fn": 18233,
+      "n_hand": 15,
+      "n_pred": 23
+    },
+    {
+      "name": "map67_1-2_001536_001536.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 121509,
+      "fp": 16783,
+      "fn": 52497,
+      "n_hand": 12,
+      "n_pred": 17
+    },
+    {
+      "name": "map67_1-2_002560_006656.png",
+      "bin": "empty",
+      "group": "priyal",
+      "tp": 0,
+      "fp": 0,
+      "fn": 1665,
+      "n_hand": 1,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_1-2_003584_007680.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 54934,
+      "fp": 11805,
+      "fn": 29995,
+      "n_hand": 7,
+      "n_pred": 22
+    },
+    {
+      "name": "map67_1-2_005120_001536.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 54720,
+      "fp": 12249,
+      "fn": 37675,
+      "n_hand": 13,
+      "n_pred": 24
+    },
+    {
+      "name": "map67_1-2_005632_003072.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 53305,
+      "fp": 14213,
+      "fn": 36003,
+      "n_hand": 11,
+      "n_pred": 19
+    },
+    {
+      "name": "map67_1-2_005632_009728.png",
+      "bin": "empty",
+      "group": "priyal",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "n_hand": 0,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_1-2_011264_010240.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 97757,
+      "fp": 13760,
+      "fn": 50981,
+      "n_hand": 11,
+      "n_pred": 28
+    },
+    {
+      "name": "map67_1-3_002560_000000.png",
+      "bin": "empty",
+      "group": "priyal",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "n_hand": 0,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_1-3_002560_001536.png",
+      "bin": "empty",
+      "group": "priyal",
+      "tp": 0,
+      "fp": 107,
+      "fn": 1969,
+      "n_hand": 1,
+      "n_pred": 1
+    },
+    {
+      "name": "map67_1-3_002560_003072.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 46098,
+      "fp": 11711,
+      "fn": 36758,
+      "n_hand": 9,
+      "n_pred": 12
+    },
+    {
+      "name": "map67_1-3_002560_009216.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 86317,
+      "fp": 10547,
+      "fn": 42999,
+      "n_hand": 9,
+      "n_pred": 24
+    },
+    {
+      "name": "map67_1-3_002560_010240.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 105483,
+      "fp": 9799,
+      "fn": 53803,
+      "n_hand": 14,
+      "n_pred": 18
+    },
+    {
+      "name": "map67_1-3_004096_004096.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 59100,
+      "fp": 13565,
+      "fn": 44325,
+      "n_hand": 13,
+      "n_pred": 28
+    },
+    {
+      "name": "map67_1-3_007168_005632.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 30936,
+      "fp": 11457,
+      "fn": 38049,
+      "n_hand": 18,
+      "n_pred": 23
+    },
+    {
+      "name": "map67_1-3_008192_007680.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 66193,
+      "fp": 6161,
+      "fn": 32024,
+      "n_hand": 13,
+      "n_pred": 17
+    },
+    {
+      "name": "map67_1-3_010752_004096.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 32766,
+      "fp": 8980,
+      "fn": 37982,
+      "n_hand": 18,
+      "n_pred": 24
+    },
+    {
+      "name": "map67_1-4_003072_009728.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 57327,
+      "fp": 17142,
+      "fn": 30253,
+      "n_hand": 18,
+      "n_pred": 22
+    },
+    {
+      "name": "map67_1-4_008192_005120.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 78323,
+      "fp": 17807,
+      "fn": 33914,
+      "n_hand": 15,
+      "n_pred": 16
+    },
+    {
+      "name": "map67_1-4_009728_007680.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 58986,
+      "fp": 23732,
+      "fn": 44542,
+      "n_hand": 11,
+      "n_pred": 20
+    },
+    {
+      "name": "map67_1-4_012288_004096.png",
+      "bin": "empty",
+      "group": "priyal",
+      "tp": 0,
+      "fp": 0,
+      "fn": 3852,
+      "n_hand": 3,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_1-4_012800_000512.png",
+      "bin": "empty",
+      "group": "priyal",
+      "tp": 0,
+      "fp": 0,
+      "fn": 2404,
+      "n_hand": 1,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_1-4_013312_007168.png",
+      "bin": "empty",
+      "group": "priyal",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "n_hand": 0,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_2-1_000000_004096.png",
+      "bin": "empty",
+      "group": "priyal",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "n_hand": 0,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_2-1_002560_007168.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 77812,
+      "fp": 11439,
+      "fn": 39881,
+      "n_hand": 19,
+      "n_pred": 29
+    },
+    {
+      "name": "map67_2-1_007168_003072.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 70043,
+      "fp": 12150,
+      "fn": 49930,
+      "n_hand": 17,
+      "n_pred": 39
+    },
+    {
+      "name": "map67_2-1_007680_005120.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 132225,
+      "fp": 16247,
+      "fn": 36426,
+      "n_hand": 18,
+      "n_pred": 26
+    },
+    {
+      "name": "map67_2-1_008192_000000.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 104827,
+      "fp": 15603,
+      "fn": 52532,
+      "n_hand": 15,
+      "n_pred": 34
+    },
+    {
+      "name": "map67_2-1_009728_002048.png",
+      "bin": "empty",
+      "group": "priyal",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "n_hand": 0,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_2-1_012800_008192.png",
+      "bin": "empty",
+      "group": "priyal",
+      "tp": 0,
+      "fp": 215,
+      "fn": 0,
+      "n_hand": 0,
+      "n_pred": 1
+    },
+    {
+      "name": "map67_2-2_001024_002560.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 4007,
+      "fp": 4638,
+      "fn": 14035,
+      "n_hand": 3,
+      "n_pred": 6
+    },
+    {
+      "name": "map67_2-2_003584_000512.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 22465,
+      "fp": 12090,
+      "fn": 14799,
+      "n_hand": 10,
+      "n_pred": 13
+    },
+    {
+      "name": "map67_2-2_004096_008704.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 78405,
+      "fp": 14497,
+      "fn": 74836,
+      "n_hand": 10,
+      "n_pred": 36
+    },
+    {
+      "name": "map67_2-2_004608_000000.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 27301,
+      "fp": 6452,
+      "fn": 30776,
+      "n_hand": 8,
+      "n_pred": 12
+    },
+    {
+      "name": "map67_2-2_008704_006656.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 102615,
+      "fp": 9998,
+      "fn": 60413,
+      "n_hand": 13,
+      "n_pred": 38
+    },
+    {
+      "name": "map67_2-2_010752_009216.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 123230,
+      "fp": 15160,
+      "fn": 60748,
+      "n_hand": 16,
+      "n_pred": 26
+    },
+    {
+      "name": "map67_2-2_011264_001536.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 66501,
+      "fp": 13279,
+      "fn": 33867,
+      "n_hand": 15,
+      "n_pred": 21
+    },
+    {
+      "name": "map67_2-2_012800_004608.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 67472,
+      "fp": 5674,
+      "fn": 45888,
+      "n_hand": 9,
+      "n_pred": 21
+    },
+    {
+      "name": "map67_2-3_006144_004096.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 8771,
+      "fp": 2346,
+      "fn": 11324,
+      "n_hand": 7,
+      "n_pred": 7
+    },
+    {
+      "name": "map67_2-3_012288_005632.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 2651,
+      "fp": 11293,
+      "fn": 3292,
+      "n_hand": 5,
+      "n_pred": 7
+    },
+    {
+      "name": "map67_2-4_001024_004096.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 75919,
+      "fp": 7311,
+      "fn": 49675,
+      "n_hand": 10,
+      "n_pred": 24
+    },
+    {
+      "name": "map67_2-4_001536_007680.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 63973,
+      "fp": 7038,
+      "fn": 48313,
+      "n_hand": 8,
+      "n_pred": 21
+    },
+    {
+      "name": "map67_2-4_006656_008192.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 86747,
+      "fp": 11939,
+      "fn": 45424,
+      "n_hand": 10,
+      "n_pred": 18
+    },
+    {
+      "name": "map67_2-4_008704_004608.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 77494,
+      "fp": 8640,
+      "fn": 75310,
+      "n_hand": 13,
+      "n_pred": 25
+    },
+    {
+      "name": "map67_3-1_001536_005632.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 85008,
+      "fp": 11643,
+      "fn": 117153,
+      "n_hand": 11,
+      "n_pred": 65
+    },
+    {
+      "name": "map67_3-1_005120_005632.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 17362,
+      "fp": 17587,
+      "fn": 19805,
+      "n_hand": 11,
+      "n_pred": 20
+    },
+    {
+      "name": "map67_3-1_006656_004096.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 18455,
+      "fp": 16015,
+      "fn": 4500,
+      "n_hand": 5,
+      "n_pred": 7
+    },
+    {
+      "name": "map67_3-2_002560_002048.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 11752,
+      "fp": 7645,
+      "fn": 41896,
+      "n_hand": 10,
+      "n_pred": 16
+    },
+    {
+      "name": "map67_3-2_004608_001536.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 5122,
+      "fp": 7639,
+      "fn": 7481,
+      "n_hand": 4,
+      "n_pred": 8
+    },
+    {
+      "name": "map67_3-2_005120_005120.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 34801,
+      "fp": 10611,
+      "fn": 44110,
+      "n_hand": 13,
+      "n_pred": 22
+    },
+    {
+      "name": "map67_3-2_006656_003584.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 45649,
+      "fp": 22524,
+      "fn": 23275,
+      "n_hand": 14,
+      "n_pred": 20
+    },
+    {
+      "name": "map67_3-2_009216_002048.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 102368,
+      "fp": 20144,
+      "fn": 44596,
+      "n_hand": 11,
+      "n_pred": 27
+    },
+    {
+      "name": "map67_3-2_010752_002560.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 133825,
+      "fp": 9592,
+      "fn": 44093,
+      "n_hand": 6,
+      "n_pred": 14
+    },
+    {
+      "name": "map67_3-3_000512_010240.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 73716,
+      "fp": 12223,
+      "fn": 49228,
+      "n_hand": 11,
+      "n_pred": 24
+    },
+    {
+      "name": "map67_3-3_001024_009728.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 79055,
+      "fp": 9361,
+      "fn": 79758,
+      "n_hand": 15,
+      "n_pred": 33
+    },
+    {
+      "name": "map67_3-3_002560_005632.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 21163,
+      "fp": 12104,
+      "fn": 30987,
+      "n_hand": 17,
+      "n_pred": 25
+    },
+    {
+      "name": "map67_3-3_005632_007168.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 73135,
+      "fp": 5500,
+      "fn": 67756,
+      "n_hand": 6,
+      "n_pred": 23
+    },
+    {
+      "name": "map67_3-3_010240_003584.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 121548,
+      "fp": 9736,
+      "fn": 72510,
+      "n_hand": 8,
+      "n_pred": 29
+    },
+    {
+      "name": "map67_3-3_010752_000000.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 1418,
+      "fp": 683,
+      "fn": 862,
+      "n_hand": 3,
+      "n_pred": 2
+    },
+    {
+      "name": "map67_3-4_002560_000000.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 55780,
+      "fp": 21926,
+      "fn": 29884,
+      "n_hand": 34,
+      "n_pred": 26
+    },
+    {
+      "name": "map67_3-4_003072_000512.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 76768,
+      "fp": 31899,
+      "fn": 49922,
+      "n_hand": 53,
+      "n_pred": 33
+    },
+    {
+      "name": "map67_3-4_003072_008192.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 23842,
+      "fp": 20919,
+      "fn": 10703,
+      "n_hand": 13,
+      "n_pred": 10
+    },
+    {
+      "name": "map67_3-4_003584_005120.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 67865,
+      "fp": 22685,
+      "fn": 40945,
+      "n_hand": 40,
+      "n_pred": 27
+    },
+    {
+      "name": "map67_3-4_004608_003584.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 98594,
+      "fp": 39822,
+      "fn": 26056,
+      "n_hand": 44,
+      "n_pred": 26
+    },
+    {
+      "name": "map67_3-4_005632_010240.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 55171,
+      "fp": 19277,
+      "fn": 24638,
+      "n_hand": 36,
+      "n_pred": 24
+    },
+    {
+      "name": "map67_3-4_011776_004096.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 50508,
+      "fp": 12162,
+      "fn": 24319,
+      "n_hand": 23,
+      "n_pred": 20
+    },
+    {
+      "name": "map67_4-1_005632_009728.png",
+      "bin": "very_dense",
+      "group": "priyal",
+      "tp": 81474,
+      "fp": 17435,
+      "fn": 17590,
+      "n_hand": 50,
+      "n_pred": 24
+    },
+    {
+      "name": "map67_4-1_006656_009728.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 38983,
+      "fp": 9204,
+      "fn": 16198,
+      "n_hand": 23,
+      "n_pred": 19
+    },
+    {
+      "name": "map67_4-1_009216_008192.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 43403,
+      "fp": 19439,
+      "fn": 13782,
+      "n_hand": 20,
+      "n_pred": 17
+    },
+    {
+      "name": "map67_4-2_002560_002048.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 19,
+      "fp": 51366,
+      "fn": 6818,
+      "n_hand": 2,
+      "n_pred": 32
+    },
+    {
+      "name": "map67_4-2_006144_004608.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 55545,
+      "fp": 14910,
+      "fn": 43040,
+      "n_hand": 15,
+      "n_pred": 19
+    },
+    {
+      "name": "map67_4-2_010240_009728.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 78733,
+      "fp": 13174,
+      "fn": 33720,
+      "n_hand": 28,
+      "n_pred": 21
+    },
+    {
+      "name": "map67_4-2_011776_007168.png",
+      "bin": "dense",
+      "group": "priyal",
+      "tp": 59104,
+      "fp": 25239,
+      "fn": 35434,
+      "n_hand": 27,
+      "n_pred": 20
+    },
+    {
+      "name": "map67_4-2_012800_003584.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 27113,
+      "fp": 9817,
+      "fn": 13386,
+      "n_hand": 11,
+      "n_pred": 16
+    },
+    {
+      "name": "map67_4-2_013312_002560.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 40190,
+      "fp": 10067,
+      "fn": 42420,
+      "n_hand": 24,
+      "n_pred": 21
+    },
+    {
+      "name": "map67_4-3_005632_002048.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 29429,
+      "fp": 14961,
+      "fn": 6586,
+      "n_hand": 8,
+      "n_pred": 12
+    },
+    {
+      "name": "map67_4-3_006144_004096.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 25193,
+      "fp": 12223,
+      "fn": 40140,
+      "n_hand": 34,
+      "n_pred": 24
+    },
+    {
+      "name": "map67_4-3_008192_000000.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 6780,
+      "fp": 1107,
+      "fn": 8207,
+      "n_hand": 7,
+      "n_pred": 7
+    },
+    {
+      "name": "map67_4-3_010240_000512.png",
+      "bin": "sparse",
+      "group": "priyal",
+      "tp": 16857,
+      "fp": 7761,
+      "fn": 5600,
+      "n_hand": 6,
+      "n_pred": 11
+    },
+    {
+      "name": "map67_4-3_011264_004608.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 44803,
+      "fp": 12622,
+      "fn": 72347,
+      "n_hand": 53,
+      "n_pred": 50
+    },
+    {
+      "name": "map67_4-3_013312_005120.png",
+      "bin": "moderate",
+      "group": "priyal",
+      "tp": 34396,
+      "fp": 8869,
+      "fn": 22476,
+      "n_hand": 13,
+      "n_pred": 13
+    },
+    {
+      "name": "map67_1-1_000000_000512.png",
+      "bin": "dense",
+      "group": "sirjan",
+      "tp": 50474,
+      "fp": 21128,
+      "fn": 48394,
+      "n_hand": 35,
+      "n_pred": 37
+    },
+    {
+      "name": "map67_1-1_000000_004096.png",
+      "bin": "sparse",
+      "group": "sirjan",
+      "tp": 20826,
+      "fp": 8342,
+      "fn": 10709,
+      "n_hand": 11,
+      "n_pred": 9
+    },
+    {
+      "name": "map67_1-1_003072_001536.png",
+      "bin": "sparse",
+      "group": "sirjan",
+      "tp": 29614,
+      "fp": 5226,
+      "fn": 56012,
+      "n_hand": 6,
+      "n_pred": 13
+    },
+    {
+      "name": "map67_1-1_005120_003072.png",
+      "bin": "empty",
+      "group": "sirjan",
+      "tp": 0,
+      "fp": 0,
+      "fn": 3058,
+      "n_hand": 1,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_1-1_005632_002560.png",
+      "bin": "empty",
+      "group": "sirjan",
+      "tp": 0,
+      "fp": 0,
+      "fn": 1375,
+      "n_hand": 1,
+      "n_pred": 0
+    },
+    {
+      "name": "map67_1-1_005632_008192.png",
+      "bin": "dense",
+      "group": "sirjan",
+      "tp": 56816,
+      "fp": 31086,
+      "fn": 35469,
+      "n_hand": 21,
+      "n_pred": 21
+    },
+    {
+      "name": "map67_1-1_006144_005120.png",
+      "bin": "very_dense",
+      "group": "sirjan",
+      "tp": 99811,
+      "fp": 21177,
+      "fn": 29140,
+      "n_hand": 22,
+      "n_pred": 27
+    }
+  ]
+}

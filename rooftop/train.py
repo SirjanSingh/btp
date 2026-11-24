@@ -214,7 +214,9 @@ class FolderDataset(Dataset):
             img  = cv2.cvtColor(cv2.imread(str(ip)), cv2.COLOR_BGR2RGB)
             mask = cv2.imread(str(mp), cv2.IMREAD_GRAYSCALE)
         # Handle both 0/1 masks (AIRS default) and 0/255 masks
-        if mask.max() <= 1:
+        if SOFT_MASKS:                       # pseudo-label probabilities stored as 0..255
+            mask = (mask / 255.0).astype(np.float32)
+        elif mask.max() <= 1:
             mask = (mask > 0).astype(np.float32)
         else:
             mask = (mask > 127).astype(np.float32)
@@ -354,7 +356,40 @@ def _boundary_band(target, px):
     return dil - ero
 
 
+# Set from --edge_weight / --edge_sigma. 0 disables.
+# Sirko et al. 2021 (Open Buildings): mark instance boundaries, blur with a
+# Gaussian (sigma 3 px at 50 cm), multiply by 200 and use as a per-pixel weight
+# on the cross-entropy. At our 26.6 cm the same ground distance is sigma ~5.6 px.
+EDGE_WEIGHT = 0.0
+SOFT_MASKS = False
+EDGE_SIGMA = 5.6
+_edge_kernel = None
+
+
+def _edge_weight_map(target):
+    global _edge_kernel
+    k = int(3 * EDGE_SIGMA) * 2 + 1
+    if _edge_kernel is None or _edge_kernel[0].device != target.device:
+        x = torch.arange(k, device=target.device, dtype=torch.float32) - k // 2
+        g = torch.exp(-x ** 2 / (2 * EDGE_SIGMA ** 2))
+        g = g / g.sum()
+        _edge_kernel = (g[None, None, :, None], g[None, None, None, :])
+    edge = _boundary_band(target.float(), 1)            # 1-px ring each side of every edge
+    gy, gx = _edge_kernel
+    edge = torch.nn.functional.conv2d(edge, gy, padding=(k // 2, 0))
+    edge = torch.nn.functional.conv2d(edge, gx, padding=(0, k // 2))
+    return 1.0 + EDGE_WEIGHT * edge
+
+
 def combined_loss(pred, target, bce_w=0.5, dice_w=0.5):
+    if EDGE_WEIGHT > 0:
+        w = _edge_weight_map(target)
+        bce = (_bce_px(pred, target) * w).sum() / w.sum()
+        return bce_w * bce + dice_w * _dice(pred, target)
+    return _combined_loss(pred, target, bce_w, dice_w)
+
+
+def _combined_loss(pred, target, bce_w=0.5, dice_w=0.5):
     """Weighted BCE + Dice, optionally ignoring a band around label edges.
 
     WHY the band: the weak labels are Open Buildings GROUND FOOTPRINTS while the
@@ -522,8 +557,15 @@ def main(args):
     writer    = SummaryWriter(log_dir=str(Path(args.log_dir) / run_logger.stem / "tb"))
 
     # ── Resume ───────────────────────────────────────────────────────────────
-    global BOUNDARY_RELAX_PX
+    global BOUNDARY_RELAX_PX, EDGE_WEIGHT, EDGE_SIGMA, SOFT_MASKS
     BOUNDARY_RELAX_PX = args.boundary_relax
+    SOFT_MASKS = args.soft_masks
+    if SOFT_MASKS:
+        print("Soft masks: train labels read as probabilities (mask / 255)")
+    EDGE_WEIGHT, EDGE_SIGMA = args.edge_weight, args.edge_sigma
+    if EDGE_WEIGHT:
+        print(f"Edge-weighted BCE (Sirko 2021): weight 1 + {EDGE_WEIGHT} x "
+              f"Gaussian(sigma {EDGE_SIGMA} px) of the label boundary")
     if BOUNDARY_RELAX_PX:
         print(f"Boundary-relaxed loss: ignoring +/-{BOUNDARY_RELAX_PX} px "
               f"around every label edge")
@@ -692,6 +734,13 @@ def parse_args():
                     help="Ignore a +/-N px band around each label edge in the "
                          "loss. Targets the roof-vs-footprint offset in weakly "
                          "supervised runs (Gap 4). 0 = off.")
+    g6.add_argument("--edge_weight", type=float, default=0.0,
+                    help="Sirko 2021 edge-weighted BCE: weight = 1 + this x blurred boundary (paper: 200)")
+    g6.add_argument("--edge_sigma", type=float, default=5.6,
+                    help="Gaussian sigma in px for --edge_weight (paper: 3 px at 50 cm = 5.6 px at 26.6 cm)")
+    g6.add_argument("--soft_masks", action="store_true",
+                    help="Read folder-dataset masks as probabilities (0..255 -> 0..1) instead of "
+                         "binarising at 127. For teacher pseudo-labels (self-training).")
     g6.add_argument("--simulate_low_res", action="store_true",
                     help="Add resolution simulation augmentation (Downscale 25-50%%). "
                          "Use when target domain is ~30cm/px (e.g. Indian govt imagery) "

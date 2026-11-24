@@ -1,0 +1,49 @@
+{
+  "seed": 7,
+  "n_candidates": 9042,
+  "excluded_from": "labelling/r12_batch1/manifest.csv",
+  "n_selected": 200,
+  "min_confidence": 0.75,
+  "bin_population": {
+    "dense": 1620,
+    "empty": 827,
+    "moderate": 2009,
+    "sparse": 2338,
+    "very_dense": 2248
+  },
+  "per_person": {
+    "sirjan": {
+      "empty": 20,
+      "sparse": 20,
+      "moderate": 20,
+      "dense": 20,
+      "very_dense": 20
+    },
+    "priyal": {
+      "empty": 20,
+      "sparse": 20,
+      "moderate": 20,
+      "dense": 20,
+      "very_dense": 20
+    }
+  },
+  "tiles_covered": [
+    "map67_1-1",
+    "map67_1-2",
+    "map67_1-3",
+    "map67_1-4",
+    "map67_2-1",
+    "map67_2-2",
+    "map67_2-3",
+    "map67_2-4",
+    "map67_3-1",
+    "map67_3-2",
+    "map67_3-3",
+    "map67_3-4",
+    "map67_4-1",
+    "map67_4-2",
+    "map67_4-3",
+    "map67_4-4"
+  ],
+  "protocol": "labels/ starts EMPTY and must be drawn without consulting openbuildings_reference/"
+}

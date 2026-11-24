@@ -1,0 +1,115 @@
+{
+ "args": {
+  "img_dirs": [
+   "data/jaipur_weak/train/images",
+   "data/jaipur_weak/val/images"
+  ],
+  "teacher": "data/jaipur_teacher_a2s",
+  "init": "rooftop/checkpoints/unet_resnet34_best.pth",
+  "index": "data/hand_r12b2/index.csv",
+  "epochs": 6,
+  "bs": 16,
+  "lr": 0.0001,
+  "sharpen": 1.0,
+  "workers": 4,
+  "seed": 1,
+  "ckpt": "checkpoints_st/student_a2s_soft_s1.pth",
+  "out": "diagnostics/hand_labels/student_a2s_soft_s1.json"
+ },
+ "history": [
+  {
+   "thr": 0.55,
+   "calib_iou": 0.6595859947642414,
+   "test_iou": 0.6893125399775527,
+   "test_area_ratio": 1.0084758716509834,
+   "test_iou_boot95": [
+    0.6635712891222977,
+    0.7146721273773466
+   ],
+   "epoch": 1,
+   "train_loss": 0.7563080813341123
+  },
+  {
+   "thr": 0.55,
+   "calib_iou": 0.6452760589415173,
+   "test_iou": 0.6870846932202003,
+   "test_area_ratio": 1.0506272094550797,
+   "test_iou_boot95": [
+    0.6555742110078561,
+    0.7177111336523623
+   ],
+   "epoch": 2,
+   "train_loss": 0.5734461532032896
+  },
+  {
+   "thr": 0.6,
+   "calib_iou": 0.6610467923848811,
+   "test_iou": 0.679861508912626,
+   "test_area_ratio": 1.0129119058760419,
+   "test_iou_boot95": [
+    0.6498761479674319,
+    0.709026553454638
+   ],
+   "epoch": 3,
+   "train_loss": 0.571164189592084
+  },
+  {
+   "thr": 0.55,
+   "calib_iou": 0.6690444430440317,
+   "test_iou": 0.6982181253357299,
+   "test_area_ratio": 1.0184373911720577,
+   "test_iou_boot95": [
+    0.671894293411838,
+    0.725970004794395
+   ],
+   "epoch": 4,
+   "train_loss": 0.5702823890603851
+  },
+  {
+   "thr": 0.6,
+   "calib_iou": 0.6700304053784691,
+   "test_iou": 0.6939108921291302,
+   "test_area_ratio": 0.9766016769326942,
+   "test_iou_boot95": [
+    0.6679965028707847,
+    0.7207286185150084
+   ],
+   "epoch": 5,
+   "train_loss": 0.5697857170387487
+  },
+  {
+   "thr": 0.6,
+   "calib_iou": 0.6700325638136994,
+   "test_iou": 0.6914319839581851,
+   "test_area_ratio": 0.9650393276695337,
+   "test_iou_boot95": [
+    0.6657359478070752,
+    0.7181999222214792
+   ],
+   "epoch": 6,
+   "train_loss": 0.569534579556121
+  }
+ ],
+ "final": {
+  "last_plain": {
+   "thr": 0.6,
+   "calib_iou": 0.6700325638136994,
+   "test_iou": 0.6914319839581851,
+   "test_area_ratio": 0.9650393276695337,
+   "test_iou_boot95": [
+    0.6657359478070752,
+    0.7181999222214792
+   ]
+  },
+  "last_tta8": {
+   "thr": 0.55,
+   "calib_iou": 0.6738616199424007,
+   "test_iou": 0.7097635086569891,
+   "test_area_ratio": 1.0302616485103504,
+   "test_iou_boot95": [
+    0.6810859641168826,
+    0.7381205059381456
+   ]
+  }
+ }
+}

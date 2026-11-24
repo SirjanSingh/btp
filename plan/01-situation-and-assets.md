@@ -63,7 +63,17 @@ Source: [Google Drive `final_dataset`](https://drive.google.com/drive/folders/1C
 | `DAtaset/Solar_Panel.coco.zip` | 1 | COCO-format solar panel set |
 | `results , unet/` | 53 | roof/solar overlays, 9 manual Indian test screenshots |
 
-> ### ⚠ The full AIRS dataset is NOT in Drive, and never was
+> ### ✅ Correction (2026-10-30): the full AIRS train set IS in Drive
+>
+> The full Drive API listing in `docs/drive_folder_listing.json` (made by `drive_list.py`,
+> 10,907 entries) shows `DAtaset/dataset/train/image` = **857** images with 1,714 label files
+> (857 masks + 857 `_vis`), `val` = 94 + labels, and `DAtaset/dataset/image` = 95 + labels.
+> The section below was written from a gdown enumeration that still stopped at 50 per folder.
+> On 2026-10-30 Priyal's session started streaming those images from Drive to the DGX as
+> crops (`experiments/2026-10-30-annotation-free-selftrain/fetch_airs_crops.py`). The text
+> below is kept as a record of the mistake; do not act on it.
+>
+> ### ~~⚠ The full AIRS dataset is NOT in Drive, and never was~~ (wrong, see above)
 >
 > **`train.txt` lists 857 images. Drive holds 75 unique labelled pairs, of which 25 appear
 > in `train.txt`.** The three AIRS folders hold 50 images each, and each `label/` folder is

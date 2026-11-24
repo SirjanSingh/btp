@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jaipur Rooftop Pipeline</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a night-time satellite console. One long scroll of "scenes", each a live canvas
+   next to a short plain-English panel. Deliberately dark-only (imagery is viewed on dark). */
+:root {
+  --night: #0a0f1f;        /* page ground, deep indigo night */
+  --deck: #121a33;         /* scene panels */
+  --line: #24305a;         /* hairlines, grid */
+  --ink: #e8ecf8;          /* main text */
+  --mute: #9aa6c8;         /* secondary text */
+  --sand: #e9a08a;         /* Jaipur sandstone pink: roofs, Open Buildings */
+  --sun: #ffc845;          /* solar gold: panels, energy, highlights */
+  --sky: #4fd8e8;          /* hand-drawn roof outlines (same cyan as our galleries) */
+  --bad: #ff6b6b;
+  --good: #5be3a1;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--night); color: var(--ink); font: 16px/1.6 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px; overflow-x: hidden;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.08; }
+h1 { font-size: clamp(2.4rem, 7vw, 5rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.6rem, 3.6vw, 2.4rem); font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 700; line-height: 1.3; }
+p { margin: 0; max-width: 62ch; color: var(--mute); }
+p strong, li strong { color: var(--ink); font-weight: 600; }
+.eyebrow { font: 600 0.8rem/1.4 var(--f-mono); letter-spacing: 0.02em; color: var(--sun); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+canvas { display: block; width: 100%; max-width: 100%; border-radius: 10px; }
+button {
+  font: 600 0.85rem var(--f-mono); color: var(--night); background: var(--sun); border: 0;
+  border-radius: 999px; padding: 8px 16px; cursor: pointer; transition: transform .15s, box-shadow .15s;
+}
+button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -8px rgba(0, 0, 0, .6); }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--sky); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* hero */
+.hero { position: relative; display: grid; gap: 20px; padding-top: 48px; }
+.hero canvas { aspect-ratio: 16 / 7; border: 1px solid var(--line); }
+.hero h1 span { color: var(--sun); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat { border-top: 1px solid var(--line); padding-top: 10px; }
+.stat b { display: block; font: 700 1.6rem var(--f-display); color: var(--ink); }
+.stat span { font-size: .8rem; color: var(--mute); }
+
+/* pipeline rail */
+.rail { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.rail a {
+  position: relative; text-decoration: none; color: var(--ink); font: 600 .8rem var(--f-mono);
+  border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; background: var(--deck);
+  overflow: hidden;
+}
+.rail a::after {
+  content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,200,69,.35), transparent);
+  transform: translateX(-100%);
+}
+.rail a:hover::after, .rail a:focus-visible::after { animation: sweep .9s ease-out; }
+.rail .arrow { color: var(--line); font-family: var(--f-mono); }
+@keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+/* scenes */
+.scene { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start;
+  background: var(--deck); border: 1px solid var(--line); border-radius: 18px; padding: 24px; }
+.scene.flip { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); }
+.scene.flip .stage { order: 2; }
+.scene .text { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.stage { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .78rem; color: var(--mute); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.readout { display: flex; flex-wrap: wrap; gap: 18px; }
+.readout div { display: flex; flex-direction: column; }
+.readout b { font: 700 1.5rem var(--f-display); font-variant-numeric: tabular-nums; }
+.readout span { font-size: .78rem; color: var(--mute); }
+ul.steps { margin: 0; padding-left: 18px; color: var(--mute); display: flex; flex-direction: column; gap: 6px; }
+.chip { font: 600 .7rem var(--f-mono); padding: 3px 9px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.layerbox { border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 6px; background: var(--night); }
+.layerbox .shape { font: 600 1.05rem var(--f-mono); color: var(--sun); }
+input[type=range] { width: 100%; accent-color: var(--sun); }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; max-width: 220px; }
+.tiles div { aspect-ratio: 1; border-radius: 4px; display: grid; place-items: center; font: 600 .7rem var(--f-mono); }
+
+/* scoreboard */
+.board { display: flex; flex-direction: column; gap: 9px; }
+.bar { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 3.4rem; gap: 12px; align-items: center; font-size: .85rem; }
+.bar .track { height: 14px; background: var(--night); border-radius: 999px; position: relative; overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 999px; background: var(--c, var(--mute)); position: relative; overflow: hidden;
+  transform-origin: left; }
+.bar .fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+  animation: sweep 3.6s infinite; }
+.bar.replay .fill { animation: grow 1.1s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.marker { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--sky); }
+
+.plan { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.plan div { border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; background: var(--night); }
+.plan p { font-size: .88rem; }
+footer p { font-size: .8rem; }
+
+/* architecture: high level flow */
+.flow { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+.flow::before { content: ""; position: absolute; left: 4%; right: 4%; top: 34px; height: 2px;
+  background: repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px); }
+.flow .pulse { position: absolute; top: 29px; left: 4%; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--sun); animation: travel 6s linear infinite; }
+@keyframes travel { from { left: 4%; } to { left: 95%; } }
+.node { position: relative; display: flex; flex-direction: column; gap: 8px; }
+.node .num { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; margin: 14px 0 4px;
+  background: var(--night); border: 2px solid var(--c, var(--sun)); font: 700 1rem var(--f-mono); color: var(--c, var(--sun)); z-index: 1; }
+.node h3 { color: var(--c, var(--sun)); }
+.node ul { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 4px; font-size: .84rem; color: var(--mute); }
+.node li strong { color: var(--ink); }
+.node .tag { font: 600 .72rem/1.4 var(--f-mono); color: var(--mute); border: 1px dashed var(--line); border-radius: 8px; padding: 4px 8px; }
+.loop { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--night);
+  display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: .84rem; color: var(--mute); }
+.loop b { color: var(--sky); font-family: var(--f-mono); font-weight: 600; }
+
+/* architecture: low level */
+.ll { display: flex; flex-direction: column; gap: 10px; }
+.ll details { border: 1px solid var(--line); border-radius: 12px; background: var(--night); }
+.ll summary { cursor: pointer; padding: 12px 14px; display: flex; gap: 12px; align-items: baseline; list-style: none; }
+.ll summary::-webkit-details-marker { display: none; }
+.ll summary::before { content: "+"; font: 700 1rem var(--f-mono); color: var(--sun); width: 1ch; }
+.ll details[open] summary::before { content: "−"; }
+.ll summary b { font-family: var(--f-display); font-size: 1.02rem; color: var(--ink); }
+.ll summary span { font-size: .8rem; color: var(--mute); }
+.ll .body { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 12px; }
+.kv { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: .86rem; }
+.kv dt { color: var(--sun); font: 600 .75rem var(--f-mono); padding-top: 2px; }
+.kv dd { margin: 0; color: var(--mute); }
+.kv dd strong, .kv dd code { color: var(--ink); }
+code { font: .82rem var(--f-mono); color: var(--ink); }
+.tbl { width: 100%; overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .82rem; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 .72rem var(--f-mono); color: var(--sun); }
+td { color: var(--mute); }
+td strong { color: var(--ink); }
+td.num { font-family: var(--f-mono); color: var(--ink); white-space: nowrap; }
+a { color: var(--sky); }
+.verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.verdict > div { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: var(--night); display: flex; flex-direction: column; gap: 8px; }
+
+@media (max-width: 820px) {
+  .scene, .scene.flip { grid-template-columns: minmax(0, 1fr); padding: 16px; }
+  .scene.flip .stage { order: 0; }
+  .bar { grid-template-columns: minmax(0, 1fr) 3rem; }
+  .bar .track { grid-column: 1 / -1; grid-row: 2; }
+  .unetinfo { grid-template-columns: minmax(0, 1fr) !important; }
+  .unetinfo canvas { max-width: 220px; }
+  .flow { grid-template-columns: minmax(0, 1fr); gap: 4px; padding-left: 8px; }
+  .flow::before { left: 27px; right: auto; top: 14px; bottom: 14px; width: 2px; height: auto;
+    background: repeating-linear-gradient(180deg, var(--line) 0 8px, transparent 8px 14px); }
+  .flow .pulse { display: none; }
+  .node { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 4px 12px; }
+  .node .num { grid-row: span 3; margin: 0; }
+  .kv { grid-template-columns: minmax(0, 1fr); }
+  .kv dt { padding-top: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>How we find every roof in Jaipur, and the <span>sun</span> it can catch</h1>
+  <p>A walk through the whole pipeline: satellite crops, free building outlines, a small label fix, a U-Net that learns roofs, a solar-panel detector, and the energy maths at the end. Every animation below is a simplified picture of the real step; every number comes from our runs.</p>
+  <canvas id="hero" width="1120" height="490" aria-label="Animated satellite view: a scan line finds roofs and solar panels"></canvas>
+  <div class="stats">
+    <div class="stat"><b class="mono">175 km²</b><span>study area, 16 Google tiles</span></div>
+    <div class="stat"><b class="mono">26.6 cm</b><span>per pixel on the ground</span></div>
+    <div class="stat"><b class="mono">9,072</b><span>crops of 512 × 512 px</span></div>
+    <div class="stat"><b class="mono">152</b><span>hand-drawn crops, used only to score</span></div>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Pipeline steps">
+  <a href="#arch">architecture</a><span class="arrow">·</span>
+  <a href="#method">method &amp; papers</a><span class="arrow">·</span>
+  <a href="#labels" style="--i:0">1 · free labels</a><span class="arrow">→</span>
+  <a href="#shift" style="--i:1">2 · 7 px shift</a><span class="arrow">→</span>
+  <a href="#unet" style="--i:2">3 · U-Net</a><span class="arrow">→</span>
+  <a href="#train" style="--i:3">4 · training</a><span class="arrow">→</span>
+  <a href="#threshold" style="--i:4">5 · threshold</a><span class="arrow">→</span>
+  <a href="#solar" style="--i:5">6 · existing panels</a><span class="arrow">→</span>
+  <a href="#energy" style="--i:6">7 · energy</a><span class="arrow">→</span>
+  <a href="#score" style="--i:7">8 · scoreboard</a>
+</nav>
+
+<!-- architecture: high level -->
+<section class="scene" id="arch" style="grid-template-columns:minmax(0,1fr)">
+  <div class="text">
+    <span class="eyebrow">Architecture · high level</span>
+    <h2>The whole system on one screen</h2>
+    <p>Data flows left to right through five stages. Only stage 3 learns anything; the rest is fixed geometry and arithmetic. The hand-drawn roofs never enter training: they sit in a separate scoring loop underneath.</p>
+  </div>
+  <div class="flow" aria-label="Five pipeline stages from data to energy">
+    <span class="pulse" aria-hidden="true"></span>
+    <div class="node" style="--c:var(--sand)"><span class="num">1</span><h3>Data in</h3>
+      <ul><li><strong>16 Google tiles</strong>, GeoTIFF, 26.6 cm/px, 175 km²</li>
+      <li><strong>Open Buildings v3</strong>, 523,283 polygons over Jaipur</li>
+      <li><strong>BDAPPV</strong> (France) panels + no-panel images, 3,955 Jaipur negatives</li>
+      <li><strong>152 hand crops</strong>, scoring only</li></ul></div>
+    <div class="node" style="--c:var(--sand)"><span class="num">2</span><h3>Labels</h3>
+      <ul><li>cut tiles into <strong>9,072 crops</strong> of 512 × 512</li>
+      <li>burn every polygon into a 0/1 mask</li>
+      <li>move the mask <strong>7 px S, 3 px W</strong></li></ul>
+      <span class="tag">testing now: per-building shift, SAM roof outlines</span></div>
+    <div class="node" style="--c:var(--sun)"><span class="num">3</span><h3>Models</h3>
+      <ul><li><strong>Roof U-Net</strong>, ResNet34 encoder, 24.4 M weights, trained on the weak labels</li>
+      <li><strong>Solar U-Net</strong>, ResNet34, trained on BDAPPV with negatives</li></ul>
+      <span class="tag">testing now: DINOv3 encoder, edge-weighted loss</span></div>
+    <div class="node" style="--c:var(--sky)"><span class="num">4</span><h3>Inference</h3>
+      <ul><li>average <strong>8 flipped / rotated</strong> copies</li>
+      <li>threshold <strong>0.40</strong> → roof mask</li>
+      <li>solar model on each crop at <strong>2.6×</strong> scale → panel mask</li></ul></div>
+    <div class="node" style="--c:var(--good)"><span class="num">5</span><h3>Energy</h3>
+      <ul><li>roof area ÷ area bias (1.21 / 1.07)</li>
+      <li>× 0.60 usable − 0.44 km² existing panels</li>
+      <li>× 0.20 efficiency × 1,630 kWh/kWp × 0.95</li>
+      <li><strong>5.3-6.0 GWp, 8.2-9.3 TWh/yr</strong></li></ul></div>
+  </div>
+  <div class="loop"><b>scoring loop</b> 152 hand crops → split by tile into calib 76 / test 76 → threshold and every choice made on calib → IoU reported on test → paired bootstrap, 2,000 resamples → a step counts only if its 95% CI excludes 0</div>
+</section>
+
+<!-- architecture: low level -->
+<section class="scene" id="arch-ll" style="grid-template-columns:minmax(0,1fr)">
+  <div class="text">
+    <span class="eyebrow">Architecture · low level</span>
+    <h2>Every stage, with its exact settings</h2>
+    <p>Open any row for its input, what it does, the settings we use, what it outputs, the code that runs it and the paper it comes from.</p>
+  </div>
+  <div class="ll">
+    <details><summary><b>1. Imagery and tiling</b><span>16 tiles → 9,072 crops</span></summary><div class="body"><dl class="kv">
+      <dt>input</dt><dd>16 Google satellite tiles <code>data/jaipur/map67_*.tif</code>, RGB uint8, EPSG:3857, 26.6 cm/px</dd>
+      <dt>does</dt><dd>slides a 512 × 512 window with stride 512 (no overlap); drops crops that are pure black mosaic gaps</dd>
+      <dt>split</dt><dd>by whole tile, never by crop: <strong>13 train tiles, 7,371 crops</strong>; val tiles 1-1, 2-2, 4-3 (dense, mid, sparse), <strong>1,701 crops</strong>. Random crop splits leak neighbouring content.</dd>
+      <dt>output</dt><dd><code>data/jaipur_weak/{train,val}/images/*.png</code>, each 512 × 512 × 3 (136 m across)</dd>
+      <dt>code</dt><dd><code>scripts/make_weak_labels.py</code></dd></dl></div></details>
+
+    <details><summary><b>2. Weak labels from Open Buildings</b><span>polygons → shifted 0/1 masks</span></summary><div class="body"><dl class="kv">
+      <dt>input</dt><dd><code>data/open_buildings/jaipur_open_buildings.csv</code>: 523,283 polygons (WKT, EPSG:4326) with a confidence score</dd>
+      <dt>does</dt><dd>keeps <strong>all confidences</strong> (<code>--min_conf 0.0</code>, +0.027 IoU over ≥0.75); reprojects to EPSG:3857 in one batch; burns each tile once at full resolution; moves the whole raster <strong>7 px south, 3 px west</strong>, zero-filling the edge; cuts the same crops as stage 1</dd>
+      <dt>why the shift</dt><dd>median offset between Open Buildings and hand roofs is about 1.9 m, the same in every tile (dy 5 to 11, dx −5 to 0). Re-measured on the calibration half alone: still (7, −3). Test IoU 0.659 → 0.697.</dd>
+      <dt>val labels</dt><dd>confidence ≥ 0.75, unshifted, used only to pick the best epoch, so no hand label touches training</dd>
+      <dt>output</dt><dd><code>data/jaipur_weak_c0_shift/train/masks/*.png</code>, 0/255, 28% roof pixels on average</dd>
+      <dt>code</dt><dd><code>scripts/make_weak_labels.py --min_conf 0.0 --shift_px 7 -3 --masks_only</code>; offset from <code>scripts/estimate_offset.py</code></dd>
+      <dt>papers</dt><dd>Sirko et al. 2021 (the labels); Kaiser et al. 2017 and Mnih &amp; Hinton 2012 (training on map labels); Girard et al. 2019 (fixing misaligned labels; ours is its simplest, one global shift)</dd></dl></div></details>
+
+    <details><summary><b>3. Data loading and augmentation</b><span>PNG → normalised tensor</span></summary><div class="body"><dl class="kv">
+      <dt>loader</dt><dd><code>FolderDataset</code>: pairs <code>images/x.png</code> with <code>masks/x.png</code>; mask &gt; 127 → 1.0. Optional RAM cache (decoding PNGs was the bottleneck).</dd>
+      <dt>train aug</dt><dd>horizontal flip 0.5 · vertical flip 0.5 · random 90° turn 0.5 · shift ±10% / scale ±20% (no rotation) 0.5 · Gaussian noise var 10-50 0.3 · colour jitter (brightness 0.2, contrast 0.2, saturation 0.1, hue 0.05) 0.4</dd>
+      <dt>normalise</dt><dd>÷ 255, then ImageNet mean (0.485, 0.456, 0.406) and std (0.229, 0.224, 0.225); output tensor 3 × 512 × 512, mask 1 × 512 × 512</dd>
+      <dt>code</dt><dd><code>rooftop/train.py</code>: <code>FolderDataset</code>, <code>train_aug()</code>, <code>val_aug()</code></dd></dl></div></details>
+
+    <details><summary><b>4. Roof model: U-Net + ResNet34</b><span>24.4 M weights, layer by layer</span></summary><div class="body">
+      <dl class="kv"><dt>build</dt><dd><code>smp.Unet("resnet34", encoder_weights="imagenet", classes=1)</code>, segmentation_models_pytorch 0.3.3</dd>
+      <dt>papers</dt><dd>Ronneberger et al. 2015 (U-Net); He et al. 2016 (ResNet). Alternative encoder SegFormer MiT-B2 (Xie et al. 2021) scored the same, 0.700.</dd></dl>
+      <div class="tbl"><table><thead><tr><th>encoder stage</th><th>layers</th><th>output (C × H × W)</th></tr></thead><tbody>
+        <tr><td>stem</td><td>conv 7×7 stride 2, 64 ch → BatchNorm → ReLU</td><td class="num">64 × 256 × 256 (skip 4)</td></tr>
+        <tr><td>pool</td><td>max-pool 3×3 stride 2</td><td class="num">64 × 128 × 128</td></tr>
+        <tr><td>layer1</td><td>3 BasicBlocks, 64 ch</td><td class="num">64 × 128 × 128 (skip 3)</td></tr>
+        <tr><td>layer2</td><td>4 BasicBlocks, 128 ch, first stride 2</td><td class="num">128 × 64 × 64 (skip 2)</td></tr>
+        <tr><td>layer3</td><td>6 BasicBlocks, 256 ch, first stride 2</td><td class="num">256 × 32 × 32 (skip 1)</td></tr>
+        <tr><td>layer4</td><td>3 BasicBlocks, 512 ch, first stride 2</td><td class="num">512 × 16 × 16 (bottleneck)</td></tr>
+      </tbody></table></div>
+      <p style="font-size:.84rem">BasicBlock = conv 3×3 → BN → ReLU → conv 3×3 → BN, plus a shortcut (1×1 conv when the stride is 2), then ReLU.</p>
+      <div class="tbl"><table><thead><tr><th>decoder block</th><th>does</th><th>input + skip → output</th></tr></thead><tbody>
+        <tr><td>D1</td><td rowspan="5">upsample 2× (nearest) → concatenate skip → (conv 3×3 → BN → ReLU) × 2</td><td class="num">512 + 256 → 256 × 32 × 32</td></tr>
+        <tr><td>D2</td><td class="num">256 + 128 → 128 × 64 × 64</td></tr>
+        <tr><td>D3</td><td class="num">128 + 64 → 64 × 128 × 128</td></tr>
+        <tr><td>D4</td><td class="num">64 + 64 → 32 × 256 × 256</td></tr>
+        <tr><td>D5</td><td class="num">32 + none → 16 × 512 × 512</td></tr>
+        <tr><td>head</td><td>conv 3×3, 16 → 1 channel</td><td class="num">1 × 512 × 512 logits</td></tr>
+      </tbody></table></div></div></details>
+
+    <details><summary><b>5. Training</b><span>loss, optimiser, schedule, model pick</span></summary><div class="body"><dl class="kv">
+      <dt>loss</dt><dd>0.5 × binary cross-entropy + 0.5 × Dice, on logits</dd>
+      <dt>optimiser</dt><dd>AdamW (Loshchilov &amp; Hutter 2019): learning rate 1e-4 for decoder and head, 1e-5 for the pretrained encoder, weight decay 1e-4</dd>
+      <dt>schedule</dt><dd>cosine decay to 1e-6 over 40 epochs; batch 16; mixed precision; seed 42; early stop after 15 epochs without improvement; one Tesla V100 32 GB, about 4 min per epoch</dd>
+      <dt>model pick</dt><dd>epoch with the best IoU on the 3 val tiles against Open Buildings (conf ≥ 0.75, unshifted). For the headline model that was epoch 16 (val IoU 0.592).</dd>
+      <dt>output</dt><dd><code>best.pth</code> (weights + optimiser state + args)</dd>
+      <dt>code</dt><dd><code>python rooftop/train.py --train_dir data/jaipur_weak_c0_shift/train --val_dir data/jaipur_weak/val --encoder resnet34 --epochs 40 --batch_size 16</code></dd></dl></div></details>
+
+    <details><summary><b>6. Inference and threshold</b><span>probability → roof mask</span></summary><div class="body"><dl class="kv">
+      <dt>TTA</dt><dd>run the crop through the model 8 times (4 rotations × with / without a mirror flip), undo each transform, average the sigmoid probabilities. +0.010 IoU (CI +0.007 to +0.013).</dd>
+      <dt>threshold</dt><dd>swept over 0.3, 0.4, 0.5, 0.6, 0.7 on the calibration half; <strong>0.40</strong> wins (the model is a little under-confident)</dd>
+      <dt>output</dt><dd>512 × 512 roof mask per crop; whole-area roof = 53.3 km² before bias correction</dd>
+      <dt>code</dt><dd><code>scripts/hand_ensemble_budget.py</code> (<code>dihedral_probs</code>), <code>scripts/d16_capacity_estimate.py</code></dd></dl></div></details>
+
+    <details><summary><b>7. Existing solar panels</b><span>subtract what is already installed</span></summary><div class="body"><dl class="kv">
+      <dt>model</dt><dd>ResNet34 U-Net, ImageNet start, batch 16, 30 epochs, seed 42; 28,598 train crops: 10,665 BDAPPV panels, 13,978 BDAPPV no-panel images, 3,955 Jaipur non-roof negatives; val IoU 0.823</dd>
+      <dt>why negatives</dt><dd>the old models only ever saw images with panels and called canals, tarps and metal roofs "solar" (31-54% of flagged area off roofs); with negatives it is about 5%</dd>
+      <dt>inference</dt><dd>each Jaipur crop upsampled 2.6× to BDAPPV's 0.1 m/px; panels kept only where the roof mask is 1</dd>
+      <dt>output</dt><dd><strong>0.444 km² of panels on roofs</strong>, 0.83% of roof area, about 89 MWp (56 MWp at 3.4×); a lower bound</dd>
+      <dt>code</dt><dd><code>scripts/existing_pv_area.py</code>; base paper Kasmi et al. 2024 (why PV models break across imagery)</dd></dl></div></details>
+
+    <details><summary><b>8. Energy estimate</b><span>roof m² → GWp → TWh/yr</span></summary><div class="body"><dl class="kv">
+      <dt>chain</dt><dd>roof area 53.3 km² ÷ hand-measured area bias (<strong>1.21</strong> calib, <strong>1.07</strong> test) × usable share <strong>0.60</strong> − 0.44 km² existing panels × panel efficiency <strong>0.20</strong> → kWp; × PVOUT <strong>1,630</strong> kWh/kWp/yr (Global Solar Atlas) × rooftop derate <strong>0.95</strong> → kWh</dd>
+      <dt>result</dt><dd><strong>5.3-6.0 GWp, 8.2-9.3 TWh/yr</strong>. The usable share (0.33-0.60 in the literature) moves the answer about 20× more than existing panels do.</dd>
+      <dt>code</dt><dd><code>scripts/d16_capacity_estimate.py --k_usable 0.60 --pvout 1630 --rooftop_derate 0.95</code></dd></dl></div></details>
+
+    <details><summary><b>9. Scoring</b><span>how every number on this page is made</span></summary><div class="body"><dl class="kv">
+      <dt>ground truth</dt><dd>152 crops hand-drawn by three annotators; split by tile into <strong>calib 76</strong> and <strong>test 76</strong></dd>
+      <dt>metric</dt><dd>IoU pooled over all pixels of a half: TP ÷ (TP + FP + FN)</dd>
+      <dt>rule</dt><dd>threshold, label settings and model choice are made on calib; IoU is reported on test; paired bootstrap over 2,000 crop resamples; a change counts only if its 95% CI excludes 0. Seed-to-seed noise is about 0.004-0.015.</dd>
+      <dt>code</dt><dd><code>scripts/score_models_hand.py</code>, <code>scripts/hand_ensemble_budget.py</code></dd></dl></div></details>
+  </div>
+</section>
+
+<!-- method and papers -->
+<section class="scene" id="method" style="grid-template-columns:minmax(0,1fr)">
+  <div class="text">
+    <span class="eyebrow">Method · what this is, and where each piece comes from</span>
+    <h2>Weak supervision, not domain adaptation</h2>
+    <p>The 0.70 model is <strong>not</strong> unsupervised domain adaptation (UDA). UDA trains on a labelled source city and adapts to an unlabelled target. We skip that: Open Buildings already gives noisy labels <strong>in Jaipur itself</strong>, so we train on the target directly and clean the labels. UDA is our comparison, and it lost.</p>
+  </div>
+  <div class="verdict">
+    <div><span class="chip" style="color:var(--good);align-self:start">what we use</span><h3>Weakly supervised training on noisy target labels</h3><p>Open Buildings footprints, shifted onto the roofs, train a U-Net directly on Jaipur. Test IoU <strong>0.697</strong>, <strong>0.706</strong> with 8-way averaging.</p></div>
+    <div><span class="chip" style="color:var(--bad);align-self:start">what we tried and dropped</span><h3>Unsupervised domain adaptation</h3><p>Train on labelled AIRS / BDAPPV, adapt to Jaipur with AdaBN, FDA, histogram matching, self-training (arms A-R), DACS mixing, BLDA and DUDA. All scored <strong>0.04-0.33</strong> on the hand roofs.</p></div>
+    <div><span class="chip" style="color:var(--mute);align-self:start">tried, separate result</span><h3>Fine-tune on 76 hand crops</h3><p>2-fold: +0.026 one way, −0.021 the other. No reliable gain, so the zero-label model stays the headline.</p></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>paper</th><th>venue (checked on dblp)</th><th>what we took</th><th>stage</th></tr></thead><tbody>
+    <tr><td><strong>Ronneberger, Fischer, Brox</strong>. U-Net</td><td><a href="https://dblp.org/rec/conf/miccai/RonnebergerFB15">MICCAI 2015</a></td><td>encoder-decoder with skip connections</td><td class="num">4</td></tr>
+    <tr><td><strong>He, Zhang, Ren, Sun</strong>. Deep Residual Learning</td><td><a href="https://dblp.org/rec/conf/cvpr/HeZRS16">CVPR 2016</a></td><td>ResNet34 encoder</td><td class="num">4</td></tr>
+    <tr><td><strong>Mnih, Hinton</strong>. Learning to Label Aerial Images from Noisy Data</td><td><a href="https://dblp.org/rec/conf/icml/MnihH12">ICML 2012</a></td><td>training on noisy, misregistered map labels works</td><td class="num">2</td></tr>
+    <tr><td><strong>Kaiser et al.</strong> Learning Aerial Image Segmentation From Online Maps</td><td><a href="https://dblp.org/rec/journals/tgrs/KaiserWLJHS17">IEEE TGRS 2017</a></td><td>map-derived labels at scale; fine-tune on a few clean ones (did not replicate for us)</td><td class="num">2, 5</td></tr>
+    <tr><td><strong>Sirko et al.</strong> Continental-Scale Building Detection</td><td><a href="https://dblp.org/rec/journals/corr/abs-2107-12283">arXiv 2021</a></td><td>the Open Buildings labels; edge-weighted loss (being tested)</td><td class="num">2, 5</td></tr>
+    <tr><td><strong>Girard, Charpiat, Tarabalka</strong>. Correcting Misaligned Cadaster Maps</td><td><a href="https://dblp.org/rec/conf/igarss/GirardCT19">IGARSS 2019</a></td><td>align the labels to the image; always refine from the original labels</td><td class="num">2</td></tr>
+    <tr><td><strong>Loshchilov, Hutter</strong>. Decoupled Weight Decay (AdamW)</td><td><a href="https://dblp.org/rec/conf/iclr/LoshchilovH19">ICLR 2019</a></td><td>optimiser</td><td class="num">5</td></tr>
+    <tr><td><strong>Xie et al.</strong> SegFormer</td><td><a href="https://dblp.org/rec/conf/nips/XieWYAAL21">NeurIPS 2021</a></td><td>MiT-B2 alternative encoder (0.700, same as ResNet34)</td><td class="num">4</td></tr>
+    <tr><td><strong>Kasmi et al.</strong> Space-scale Exploration ... Rooftop PV</td><td><a href="https://dblp.org/rec/journals/corr/abs-2408-07828">arXiv 2024</a></td><td>base paper for the UDA comparison; why PV models break across imagery</td><td class="num">7</td></tr>
+    <tr><td><strong>Kang et al.</strong> DUDA</td><td><a href="https://dblp.org/rec/journals/corr/abs-2504-09814">arXiv 2025</a> (no WACV record on dblp yet)</td><td>strongest UDA baseline we ran; lost</td><td class="num">-</td></tr>
+    <tr><td><strong>Kirillov et al.</strong> Segment Anything</td><td>ICCV 2023 (not yet dblp-checked)</td><td>SAM ViT-H, prompted with each building's box, to trace roof outlines (being tested)</td><td class="num">2</td></tr>
+    <tr><td><strong>Meta AI</strong>. DINOv3</td><td>arXiv 2508.10104, 2025 (not yet dblp-checked)</td><td>ConvNeXt-Tiny encoder distilled from DINOv3 (being tested)</td><td class="num">4</td></tr>
+    <tr><td><strong>OMAF</strong>; <strong>Align and Segment</strong></td><td>CVPR 2026; arXiv 2607.10841 (not yet dblp-checked)</td><td>idea of shifting each building separately (being tested, our own code)</td><td class="num">2</td></tr>
+  </tbody></table></div>
+</section>
+
+<!-- 1 labels -->
+<section class="scene" id="labels">
+  <div class="stage">
+    <canvas id="cvLabels" width="640" height="420" aria-label="Open Buildings footprints dropping onto a satellite crop"></canvas>
+    <div class="legend"><span><i style="background:var(--sand)"></i>roof in the image</span><span><i style="background:transparent;border:2px dashed var(--sand)"></i>Open Buildings outline</span><span><i style="background:var(--sky)"></i>hand-drawn roof (scoring only)</span></div>
+  </div>
+  <div class="text">
+    <span class="eyebrow">Step 1 · weak supervision</span>
+    <h2>Nobody labelled 9,072 crops. Google already had.</h2>
+    <p>Google's <strong>Open Buildings</strong> dataset has a polygon for almost every building in Africa and South Asia, made by their own model. We draw those polygons onto our Jaipur crops and use them as the answer key for training.</p>
+    <p>They are <strong>noisy</strong>: a few buildings are missing, outlines are a bit rough, and the whole layer sits slightly off the roofs. That is why this is called <strong>weak</strong> supervision. It is not unsupervised domain adaptation: we tried those methods (AdaBN, FDA, self-training, DUDA) and they scored 0.04 to 0.33.</p>
+    <div class="btns"><button id="btnLabels">Drop the outlines again</button></div>
+  </div>
+</section>
+
+<!-- 2 shift -->
+<section class="scene flip" id="shift">
+  <div class="stage">
+    <canvas id="cvShift" width="640" height="420" aria-label="Footprints sliding 7 pixels south and 3 pixels west onto roofs"></canvas>
+    <div class="readout">
+      <div><b class="mono" id="shiftDy">0 px</b><span>moved south</span></div>
+      <div><b class="mono" id="shiftDx">0 px</b><span>moved west</span></div>
+      <div><b class="mono" id="shiftIou" style="color:var(--sun)">0.659</b><span>test IoU of model trained on it</span></div>
+    </div>
+  </div>
+  <div class="text">
+    <span class="eyebrow">Step 2 · the label fix that mattered most</span>
+    <h2>Slide every outline 7 px south and 3 px west</h2>
+    <p>Comparing Open Buildings with our hand-drawn roofs showed the whole layer is offset by about <strong>1.9 m</strong>: 7 pixels north and 3 east of the true roofs, in every one of the 16 tiles. So we move the label raster back before training.</p>
+    <p>Measured again today on the calibration half alone (so the test crops never influenced it): still exactly <strong>7 south, 3 west</strong>.</p>
+    <p>Result: test IoU <strong>0.659 → 0.697</strong>, a gain of +0.038 (95% CI +0.031 to +0.045), the same on 3 random seeds.</p>
+    <div class="btns"><button id="btnShift">Replay the shift</button></div>
+  </div>
+</section>
+
+<!-- 3 unet -->
+<section class="scene" id="unet" style="grid-template-columns:minmax(0,1fr)">
+  <div class="text">
+    <span class="eyebrow">Step 3 · the network</span>
+    <h2>U-Net with a ResNet34 encoder, layer by layer</h2>
+    <p>The left half (encoder) shrinks the picture while learning <strong>what</strong> is in it. The right half (decoder) grows it back to full size to say <strong>where</strong>. The arcs are skip connections: they hand fine detail from the encoder straight to the decoder so roof edges stay sharp. 24.4 million weights, starting from ImageNet.</p>
+  </div>
+  <div class="stage">
+    <canvas id="cvUnet" width="1060" height="430" aria-label="U-Net diagram with data flowing through encoder, bottleneck and decoder"></canvas>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:16px" class="unetinfo">
+      <div class="layerbox" aria-live="polite">
+        <span class="eyebrow" id="lyName">Input</span>
+        <span class="shape" id="lyShape">3 × 512 × 512</span>
+        <p id="lyDesc" style="max-width:none">A 512 × 512 RGB crop (136 m across), scaled to 0-1 and normalised with ImageNet mean and spread.</p>
+      </div>
+      <canvas id="cvFeat" width="220" height="220" aria-label="What the network sees at this layer"></canvas>
+    </div>
+    <div class="btns"><button class="ghost" id="lyPrev">◀ Prev</button><button id="lyPlay">❚❚ Pause</button><button class="ghost" id="lyNext">Next ▶</button></div>
+  </div>
+</section>
+
+<!-- 4 training -->
+<section class="scene flip" id="train">
+  <div class="stage">
+    <canvas id="cvTrain" width="640" height="400" aria-label="Loss falling and learning rate decaying over 40 epochs while the predicted mask sharpens"></canvas>
+    <div class="readout"><div><b class="mono" id="epoch">0</b><span>epoch / 40</span></div><div><b class="mono" id="lossv">0.62</b><span>BCE + Dice loss</span></div><div><b class="mono" id="lrv">1.0e-4</b><span>learning rate</span></div></div>
+  </div>
+  <div class="text">
+    <span class="eyebrow">Step 4 · training</span>
+    <h2>40 passes over 7,371 crops</h2>
+    <ul class="steps">
+      <li><strong>Loss:</strong> half BCE (each pixel right or wrong) plus half Dice (overlap of the whole shape).</li>
+      <li><strong>Optimiser:</strong> AdamW, learning rate 1e-4 for the decoder, 1e-5 for the pretrained encoder, weight decay 1e-4.</li>
+      <li><strong>Schedule:</strong> cosine decay down to 1e-6; batch 16; mixed precision on a V100.</li>
+      <li><strong>Augmentation:</strong> flips, 90° turns, small shifts and zooms, noise, colour jitter.</li>
+      <li><strong>Model pick:</strong> the epoch with best overlap on 3 held-out tiles, scored against Open Buildings. No hand label is used.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5 threshold -->
+<section class="scene" id="threshold">
+  <div class="stage">
+    <canvas id="cvThr" width="640" height="320" aria-label="Probability map and the mask produced by the chosen threshold"></canvas>
+    <label for="thr" class="mono" style="font-size:.85rem">threshold <b id="thrv" style="color:var(--sun)">0.40</b> · overlap with hand roofs in this demo <b id="thrIou">-</b></label>
+    <input type="range" id="thr" min="0.15" max="0.7" step="0.05" value="0.4">
+  </div>
+  <div class="text">
+    <span class="eyebrow">Step 5 · from probability to roof</span>
+    <h2>Pick the cut-off on one half, report on the other</h2>
+    <p>The network outputs a probability for every pixel (left). A <strong>threshold</strong> turns it into roof / not roof (right). Our models are a little under-confident, so 0.4 beats the usual 0.5.</p>
+    <p>To keep the score honest, the 152 hand crops are split <strong>by tile</strong>. The threshold is chosen on the calibration tiles and the IoU is reported only on the test tiles.</p>
+    <div class="tiles" id="tiles" aria-label="4 by 4 grid of tiles, calibration and test"></div>
+    <div class="legend"><span><i style="background:var(--sand)"></i>calibration</span><span><i style="background:var(--sky)"></i>test</span></div>
+  </div>
+</section>
+
+<!-- 6 solar -->
+<section class="scene flip" id="solar">
+  <div class="stage">
+    <canvas id="cvSolar" width="640" height="400" aria-label="Old solar model flags canals and tarps; retrained model flags only real panels"></canvas>
+    <div class="readout">
+      <div><b class="mono" id="solarMode" style="color:var(--bad)">old model</b><span>showing</span></div>
+      <div><b class="mono" id="solarOff">31-54%</b><span>flagged area off roofs</span></div>
+      <div><b class="mono" id="solarCrops">135-151</b><span>of 152 crops flagged</span></div>
+    </div>
+  </div>
+  <div class="text">
+    <span class="eyebrow">Step 6 · subtract panels already there</span>
+    <h2>Teach the panel detector what "no panel" looks like</h2>
+    <p>The old solar models were trained only on French images that all contained panels. On Jaipur they called canals, blue tarps and metal roofs "solar".</p>
+    <p>We retrained with <strong>15,504 French images with no panels</strong> plus <strong>3,955 Jaipur patches</strong> of fields, roads and canals. False alarms dropped from about half to about 5%.</p>
+    <p>Existing rooftop solar in our area: <strong>0.28 to 0.44 km² of panels, about 56 to 89 MWp</strong>. That is a lower bound, and only about 1.5% of the potential.</p>
+  </div>
+</section>
+
+<!-- 7 energy -->
+<section class="scene" id="energy" style="grid-template-columns:minmax(0,1fr)">
+  <div class="text">
+    <span class="eyebrow">Step 7 · from roof area to energy</span>
+    <h2>The chain of multiplications</h2>
+    <p>The predicted roof area is corrected by its measured bias, multiplied by the share of roof that can actually take panels, minus panels already there, times panel efficiency, times the sunshine Jaipur gets (Global Solar Atlas). The usable share is the weakest link, so try both values.</p>
+    <div class="btns" role="group" aria-label="Usable share of roof">
+      <button id="k60">usable share 0.60 (our assumption)</button>
+      <button class="ghost" id="k30">usable share 0.30 (Bhopal, Nepal papers)</button>
+    </div>
+  </div>
+  <canvas id="cvEnergy" width="1060" height="300" aria-label="Animated energy chain from roof area to terawatt hours"></canvas>
+</section>
+
+<!-- 8 score -->
+<section class="scene" id="score" style="grid-template-columns:minmax(0,1fr)">
+  <div class="text">
+    <span class="eyebrow">Step 8 · how good is it</span>
+    <h2>Scoreboard on real, hand-drawn roofs</h2>
+    <p>IoU = overlap ÷ union of predicted and true roof pixels (1.0 is perfect). The blue line marks the best fully supervised result we found on the comparable Inria aerial benchmark (about 0.83, clean labels). Our agreed target is 0.75 to 0.80.</p>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="btns"><button class="ghost" id="btnBoard">Replay bars</button></div>
+</section>
+
+<!-- next -->
+<section class="scene" style="grid-template-columns:minmax(0,1fr)">
+  <div class="text">
+    <span class="eyebrow">Next · toward 0.75 to 0.80</span>
+    <h2>What we are doing now</h2>
+  </div>
+  <div class="plan">
+    <div><span class="chip" style="color:var(--good)">done</span><h3>Re-measure the shift</h3><p>Calibration half alone gives 7 south, 3 west again. No leak, no retrain needed.</p></div>
+    <div><span class="chip" style="color:var(--good)">done</span><h3>Error budget</h3><p>93% of wrong pixels are edges and partly covered roofs; only 4% are missed buildings and 3% invented ones. Ignoring a 3 px (80 cm) band round every roof edge lifts IoU only to 0.776, so shapes, not just edges, are off.</p></div>
+    <div><span class="chip" style="color:var(--good)">done</span><h3>Ensemble + flips</h3><p>Averaging 8 flipped and rotated copies: <strong>0.697 → 0.706</strong> (+0.010, CI +0.007 to +0.013). Adding more models on top gives nothing extra.</p></div>
+    <div><span class="chip" style="color:var(--good)">done</span><h3>Fine-tune on 76 hand crops</h3><p>2-fold, halves swapped: +0.026 one way, −0.021 the other. <strong>No reliable gain</strong>; the zero-label model stays the headline.</p></div>
+    <div><span class="chip" style="color:var(--good)">done</span><h3>Shift each building separately?</h3><p>Moving each Open Buildings outline on its own toward the model's prediction lifts the <em>labels</em> from 0.551 to 0.567 IoU against hand roofs (calib). The outline <em>shape</em>, not its position, is the bigger limit.</p></div>
+  </div>
+</section>
+
+<!-- round 1 experiments -->
+<section class="scene" id="round1" style="grid-template-columns:minmax(0,1fr)">
+  <div class="text">
+    <span class="eyebrow">Round 1 · five experiments in parallel</span>
+    <h2>Which change raises IoU?</h2>
+    <p>Each run changes <strong>one thing</strong> against the 0.697 baseline (same seed, epochs, batch and model pick). Label variants are first scored against the hand roofs on calib and only trained if they beat the current labels.</p>
+  </div>
+  <div class="plan" id="r1cards">
+    <div><span class="chip" style="color:var(--sun)">running</span><h3>Edge-weighted loss</h3><p>Sirko et al. 2021: pixels near a roof edge count up to about 28× more in the cross-entropy (Gaussian σ 5.6 px). Targets the 93% of error that sits on edges.</p></div>
+    <div><span class="chip" style="color:var(--sun)">running</span><h3>DINOv3 encoder</h3><p>Swap ResNet34 for a ConvNeXt-Tiny distilled from Meta's DINOv3 (31.9 M weights), the encoder Align and Segment uses.</p></div>
+    <div><span class="chip" style="color:var(--sun)">running</span><h3>Per-building shift labels</h3><p>Every Open Buildings polygon moved on its own (±14 px) to best match the current model's roof prediction.</p></div>
+    <div><span class="chip" style="color:var(--sun)">running</span><h3>SAM roof outlines</h3><p>Each building's box prompts SAM ViT-H; its outline replaces the footprint when the two agree.</p></div>
+    <div><span class="chip" style="color:var(--sun)">running</span><h3>Shift + SAM (hybrid labels)</h3><p>SAM prompted with the per-building-shifted box: both label fixes at once.</p></div>
+  </div>
+</section>
+
+<footer><p>Built from the repo's experiment READMEs (2026-11-19 hand-label scoring, 2026-11-20 solar with negatives). Animations are schematic; numbers are measured. Imagery is not shown because its licence is unresolved.</p></footer>
+</div>
+
+<script>
+(() => {
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const C = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const COL = { night: C("--night"), deck: C("--deck"), line: C("--line"), ink: C("--ink"), mute: C("--mute"),
+  sand: C("--sand"), sun: C("--sun"), sky: C("--sky"), bad: C("--bad"), good: C("--good") };
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+function rgba(hex, a) { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
+
+// Make a little "city": roofs as rectangles, some with panels, plus canal/tarp props.
+function city(w, h, seed, cell = 64) {
+  const r = rng(seed), roofs = [];
+  for (let y = 10; y < h - 30; y += cell) for (let x = 10; x < w - 30; x += cell) {
+    if (r() < 0.18) continue;
+    const bw = cell * (0.45 + r() * 0.4), bh = cell * (0.45 + r() * 0.4);
+    roofs.push({ x: x + r() * (cell - bw), y: y + r() * (cell - bh), w: bw, h: bh,
+      tone: 0.65 + r() * 0.35, panel: r() < 0.12, miss: r() < 0.08 });
+  }
+  return roofs;
+}
+function ground(ctx, w, h, seed) {
+  const r = rng(seed);
+  ctx.fillStyle = "#1a2140"; ctx.fillRect(0, 0, w, h);
+  for (let i = 0; i < 900; i++) { ctx.fillStyle = rgba("#3a4470", r() * .25); ctx.fillRect(r() * w, r() * h, 2 + r() * 5, 2 + r() * 5); }
+  ctx.strokeStyle = rgba("#2c3768", .9); ctx.lineWidth = 6;
+  for (let i = 0; i < 3; i++) { ctx.beginPath(); const y = h * (i + 1) / 4 + r() * 20; ctx.moveTo(0, y); ctx.lineTo(w, y + r() * 30 - 15); ctx.stroke(); }
+}
+function drawRoof(ctx, b, alpha = 1) {
+  ctx.fillStyle = rgba(COL.sand, 0.35 + 0.45 * b.tone * alpha);
+  ctx.fillRect(b.x, b.y, b.w, b.h);
+  ctx.fillStyle = rgba("#000000", .25); ctx.fillRect(b.x + b.w, b.y + 3, 3, b.h); // little shadow
+}
+function drawPanels(ctx, b, glow = 0) {
+  const pw = b.w * .55, ph = b.h * .45, px = b.x + b.w * .2, py = b.y + b.h * .25;
+  ctx.fillStyle = "#1f3f8f"; ctx.fillRect(px, py, pw, ph);
+  ctx.strokeStyle = rgba("#9cc4ff", .7); ctx.lineWidth = 1;
+  for (let i = 1; i < 4; i++) { ctx.beginPath(); ctx.moveTo(px + pw * i / 4, py); ctx.lineTo(px + pw * i / 4, py + ph); ctx.stroke(); }
+  ctx.beginPath(); ctx.moveTo(px, py + ph / 2); ctx.lineTo(px + pw, py + ph / 2); ctx.stroke();
+  if (glow > 0) { ctx.strokeStyle = rgba(COL.sun, glow); ctx.lineWidth = 3; ctx.strokeRect(px - 3, py - 3, pw + 6, ph + 6); }
+}
+// Run a draw(t) loop only while the canvas is on screen.
+function loop(canvas, draw) {
+  let on = false, raf = 0, t0 = performance.now();
+  const tick = now => { draw((now - t0) / 1000); if (on && !RM) raf = requestAnimationFrame(tick); };
+  draw(0);
+  new IntersectionObserver(es => es.forEach(e => {
+    on = e.isIntersecting; if (on && !RM) { cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); }
+  }), { threshold: 0.05 }).observe(canvas);
+  return { reset() { t0 = performance.now(); if (RM) draw(99); } };
+}
+
+/* HERO: scan line finds roofs (cyan) and panels (gold) */
+(() => {
+  const cv = document.getElementById("hero"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const roofs = city(W, H, 7, 56);
+  loop(cv, t => {
+    ground(ctx, W, H, 3);
+    const period = 6, x = ((t % period) / period) * (W + 200) - 100;
+    roofs.forEach(b => {
+      drawRoof(ctx, b);
+      const seen = b.x + b.w / 2 < x;
+      if (b.panel) drawPanels(ctx, b, seen ? 0.5 + 0.5 * Math.sin(t * 4) : 0);
+      if (seen) { ctx.strokeStyle = COL.sky; ctx.lineWidth = 1.6; ctx.strokeRect(b.x, b.y, b.w, b.h); }
+    });
+    const g = ctx.createLinearGradient(x - 120, 0, x, 0);
+    g.addColorStop(0, rgba(COL.sun, 0)); g.addColorStop(1, rgba(COL.sun, .28));
+    ctx.fillStyle = g; ctx.fillRect(x - 120, 0, 120, H);
+    ctx.fillStyle = COL.sun; ctx.fillRect(x, 0, 2, H);
+    ctx.fillStyle = rgba(COL.night, .8); ctx.fillRect(14, H - 40, 300, 28);
+    ctx.fillStyle = COL.ink; ctx.font = "600 13px JetBrains Mono, monospace";
+    const found = roofs.filter(b => b.x + b.w / 2 < x).length;
+    ctx.fillText(`roofs found ${String(found).padStart(3)}   panels ${roofs.filter(b => b.panel && b.x + b.w / 2 < x).length}`, 24, H - 21);
+  });
+})();
+
+/* 1 LABELS: footprints drop onto roofs (offset, some missing) */
+(() => {
+  const cv = document.getElementById("cvLabels"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const roofs = city(W, H, 21, 80);
+  const L = loop(cv, t => {
+    ground(ctx, W, H, 11);
+    roofs.forEach(b => drawRoof(ctx, b));
+    roofs.forEach((b, i) => {
+      if (b.miss) return;
+      const k = ease(clamp((t - i * 0.04) / 0.7, 0, 1));
+      const oy = -7 * 1.6, ox = 3 * 1.6;          // OB sits north-east of the roof
+      ctx.globalAlpha = k;
+      ctx.setLineDash([6, 4]); ctx.strokeStyle = COL.sand; ctx.lineWidth = 2;
+      ctx.strokeRect(b.x + ox + 3, b.y + oy - (1 - k) * 60 + 3, b.w - 6, b.h - 6);
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+    });
+    if (t > 2.2) {
+      const a = clamp((t - 2.2) / .6, 0, 1);
+      roofs.filter(b => b.miss).forEach(b => {
+        ctx.strokeStyle = rgba(COL.bad, a); ctx.lineWidth = 2; ctx.beginPath();
+        ctx.arc(b.x + b.w / 2, b.y + b.h / 2, Math.max(b.w, b.h) * .75, 0, 7); ctx.stroke();
+      });
+      ctx.fillStyle = rgba(COL.night, .85 * a); ctx.fillRect(12, H - 38, 340, 26);
+      ctx.fillStyle = rgba(COL.ink, a); ctx.font = "600 12px JetBrains Mono, monospace";
+      ctx.fillText("red circles: buildings Open Buildings missed", 20, H - 20);
+    }
+  });
+  document.getElementById("btnLabels").onclick = () => L.reset();
+})();
+
+/* 2 SHIFT: outlines slide 7 S, 3 W; IoU counter */
+(() => {
+  const cv = document.getElementById("cvShift"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const roofs = city(W, H, 33, 92), S = 2.2;
+  const dyEl = document.getElementById("shiftDy"), dxEl = document.getElementById("shiftDx"), iouEl = document.getElementById("shiftIou");
+  const L = loop(cv, t => {
+    const k = ease(clamp((t - 0.8) / 1.8, 0, 1));
+    ground(ctx, W, H, 5);
+    roofs.forEach(b => { drawRoof(ctx, b); ctx.strokeStyle = COL.sky; ctx.lineWidth = 1.5; ctx.strokeRect(b.x, b.y, b.w, b.h); });
+    const oy = -7 * S * (1 - k), ox = 3 * S * (1 - k);
+    roofs.forEach(b => {
+      if (b.miss) return;
+      ctx.fillStyle = rgba(COL.sand, .18); ctx.fillRect(b.x + ox, b.y + oy, b.w, b.h);
+      ctx.setLineDash([6, 4]); ctx.strokeStyle = COL.sand; ctx.lineWidth = 2;
+      ctx.strokeRect(b.x + ox, b.y + oy, b.w, b.h); ctx.setLineDash([]);
+    });
+    // compass
+    ctx.fillStyle = rgba(COL.night, .85); ctx.fillRect(W - 92, 12, 80, 80);
+    ctx.strokeStyle = COL.mute; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(W - 52, 22); ctx.lineTo(W - 52, 82); ctx.moveTo(W - 82, 52); ctx.lineTo(W - 22, 52); ctx.stroke();
+    ctx.fillStyle = COL.ink; ctx.font = "600 11px JetBrains Mono, monospace"; ctx.fillText("N", W - 56, 20); ctx.fillText("1 px = 26.6 cm", 14, H - 14);
+    ctx.fillStyle = COL.sun; ctx.beginPath(); ctx.arc(W - 52 - 9 * k, 52 + 21 * k, 4, 0, 7); ctx.fill();
+    dyEl.textContent = `${Math.round(7 * k)} px`; dxEl.textContent = `${Math.round(3 * k)} px`;
+    iouEl.textContent = (0.659 + 0.038 * k).toFixed(3);
+  });
+  document.getElementById("btnShift").onclick = () => L.reset();
+})();
+
+/* 3 UNET: blocks + flowing packet + feature preview */
+(() => {
+  const cv = document.getElementById("cvUnet"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const feat = document.getElementById("cvFeat"), fx = feat.getContext("2d");
+  const layers = [
+    { n: "Input", s: "3 × 512 × 512", res: 512, ch: 3, side: "in",
+      d: "A 512 × 512 RGB crop (136 m across), scaled to 0-1 and normalised with ImageNet mean and spread." },
+    { n: "Stem: conv 7×7, stride 2 + BN + ReLU", s: "64 × 256 × 256", res: 256, ch: 64, side: "enc", skip: 4,
+      d: "64 filters of 7 × 7 slide over the image with step 2: edges, colours, textures. Batch-norm keeps the numbers stable, ReLU keeps positives. Its output is saved for skip 4." },
+    { n: "Max-pool 3×3, stride 2", s: "64 × 128 × 128", res: 128, ch: 64, side: "enc",
+      d: "Keeps the strongest response in each 3 × 3 window and halves the size again. Cheap and makes the network tolerant of small shifts." },
+    { n: "layer1: 3 BasicBlocks", s: "64 × 128 × 128", res: 128, ch: 64, side: "enc", skip: 3,
+      d: "Each BasicBlock is conv 3×3 → BN → ReLU → conv 3×3 → BN, plus a shortcut that adds the block's input back (the ResNet trick that lets deep nets train). Saved for skip 3." },
+    { n: "layer2: 4 BasicBlocks", s: "128 × 64 × 64", res: 64, ch: 128, side: "enc", skip: 2,
+      d: "First block uses stride 2 (with a 1×1 conv on the shortcut so sizes match). Now it sees corners, small roofs, roof edges. Saved for skip 2." },
+    { n: "layer3: 6 BasicBlocks", s: "256 × 32 × 32", res: 32, ch: 256, side: "enc", skip: 1,
+      d: "The deepest stack. Each pixel here covers about 8.5 m of ground, enough to see a whole house and its surroundings. Saved for skip 1." },
+    { n: "layer4: 3 BasicBlocks (bottleneck)", s: "512 × 16 × 16", res: 16, ch: 512, side: "mid",
+      d: "512 channels on a 16 × 16 grid. Very little 'where', a lot of 'what': roof vs road vs tree vs canal." },
+    { n: "Decoder D1", s: "256 × 32 × 32", res: 32, ch: 256, side: "dec", use: 1,
+      d: "Upsample 2× (nearest), glue on skip 1 from layer3 (512 + 256 channels), then two rounds of conv 3×3 → BN → ReLU." },
+    { n: "Decoder D2", s: "128 × 64 × 64", res: 64, ch: 128, side: "dec", use: 2,
+      d: "Upsample 2×, add skip 2 from layer2 (256 + 128), two conv-BN-ReLU. Shapes of single buildings come back." },
+    { n: "Decoder D3", s: "64 × 128 × 128", res: 128, ch: 64, side: "dec", use: 3,
+      d: "Upsample 2×, add skip 3 from layer1 (128 + 64), two conv-BN-ReLU. Gaps between houses reappear." },
+    { n: "Decoder D4", s: "32 × 256 × 256", res: 256, ch: 32, side: "dec", use: 4,
+      d: "Upsample 2×, add skip 4 from the stem (64 + 64), two conv-BN-ReLU. Fine roof edges." },
+    { n: "Decoder D5", s: "16 × 512 × 512", res: 512, ch: 16, side: "dec",
+      d: "Upsample to full 512 × 512. No skip here; two conv-BN-ReLU on 16 channels." },
+    { n: "Head: conv 3×3 → sigmoid → threshold 0.4", s: "1 × 512 × 512", res: 512, ch: 1, side: "out",
+      d: "One 3 × 3 conv turns 16 channels into one score per pixel; sigmoid makes it a 0-1 probability; above 0.4 counts as roof." },
+  ];
+  // geometry: encoder down-left, decoder up-right
+  const pos = layers.map((L, i) => {
+    const h = 30 + 220 * Math.log2(L.res) / 9, w = 10 + 26 * Math.log2(L.ch + 1) / 9;
+    const depth = { 512: 0, 256: 1, 128: 2, 64: 3, 32: 4, 16: 5 }[L.res];
+    const x = 34 + i * ((W - 90) / (layers.length - 1));
+    const y = 40 + depth * 52;
+    return { x, y, w, h };
+  });
+  // feature preview source: a tiny roof scene rendered once
+  const src = document.createElement("canvas"); src.width = src.height = 512;
+  const sx = src.getContext("2d"); ground(sx, 512, 512, 9); const sroofs = city(512, 512, 44, 84); sroofs.forEach(b => drawRoof(sx, b));
+  const mask = document.createElement("canvas"); mask.width = mask.height = 512;
+  const mx = mask.getContext("2d"); mx.fillStyle = "#000"; mx.fillRect(0, 0, 512, 512); mx.fillStyle = COL.sky; sroofs.forEach(b => mx.fillRect(b.x, b.y, b.w, b.h));
+  const tmp = document.createElement("canvas");
+  function preview(i) {
+    const L = layers[i], r = L.res, z = 220;
+    fx.imageSmoothingEnabled = false;
+    tmp.width = tmp.height = r; const tx = tmp.getContext("2d"); tx.imageSmoothingEnabled = true;
+    const isOut = L.side === "out", decK = L.side === "dec" ? (i - 6) / 6 : 0;
+    tx.drawImage(isOut ? mask : src, 0, 0, r, r);
+    if (L.side === "dec") { tx.globalAlpha = decK; tx.drawImage(mask, 0, 0, r, r); tx.globalAlpha = 1; }
+    if (L.side === "enc" || L.side === "mid") {      // false-colour "feature map" look
+      tx.globalCompositeOperation = "color"; tx.fillStyle = i % 2 ? "#ff7a59" : "#6b8cff"; tx.fillRect(0, 0, r, r);
+      tx.globalCompositeOperation = "source-over";
+    }
+    fx.clearRect(0, 0, z, z); fx.drawImage(tmp, 0, 0, z, z);
+    fx.fillStyle = rgba(COL.night, .8); fx.fillRect(0, z - 22, z, 22);
+    fx.fillStyle = COL.ink; fx.font = "600 11px JetBrains Mono, monospace"; fx.fillText(`${r} × ${r} grid`, 8, z - 7);
+  }
+  let cur = 0, playing = !RM, tLast = 0, phase = 0;
+  const nm = document.getElementById("lyName"), sh = document.getElementById("lyShape"), ds = document.getElementById("lyDesc");
+  function select(i) { cur = (i + layers.length) % layers.length; phase = 0; nm.textContent = layers[cur].n; sh.textContent = layers[cur].s; ds.textContent = layers[cur].d; preview(cur); }
+  function draw(t) {
+    const dt = t - tLast; tLast = t; if (playing) { phase += dt / 1.9; if (phase >= 1) select(cur + 1); }
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = COL.night; ctx.fillRect(0, 0, W, H);
+    // skip arcs
+    layers.forEach((L, i) => {
+      if (!L.skip) return;
+      const j = layers.findIndex(M => M.use === L.skip), a = pos[i], b = pos[j]; if (j < 0) return;
+      const live = cur === j || (cur === i);
+      ctx.strokeStyle = live ? COL.sky : rgba(COL.sky, .22); ctx.lineWidth = live ? 3 : 1.5; ctx.setLineDash(live ? [] : [5, 5]);
+      ctx.beginPath(); const ax = a.x + a.w, ay = a.y + 12, bx = b.x, by = b.y + 12;
+      ctx.moveTo(ax, ay); ctx.bezierCurveTo(ax + 60, ay - 34, bx - 60, by - 34, bx, by); ctx.stroke(); ctx.setLineDash([]);
+      if (live) { const u = (t * .8) % 1, px = (1 - u) ** 3 * ax + 3 * (1 - u) ** 2 * u * (ax + 60) + 3 * (1 - u) * u * u * (bx - 60) + u ** 3 * bx;
+        const py = (1 - u) ** 3 * ay + 3 * (1 - u) ** 2 * u * (ay - 34) + 3 * (1 - u) * u * u * (by - 34) + u ** 3 * by;
+        ctx.fillStyle = COL.sky; ctx.beginPath(); ctx.arc(px, py, 4, 0, 7); ctx.fill(); }
+    });
+    // connections
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 2; ctx.beginPath();
+    pos.forEach((p, i) => { if (i) { const q = pos[i - 1]; ctx.moveTo(q.x + q.w, q.y + q.h / 2); ctx.lineTo(p.x, p.y + p.h / 2); } }); ctx.stroke();
+    // blocks
+    layers.forEach((L, i) => {
+      const p = pos[i], active = i === cur, done = i < cur;
+      const col = L.side === "enc" || L.side === "mid" ? COL.sand : L.side === "dec" ? COL.sky : COL.sun;
+      ctx.fillStyle = active ? col : rgba(col, done ? .55 : .2);
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+      if (active) { ctx.strokeStyle = COL.ink; ctx.lineWidth = 2; ctx.strokeRect(p.x - 2, p.y - 2, p.w + 4, p.h + 4); }
+      ctx.save(); ctx.translate(p.x + p.w / 2, p.y + p.h + 12); ctx.fillStyle = active ? COL.ink : COL.mute;
+      ctx.font = "600 10px JetBrains Mono, monospace"; ctx.textAlign = "center"; ctx.fillText(L.res, 0, 0); ctx.fillText(L.ch + "ch", 0, 12); ctx.restore();
+    });
+    // packet travelling into current block
+    if (cur > 0) { const a = pos[cur - 1], b = pos[cur], u = ease(clamp(phase * 1.6, 0, 1));
+      const px = a.x + a.w + (b.x - a.x - a.w) * u, py = a.y + a.h / 2 + (b.y + b.h / 2 - a.y - a.h / 2) * u;
+      ctx.fillStyle = COL.sun; ctx.beginPath(); ctx.arc(px, py, 6, 0, 7); ctx.fill(); }
+    ctx.fillStyle = COL.mute; ctx.font = "600 12px JetBrains Mono, monospace";
+    ctx.fillText("ENCODER  (what)", 34, 22); ctx.textAlign = "right"; ctx.fillText("DECODER  (where)", W - 20, 22); ctx.textAlign = "left";
+    ctx.fillStyle = COL.sky; ctx.fillText("─ ─  skip connection", 34, H - 12);
+  }
+  select(0); loop(cv, draw);
+  const pb = document.getElementById("lyPlay");
+  const setPlay = v => { playing = v; pb.textContent = v ? "❚❚ Pause" : "▶ Play"; };
+  setPlay(playing);
+  pb.onclick = () => setPlay(!playing);
+  document.getElementById("lyNext").onclick = () => { setPlay(false); select(cur + 1); draw(tLast); };
+  document.getElementById("lyPrev").onclick = () => { setPlay(false); select(cur - 1); draw(tLast); };
+})();
+
+/* 4 TRAINING: loss + cosine lr + sharpening mask */
+(() => {
+  const cv = document.getElementById("cvTrain"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const ep = document.getElementById("epoch"), lv = document.getElementById("lossv"), lr = document.getElementById("lrv");
+  const loss = e => 0.18 + 0.44 * Math.exp(-e / 7) + 0.006 * Math.sin(e * 1.7);
+  const lrf = e => 1e-6 + 0.5 * (1e-4 - 1e-6) * (1 + Math.cos(Math.PI * e / 40));
+  const roofs = city(220, 220, 77, 55);
+  loop(cv, t => {
+    const e = RM ? 40 : (t * 5) % 46; const E = Math.min(40, e);
+    ctx.fillStyle = COL.night; ctx.fillRect(0, 0, W, H);
+    const gx = 40, gy = 30, gw = W - 300, gh = H - 80;
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) { ctx.beginPath(); ctx.moveTo(gx, gy + gh * i / 4); ctx.lineTo(gx + gw, gy + gh * i / 4); ctx.stroke(); }
+    const line = (f, col, lo, hi) => { ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.beginPath();
+      for (let x = 0; x <= E; x += .25) { const px = gx + gw * x / 40, py = gy + gh * (1 - (f(x) - lo) / (hi - lo)); x ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.stroke(); };
+    line(loss, COL.sun, 0.1, 0.7); line(lrf, COL.sky, 0, 1.1e-4);
+    ctx.fillStyle = COL.mute; ctx.font = "600 11px JetBrains Mono, monospace";
+    ctx.fillText("epoch 0", gx, gy + gh + 18); ctx.fillText("40", gx + gw - 14, gy + gh + 18);
+    ctx.fillStyle = COL.sun; ctx.fillText("loss", gx + 4, gy - 10); ctx.fillStyle = COL.sky; ctx.fillText("learning rate", gx + 60, gy - 10);
+    // mask panel
+    const ox = W - 240, oy = 40, s = 220, k = E / 40;
+    ctx.fillStyle = "#000"; ctx.fillRect(ox, oy, s, s);
+    const r = rng(Math.floor(E * 3));
+    roofs.forEach(b => { ctx.fillStyle = rgba(COL.sky, .25 + .75 * k);
+      const j = (1 - k) * 10; ctx.fillRect(ox + b.x + (r() - .5) * j, oy + b.y + (r() - .5) * j, b.w * (0.6 + .4 * k), b.h * (0.6 + .4 * k)); });
+    for (let i = 0; i < 160 * (1 - k); i++) { ctx.fillStyle = rgba(COL.sky, .4); ctx.fillRect(ox + r() * s, oy + r() * s, 3, 3); }
+    ctx.fillStyle = COL.mute; ctx.fillText("prediction on one crop", ox, oy + s + 18);
+    ep.textContent = Math.round(E); lv.textContent = loss(E).toFixed(2); lr.textContent = lrf(E).toExponential(1);
+  });
+})();
+
+/* 5 THRESHOLD */
+(() => {
+  const cv = document.getElementById("cvThr"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const N = 128, roofs = city(N, N, 91, 32), prob = new Float32Array(N * N), truth = new Uint8Array(N * N);
+  roofs.forEach(b => { for (let y = Math.floor(b.y); y < b.y + b.h; y++) for (let x = Math.floor(b.x); x < b.x + b.w; x++) truth[y * N + x] = 1; });
+  // blurred, under-confident probability
+  const r = rng(5);
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    let s = 0, c = 0; for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) { const yy = y + dy, xx = x + dx; if (yy >= 0 && xx >= 0 && yy < N && xx < N) { s += truth[yy * N + xx]; c++; } }
+    prob[y * N + x] = clamp(0.78 * s / c + (r() - .5) * .16, 0, 1);
+  }
+  const img = ctx.createImageData(N, N), tmp = document.createElement("canvas"); tmp.width = tmp.height = N;
+  const slider = document.getElementById("thr"), tv = document.getElementById("thrv"), ti = document.getElementById("thrIou");
+  function render(thr) {
+    const S = Math.min(W / 2 - 16, H - 24), p = tmp.getContext("2d");
+    ctx.fillStyle = COL.night; ctx.fillRect(0, 0, W, H); ctx.imageSmoothingEnabled = false;
+    for (let i = 0; i < N * N; i++) { const v = prob[i]; img.data[i * 4] = 40 + v * 215; img.data[i * 4 + 1] = 30 + v * 170; img.data[i * 4 + 2] = 80 - v * 20; img.data[i * 4 + 3] = 255; }
+    p.putImageData(img, 0, 0); ctx.drawImage(tmp, 8, 8, S, S);
+    let tp = 0, fp = 0, fn = 0;
+    for (let i = 0; i < N * N; i++) { const q = prob[i] > thr, h = truth[i]; tp += q && h; fp += q && !h; fn += !q && h;
+      const c = q && h ? [91, 227, 161] : q ? [255, 107, 107] : h ? [79, 216, 232] : [10, 15, 31];
+      img.data[i * 4] = c[0]; img.data[i * 4 + 1] = c[1]; img.data[i * 4 + 2] = c[2]; img.data[i * 4 + 3] = h && !q ? 120 : 255; }
+    p.putImageData(img, 0, 0); ctx.drawImage(tmp, W / 2 + 8, 8, S, S);
+    ctx.fillStyle = COL.mute; ctx.font = "600 11px JetBrains Mono, monospace";
+    ctx.fillText("probability", 12, H - 4); ctx.fillText("green right · red extra · faint cyan missed", W / 2 + 8, H - 4);
+    tv.textContent = thr.toFixed(2); ti.textContent = (tp / (tp + fp + fn)).toFixed(3);
+  }
+  slider.oninput = () => render(+slider.value); render(0.4);
+  const test = new Set(["1-1", "2-2", "4-3", "1-3", "2-4", "3-1", "3-3", "4-1"]), box = document.getElementById("tiles");
+  for (let rr = 1; rr <= 4; rr++) for (let cc = 1; cc <= 4; cc++) { const d = document.createElement("div"), id = `${rr}-${cc}`, t = test.has(id);
+    d.textContent = id; d.style.background = t ? COL.sky : COL.sand; d.style.color = COL.night; box.appendChild(d); }
+})();
+
+/* 6 SOLAR: old vs new detector */
+(() => {
+  const cv = document.getElementById("cvSolar"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const mode = document.getElementById("solarMode"), off = document.getElementById("solarOff"), crops = document.getElementById("solarCrops");
+  const things = [
+    { k: "panel", x: 70, y: 70, w: 120, h: 80 }, { k: "panel", x: 420, y: 250, w: 140, h: 90 },
+    { k: "canal", x: 0, y: 190, w: W, h: 26 }, { k: "tarp", x: 300, y: 60, w: 70, h: 50 },
+    { k: "metal", x: 230, y: 250, w: 130, h: 100 }, { k: "roof", x: 470, y: 70, w: 110, h: 90 }, { k: "roof", x: 60, y: 260, w: 120, h: 100 },
+  ];
+  loop(cv, t => {
+    const cyc = 6, isNew = RM ? true : (t % cyc) > cyc / 2, p = ((t % (cyc / 2)) / (cyc / 2));
+    ground(ctx, W, H, 13);
+    things.forEach(o => {
+      if (o.k === "canal") { ctx.fillStyle = "#2a6fb0"; ctx.fillRect(o.x, o.y, o.w, o.h); }
+      if (o.k === "tarp") { ctx.fillStyle = COL.sand; ctx.globalAlpha = .7; ctx.fillRect(o.x - 15, o.y - 15, o.w + 30, o.h + 30); ctx.globalAlpha = 1; ctx.fillStyle = "#2f7de0"; ctx.fillRect(o.x, o.y, o.w, o.h); }
+      if (o.k === "metal") { ctx.fillStyle = "#8a93a8"; ctx.fillRect(o.x, o.y, o.w, o.h); ctx.strokeStyle = "#c9d0de"; for (let i = 8; i < o.w; i += 10) { ctx.beginPath(); ctx.moveTo(o.x + i, o.y); ctx.lineTo(o.x + i, o.y + o.h); ctx.stroke(); } }
+      if (o.k === "roof" || o.k === "panel") { drawRoof(ctx, { ...o, tone: .9 }); if (o.k === "panel") drawPanels(ctx, o); }
+    });
+    const flagged = things.filter(o => isNew ? o.k === "panel" : o.k !== "roof");
+    const pulse = 0.55 + 0.45 * Math.sin(t * 6);
+    flagged.forEach(o => { const bad = o.k !== "panel"; ctx.strokeStyle = rgba(bad ? COL.bad : COL.sun, pulse); ctx.lineWidth = 3;
+      ctx.strokeRect(o.x - 4, o.y - 4, o.w + 8, o.h + 8);
+      ctx.fillStyle = rgba(bad ? COL.bad : COL.sun, .18 * pulse); ctx.fillRect(o.x - 4, o.y - 4, o.w + 8, o.h + 8);
+      ctx.fillStyle = bad ? COL.bad : COL.sun; ctx.font = "600 11px JetBrains Mono, monospace";
+      ctx.fillText(bad ? `"panel"? (${o.k})` : "panel ✓", Math.max(6, o.x), o.y - 8); });
+    ctx.fillStyle = rgba(COL.night, .85); ctx.fillRect(0, H - 30, W, 30);
+    ctx.fillStyle = COL.ink; ctx.font = "600 12px JetBrains Mono, monospace";
+    ctx.fillText(isNew ? "retrained with 19k no-panel images" : "old model: trained only on images with panels", 12, H - 11);
+    ctx.fillStyle = isNew ? COL.good : COL.bad; ctx.fillRect(0, H - 3, W * p, 3);
+    mode.textContent = isNew ? "retrained" : "old model"; mode.style.color = isNew ? COL.good : COL.bad;
+    off.textContent = isNew ? "5%" : "31-54%"; crops.textContent = isNew ? "54" : "135-151";
+  });
+})();
+
+/* 7 ENERGY chain */
+(() => {
+  const cv = document.getElementById("cvEnergy"), ctx = cv.getContext("2d"), W = cv.width, H = cv.height;
+  let k = 0.60, t0 = performance.now();
+  const b60 = document.getElementById("k60"), b30 = document.getElementById("k30");
+  const set = v => { k = v; t0 = performance.now(); b60.className = v === .6 ? "" : "ghost"; b30.className = v === .3 ? "" : "ghost"; };
+  b60.onclick = () => set(.6); b30.onclick = () => set(.3);
+  function stages() {
+    const lo = { roof: 44.1 }, hi = { roof: 49.8 };
+    [lo, hi].forEach(s => { s.use = k * s.roof - 0.444; s.gw = s.use * 0.2; s.twh = s.gw * 1630 * 0.95 / 1000; });
+    return [
+      { a: "53.3 km²", b: "roof predicted", op: "" },
+      { a: `${lo.roof}-${hi.roof} km²`, b: "÷ area bias 1.21 / 1.07", op: "÷" },
+      { a: `${(k * lo.roof).toFixed(1)}-${(k * hi.roof).toFixed(1)} km²`, b: `× usable share ${k.toFixed(2)}`, op: "×" },
+      { a: `${lo.use.toFixed(1)}-${hi.use.toFixed(1)} km²`, b: "− 0.44 km² panels already up", op: "−" },
+      { a: `${lo.gw.toFixed(2)}-${hi.gw.toFixed(2)} GWp`, b: "× 20% panel efficiency", op: "×" },
+      { a: `${lo.twh.toFixed(1)}-${hi.twh.toFixed(1)} TWh/yr`, b: "× 1630 kWh/kWp × 0.95", op: "×" },
+    ];
+  }
+  loop(cv, () => {
+    const s = stages(), n = s.length, T = RM ? 99 : (performance.now() - t0) / 1000;
+    ctx.fillStyle = COL.night; ctx.fillRect(0, 0, W, H);
+    const gap = W / n;
+    s.forEach((st, i) => {
+      const a = clamp((T - i * 0.45) / 0.5, 0, 1), x = gap * i + gap / 2, y = 120;
+      if (i) { ctx.strokeStyle = COL.line; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x - gap + 54, y); ctx.lineTo(x - 54, y); ctx.stroke();
+        const u = ((T * .9) + i * .17) % 1; ctx.fillStyle = COL.sun; ctx.beginPath(); ctx.arc(x - gap + 54 + (gap - 108) * u, y, 4, 0, 7); ctx.fill(); }
+      const r = 46 * ease(a), last = i === n - 1;
+      ctx.fillStyle = rgba(last ? COL.sun : COL.sand, last ? .95 : .22 + .2 * a); ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+      if (last && a === 1) { ctx.strokeStyle = rgba(COL.sun, .4 + .3 * Math.sin(T * 4)); ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(x, y, 54, 0, 7); ctx.stroke(); }
+      ctx.globalAlpha = a; ctx.textAlign = "center";
+      ctx.fillStyle = last ? COL.night : COL.ink; ctx.font = "800 20px Bricolage Grotesque, sans-serif"; ctx.fillText(st.op || "▣", x, y + 7);
+      ctx.fillStyle = last ? COL.sun : COL.ink; ctx.font = "700 15px JetBrains Mono, monospace";
+      const words = st.a; ctx.fillText(words, x, y + 86);
+      ctx.fillStyle = COL.mute; ctx.font = "500 12px Figtree, sans-serif"; ctx.fillText(st.b, x, y + 108);
+      ctx.globalAlpha = 1; ctx.textAlign = "left";
+    });
+    ctx.fillStyle = COL.mute; ctx.font = "500 12px Figtree, sans-serif";
+    ctx.fillText("Range = calibration-half vs test-half area bias. 1 km² of panels at 20% efficiency ≈ 0.2 GWp.", 16, H - 14);
+  });
+})();
+
+/* 8 SCOREBOARD */
+(() => {
+  const rows = [
+    ["AIRS model, no Jaipur data", .154, COL.bad, "136-crop set"],
+    ["Annotation-free UDA, DUDA", .275, COL.bad, "136-crop set"],
+    ["Annotation-free UDA, best (arm R)", .326, COL.bad, ""],
+    ["Open Buildings outlines themselves", .499, COL.mute, ""],
+    ["Old default: MiT-B2, eroded labels", .597, COL.sand, ""],
+    ["ResNet34, OB conf ≥ 0.75", .632, COL.sand, ""],
+    ["ResNet34, all OB, unshifted", .659, COL.sand, ""],
+    ["ResNet34, all OB, shifted  ★", .697, COL.sun, ""],
+    ["MiT-B2, all OB, shifted", .700, COL.sun, ""],
+    ["ResNet34 shifted + 8-way flips (today)", .706, COL.good, ""],
+  ];
+  const box = document.getElementById("board");
+  rows.forEach(([n, v, c, note], i) => {
+    const d = document.createElement("div"); d.className = "bar";
+    d.innerHTML = `<span>${n}${note ? ` <small style="color:var(--mute)">(${note})</small>` : ""}</span>
+      <div class="track"><div class="fill" style="width:${v * 100}%;--c:${c};animation-delay:${i * 80}ms"></div>
+      <div class="marker" style="left:83%" title="Inria supervised ceiling about 0.83"></div></div>
+      <b class="mono" style="color:${c}">${v.toFixed(3)}</b>`;
+    box.appendChild(d);
+  });
+  document.getElementById("btnBoard").onclick = () => box.querySelectorAll(".bar").forEach(b => { b.classList.remove("replay"); void b.offsetWidth; b.classList.add("replay"); });
+})();
+})();
+</script>
+
+</body>
+</html>

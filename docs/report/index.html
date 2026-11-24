@@ -1,0 +1,599 @@
+<title>Jaipur Rooftop Study</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (~72ch) with wide figure blocks that break out to 1180px; a left rail of section links on desktop. */
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#16202e; --muted:#566273; --line:#d8dee7;
+  --cobalt:#1d4f91; --cobalt-soft:#e3ecf8; --ochre:#8c5806; --ochre-soft:#fbf0dc;
+  --good:#1f7a4d; --good-soft:#e0f2e8; --bad:#b03a2e; --bad-soft:#f8e3e0; --grid:#e8ecf2;
+  --f-display:"Sora", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Inter", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141c; --surface:#161d28; --ink:#e4e9f1; --muted:#9aa6b6; --line:#2a3443;
+  --cobalt:#7fa8e0; --cobalt-soft:#1b2a40; --ochre:#e3a54a; --ochre-soft:#33270f;
+  --good:#5cc08c; --good-soft:#16301f; --bad:#ec7c70; --bad-soft:#3a1c19; --grid:#222b38; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141c; --surface:#161d28; --ink:#e4e9f1; --muted:#9aa6b6; --line:#2a3443;
+  --cobalt:#7fa8e0; --cobalt-soft:#1b2a40; --ochre:#e3a54a; --ochre-soft:#33270f;
+  --good:#5cc08c; --good-soft:#16301f; --bad:#ec7c70; --bad-soft:#3a1c19; --grid:#222b38; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15.5px/1.65 var(--f-body);margin:0}
+.wrap{max-width:1420px;margin:0 auto;padding-block:32px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.layout{display:grid;grid-template-columns:168px minmax(0,1fr);gap:32px}
+nav.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;font-size:13px}
+nav.rail a{display:block;color:var(--muted);text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid var(--line)}
+nav.rail a:hover,nav.rail a:focus-visible{color:var(--cobalt);border-left-color:var(--cobalt)}
+main{min-width:0}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:clamp(28px,4.2vw,42px);letter-spacing:-.01em}
+h2{font-size:24px;margin-top:64px;padding-top:12px;border-top:1px solid var(--line)}
+h3{font-size:17px;margin-top:30px}
+p,li{max-width:72ch}
+p{margin:12px 0}
+a{color:var(--cobalt)}
+.eyebrow{font:600 12px/1.4 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--ochre)}
+.lede{font-size:17px;color:var(--muted);max-width:68ch}
+.mono,code{font-family:var(--f-mono);font-size:.88em}
+code{background:var(--cobalt-soft);padding:1px 5px;border-radius:4px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:24px 0}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.kpi b{display:block;font:600 26px/1.2 var(--f-display);font-variant-numeric:tabular-nums}
+.kpi span{font-size:13px;color:var(--muted)}
+.callout{background:var(--ochre-soft);border:1px solid var(--line);padding:12px 16px;border-radius:6px;margin:18px 0;max-width:80ch}
+.callout.good{background:var(--good-soft)}
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin:20px 0}
+.fig .scroll{overflow-x:auto}
+.fig figcaption{font-size:13px;color:var(--muted);margin-top:10px;max-width:none}
+.tbl{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td:first-child{white-space:nowrap}
+td.num{text-align:right;font-family:var(--f-mono);font-size:13px;white-space:nowrap}
+.pill{display:inline-block;font:600 11.5px/1.5 var(--f-body);padding:1px 8px;border-radius:99px;white-space:nowrap}
+.pill.kept{background:var(--good-soft);color:var(--good)}
+.pill.rej{background:var(--bad-soft);color:var(--bad)}
+.pill.open{background:var(--cobalt-soft);color:var(--cobalt)}
+.pill.std{background:var(--grid);color:var(--muted)}
+.pill.new{background:var(--ochre-soft);color:var(--ochre)}
+.ref{font:500 11.5px var(--f-mono);color:var(--cobalt);text-decoration:none;vertical-align:1px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:18px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;min-width:0}
+.card h4{margin:0 0 6px;font:600 15px/1.35 var(--f-display)}
+.card p{font-size:14px;margin:6px 0}
+details{background:var(--surface);border:1px solid var(--line);border-radius:8px;margin:10px 0;padding:0 16px}
+details summary{cursor:pointer;padding:12px 0;font-weight:600;font-family:var(--f-display)}
+details[open] summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+details>div{padding-bottom:12px}
+ol.refs{font-size:13.5px;padding-left:22px}
+ol.refs li{margin:4px 0;max-width:none}
+/* SVG diagram classes */
+svg text{font-family:var(--f-body);fill:var(--ink)}
+svg .t-s{font-size:11.5px;fill:var(--muted)}
+svg .t-h{font-size:13px;font-weight:600}
+svg .t-lane{font:600 11.5px var(--f-body);letter-spacing:.02em;fill:var(--ochre)}
+svg .t-ref{font:500 11px var(--f-mono);fill:var(--cobalt)}
+svg .t-m{font:500 11.5px var(--f-mono);fill:var(--ink)}
+svg .box{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+svg .box.k{fill:var(--cobalt-soft);stroke:var(--cobalt)}
+svg .box.o{fill:var(--ochre-soft);stroke:var(--ochre)}
+svg .box.g{fill:var(--good-soft);stroke:var(--good)}
+svg .col{fill:none;stroke:var(--line);stroke-dasharray:3 4}
+svg .arr{fill:none;stroke:var(--muted);stroke-width:1.4}
+svg .arr.k{stroke:var(--cobalt);stroke-width:1.8}
+svg .arr.o{stroke:var(--ochre);stroke-width:1.8;stroke-dasharray:6 4}
+svg .arr.d{stroke-dasharray:4 4}
+svg .ah{fill:var(--muted)} svg .ah.k{fill:var(--cobalt)} svg .ah.o{fill:var(--ochre)}
+svg .grid{stroke:var(--grid);stroke-width:1}
+svg .bar{fill:var(--cobalt)} svg .bar.o{fill:var(--ochre)} svg .bar.g{fill:var(--good)} svg .bar.m{fill:var(--muted);opacity:.55} svg .bar.b{fill:var(--bad)}
+svg .whisk{stroke:var(--ink);stroke-width:1.3}
+svg .fp{fill:var(--ochre);opacity:.35;stroke:var(--ochre);stroke-width:1.2}
+svg .roof{fill:var(--cobalt);opacity:.28;stroke:var(--cobalt);stroke-width:1.2}
+svg .sam{fill:none;stroke:var(--good);stroke-width:2}
+svg .gnd{fill:var(--grid)}
+@media (max-width:860px){.layout{grid-template-columns:1fr}nav.rail{display:none}}
+@media (prefers-reduced-motion:no-preference){a{transition:color .15s}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">B.Tech project · LNMIIT · overnight report, 21 Nov 2026</div>
+  <h1>Finding every rooftop in Jaipur without labelling one</h1>
+  <p class="lede">A segmentation model trained only on Google Open Buildings footprints finds roofs in 26.6 cm satellite imagery of Jaipur, and the roof area feeds a city-scale rooftop-solar estimate. This report covers the full pipeline, every technique and the paper it comes from, what ran overnight, and what could be published.</p>
+  <div class="kpis" id="kpis">
+    <div class="kpi"><b id="kpi-iou">0.712</b><span>best test IoU against hand-drawn roofs (was 0.564 in Sept)</span></div>
+    <div class="kpi"><b>0.04–0.33</b><span>test IoU of every domain-adaptation method we tried</span></div>
+    <div class="kpi"><b>5.2–5.9 GWp</b><span>rooftop PV potential, 8.0–9.1 TWh/yr after existing PV</span></div>
+    <div class="kpi"><b>0</b><span>hand labels used for training (152 used only to measure)</span></div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="rail" aria-label="Sections">
+  <a href="#tldr">Summary</a>
+  <a href="#pipeline">Full pipeline</a>
+  <a href="#lowlevel">Inside each stage</a>
+  <a href="#journey">How we got here</a>
+  <a href="#overnight">Overnight experiments</a>
+  <a href="#techniques">Modern techniques</a>
+  <a href="#sources">Technique → paper</a>
+  <a href="#energy">Energy estimate</a>
+  <a href="#novelty">What is publishable</a>
+  <a href="#next">Next steps</a>
+  <a href="#refs">References</a>
+</nav>
+<main>
+
+<section id="tldr">
+<h2>Summary</h2>
+<div id="tldr-body">
+<p><b>The method is weak supervision, not unsupervised domain adaptation.</b> We train a U-Net on Google's Open Buildings polygons over Jaipur, after moving them 7 px south and 3 px west to sit on the roofs. Seven domain-adaptation methods that start from a model trained on another city (AIRS, Christchurch) scored 0.04 to 0.33 IoU on the same hand-labelled test crops. The weakly supervised model scores 0.697, and 0.706 with test-time augmentation.</p>
+<p><b>Overnight</b> we tried five changes in parallel on the DGX (round 1) and then a teacher self-training hybrid (round 2). <span id="tldr-result">Best result, chosen on the calibration half: an ensemble of the shift+SAM-label model and the self-trained student, with TTA, at <b>0.712</b> test IoU (+0.015, 95% interval +0.009 to +0.022, over the plain model; +0.006 over the plain model with TTA). It reproduces with a second training seed (0.712 again). The honest summary: shift+SAM labels give a +0.008 single-pass gain that reproduces across two seeds, the self-trained student matches the TTA teacher in one pass, the edge-weighted loss and DINOv3 encoder did not help, and nothing stacked past about 0.71. 91% of the remaining error is partial boundaries (ignoring a 2 px band around roof edges gives 0.765), so the next step up is sharper roof outlines, not more weak-label tricks.</span></p>
+</div>
+<div class="callout"><b>How to read the numbers.</b> Every IoU here is measured against 152 hand-drawn roof crops split by map tile into a <i>calibration</i> half and a <i>test</i> half (76 crops each). Any setting (threshold, label variant, fusion weight) is picked on calibration; the number we quote is the test half. Gains come with a 95% paired-bootstrap interval. A change counts only if that interval stays above zero. Seed-to-seed noise is about 0.004–0.015.</div>
+</section>
+
+<section id="pipeline">
+<h2>The full pipeline, end to end</h2>
+<p>Five stages run left to right. Grey boxes are standard parts; blue boxes are where this project made a choice the results depend on; the ochre box is tonight's new step. Numbers in brackets point to the <a href="#refs">references</a>. The dashed ochre loop is round 2: the trained model's own predictions become part of the next round's labels.</p>
+<figure class="fig"><div class="scroll">
+<svg viewBox="0 0 1160 590" width="1160" style="min-width:980px;max-width:none" role="img" aria-label="Pipeline block diagram from imagery to energy estimate">
+<defs>
+ <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ah"/></marker>
+ <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ah k"/></marker>
+ <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ah o"/></marker>
+</defs>
+<text x="20" y="44" class="t-lane">1 · DATA IN</text>
+<text x="250" y="44" class="t-lane">2 · LABELS</text>
+<text x="480" y="44" class="t-lane">3 · MODEL &amp; TRAINING</text>
+<text x="710" y="44" class="t-lane">4 · INFERENCE</text>
+<text x="940" y="44" class="t-lane">5 · ENERGY</text>
+<!-- column 1 -->
+<rect class="box" x="20" y="60" width="200" height="64" rx="6"/><text x="32" y="84" class="t-h">Google satellite tiles</text><text x="32" y="104" class="t-s">16 tiles · 26.6 cm/px · 175 km²</text>
+<rect class="box" x="20" y="142" width="200" height="64" rx="6"/><text x="32" y="166" class="t-h">512 × 512 crops</text><text x="32" y="186" class="t-s">7,371 train · 1,701 val (3 tiles)</text>
+<rect class="box" x="20" y="224" width="200" height="64" rx="6"/><text x="32" y="248" class="t-h">Open Buildings v3 <tspan class="t-ref">[3]</tspan></text><text x="32" y="268" class="t-s">523,283 polygons, all confidences</text>
+<rect class="box" x="20" y="306" width="200" height="64" rx="6"/><text x="32" y="330" class="t-h">One ID per polygon</text><text x="32" y="350" class="t-s">16-bit instance PNG per crop</text>
+<rect class="box" x="20" y="388" width="200" height="64" rx="6"/><text x="32" y="412" class="t-h">152 hand-drawn crops</text><text x="32" y="432" class="t-s">3 annotators · eval only</text>
+<path class="arr" d="M120,124V142" marker-end="url(#a1)"/><path class="arr" d="M120,288V306" marker-end="url(#a1)"/>
+<!-- column 2 -->
+<rect class="box" x="250" y="60" width="200" height="64" rx="6"/><text x="262" y="84" class="t-h">Rasterise footprints <tspan class="t-ref">[4]</tspan></text><text x="262" y="104" class="t-s">conf ≥ 0 beats conf ≥ 0.75</text>
+<rect class="box k" x="250" y="142" width="200" height="64" rx="6"/><text x="262" y="166" class="t-h">Global shift <tspan class="t-ref">[6]</tspan></text><text x="262" y="186" class="t-s">7 px S, 3 px W (≈1.9 m)</text>
+<rect class="box k" x="250" y="224" width="200" height="64" rx="6"/><text x="262" y="248" class="t-h">Per-building align <tspan class="t-ref">[14,15]</tspan></text><text x="262" y="268" class="t-s">template match, ±14 px</text>
+<rect class="box k" x="250" y="306" width="200" height="64" rx="6"/><text x="262" y="330" class="t-h">SAM ViT-H box refine <tspan class="t-ref">[9]</tspan></text><text x="262" y="350" class="t-s">keep if IoU ≥ 0.3, area 0.5–2×</text>
+<rect class="box o" x="250" y="388" width="200" height="64" rx="6"/><text x="262" y="412" class="t-h">Teacher fusion <tspan class="t-ref">[3,6]</tspan></text><text x="262" y="432" class="t-s">w·p + (1 − w)·label, soft</text>
+<path class="arr" d="M350,124V142" marker-end="url(#a1)"/><path class="arr" d="M350,206V224" marker-end="url(#a1)"/><path class="arr" d="M350,288V306" marker-end="url(#a1)"/><path class="arr" d="M350,370V388" marker-end="url(#a1)"/>
+<!-- column 3 -->
+<rect class="box k" x="480" y="60" width="200" height="64" rx="6"/><text x="492" y="84" class="t-h">Encoder <tspan class="t-ref">[2,8,10]</tspan></text><text x="492" y="104" class="t-s">ResNet34 · MiT-B2 · DINOv3</text>
+<rect class="box" x="480" y="142" width="200" height="64" rx="6"/><text x="492" y="166" class="t-h">U-Net decoder <tspan class="t-ref">[1]</tspan></text><text x="492" y="186" class="t-s">5 up-blocks with skips</text>
+<rect class="box" x="480" y="224" width="200" height="64" rx="6"/><text x="492" y="248" class="t-h">Loss: BCE + Dice</text><text x="492" y="268" class="t-s">+ edge weight (Sirko) <tspan class="t-ref">[3]</tspan></text>
+<rect class="box" x="480" y="306" width="200" height="64" rx="6"/><text x="492" y="330" class="t-h">AdamW <tspan class="t-ref">[7]</tspan>, 40 epochs</text><text x="492" y="350" class="t-s">cosine lr · batch 16 · AMP</text>
+<path class="arr" d="M580,124V142" marker-end="url(#a1)"/><path class="arr" d="M580,206V224" marker-end="url(#a1)"/><path class="arr" d="M580,288V306" marker-end="url(#a1)"/>
+<!-- column 4 -->
+<rect class="box k" x="710" y="60" width="200" height="64" rx="6"/><text x="722" y="84" class="t-h">8-way dihedral TTA</text><text x="722" y="104" class="t-s">4 rotations × flip, averaged</text>
+<rect class="box k" x="710" y="142" width="200" height="64" rx="6"/><text x="722" y="166" class="t-h">Threshold 0.40</text><text x="722" y="186" class="t-s">picked on calibration half</text>
+<rect class="box" x="710" y="224" width="200" height="64" rx="6"/><text x="722" y="248" class="t-h">Roof mask, whole city</text><text x="722" y="268" class="t-s">9,072 crops → 53.3 km²</text>
+<rect class="box" x="710" y="306" width="200" height="64" rx="6"/><text x="722" y="330" class="t-h">Solar-panel U-Net <tspan class="t-ref">[12]</tspan></text><text x="722" y="350" class="t-s">BDAPPV + negatives</text>
+<path class="arr" d="M810,124V142" marker-end="url(#a1)"/><path class="arr" d="M810,206V224" marker-end="url(#a1)"/>
+<!-- column 5 -->
+<rect class="box" x="940" y="60" width="200" height="64" rx="6"/><text x="952" y="84" class="t-h">Area bias correction</text><text x="952" y="104" class="t-s">÷ pred/hand ratio (1.07–1.21)</text>
+<rect class="box" x="940" y="142" width="200" height="64" rx="6"/><text x="952" y="166" class="t-h">Capacity (GWp)</text><text x="952" y="186" class="t-m">A × 0.60 × 0.20 kW/m²</text>
+<rect class="box" x="940" y="224" width="200" height="64" rx="6"/><text x="952" y="248" class="t-h">Energy (TWh/yr)</text><text x="952" y="268" class="t-m">P × 1,630 × 0.95</text>
+<rect class="box g" x="940" y="306" width="200" height="64" rx="6"/><text x="952" y="330" class="t-h">5.2–5.9 GWp</text><text x="952" y="350" class="t-s">8.0–9.1 TWh/yr, minus existing PV</text>
+<path class="arr" d="M1040,124V142" marker-end="url(#a1)"/><path class="arr" d="M1040,206V224" marker-end="url(#a1)"/><path class="arr" d="M1040,288V306" marker-end="url(#a1)"/>
+<!-- cross-column arrows -->
+<path class="arr k" d="M220,256H234V92H250" marker-end="url(#a2)"/>
+<path class="arr k" d="M220,338H243V256H250" marker-end="url(#a2)"/>
+<path class="arr k" d="M220,174H228V24H470V80H480" marker-end="url(#a2)"/>
+<text x="300" y="19" class="t-s">images</text>
+<path class="arr k" d="M450,420H465V256H480" marker-end="url(#a2)"/>
+<text x="452" y="440" class="t-s">labels</text>
+<path class="arr k" d="M680,338H689V80H710" marker-end="url(#a2)"/>
+<path class="arr k" d="M910,256H925V92H940" marker-end="url(#a2)"/>
+<path class="arr k" d="M910,338H940" marker-end="url(#a2)"/>
+<!-- self-training loop -->
+<path class="arr o" d="M710,112H700V470H330V452" marker-end="url(#a3)"/>
+<text x="470" y="487" class="t-s" style="fill:var(--ochre)">round 2: teacher probabilities become soft labels</text>
+<!-- evaluation band -->
+<rect class="box" x="250" y="500" width="890" height="72" rx="6" style="stroke-dasharray:5 4"/>
+<text x="266" y="526" class="t-h">Evaluation on 152 hand-drawn roofs (never trained on)</text>
+<text x="266" y="548" class="t-s">split by tile: calibration 76 / test 76 · label gate scores each label set before training · threshold and fusion weight picked on calibration · test IoU with paired bootstrap (2,000 resamples)</text>
+<path class="arr d" d="M120,452V536H250" marker-end="url(#a1)"/>
+<path class="arr d" d="M290,500V452" marker-end="url(#a1)"/><text x="296" y="490" class="t-s">gate</text>
+<path class="arr d" d="M810,500V370" marker-end="url(#a1)"/><text x="816" y="490" class="t-s">picks threshold</text>
+</svg></div>
+<figcaption>Figure 1. High-level pipeline. Blue arrows carry data; dashed grey arrows are where the hand-labelled crops are used (measurement only); the dashed ochre loop is the round-2 self-training step.</figcaption>
+</figure>
+</section>
+
+<section id="lowlevel">
+<h2>Inside each stage</h2>
+<p>Open any stage for the exact settings. Everything here is read from the code (<code>rooftop/train.py</code>, <code>scripts/make_weak_labels.py</code>, <code>scripts/refine_labels.py</code>, <code>scripts/d16_capacity_estimate.py</code>), not from memory.</p>
+
+<h3>Stage 3 in detail: the U-Net with a ResNet34 encoder</h3>
+<figure class="fig"><div class="scroll">
+<svg viewBox="0 0 1100 450" width="1100" style="min-width:900px;max-width:none" role="img" aria-label="U-Net architecture with ResNet34 encoder">
+<defs><marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ah"/></marker>
+<marker id="b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ah k"/></marker></defs>
+<text x="20" y="22" class="t-lane">ENCODER (RESNET34, IMAGENET) [2]</text>
+<text x="640" y="22" class="t-lane">DECODER (U-NET) [1]</text>
+<g id="unet"></g>
+</svg></div>
+<figcaption>Figure 2. Tensor shapes for a 3 × 512 × 512 input. Each encoder stage halves the resolution; each decoder block doubles it, concatenates the matching encoder output (blue skip arrows), then applies two conv 3×3 → BatchNorm → ReLU layers. 24.4 M parameters. The DINOv3 variant swaps the encoder for a ConvNeXt-Tiny with channels 96/192/384/768 (31.9 M parameters); MiT-B2 swaps in a SegFormer transformer encoder.</figcaption>
+</figure>
+
+<h3>Stage 2 in detail: one building, six label versions</h3>
+<figure class="fig"><div class="scroll">
+<svg id="labsteps" viewBox="0 0 1100 270" width="1100" style="min-width:900px;max-width:none" role="img" aria-label="Label refinement steps for one building"></svg></div>
+<figcaption>Figure 3. Schematic of one building (not real data). Blue: the true roof. Ochre: the label we train on. In the satellite image a roof appears offset from its footprint and larger than it (eaves, parapets, off-nadir view). Each step fixes one of those errors; the label gate (Figure 7) measures how much each step helps across all 152 hand crops.</figcaption>
+</figure>
+
+<h3>Round 2 in detail: teacher self-training</h3>
+<figure class="fig"><div class="scroll">
+<svg viewBox="0 0 1100 200" width="1100" style="min-width:900px;max-width:none" role="img" aria-label="Self-training loop">
+<defs><marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ah k"/></marker>
+<marker id="c3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ah o"/></marker></defs>
+<rect class="box" x="20" y="60" width="180" height="70" rx="6"/><text x="32" y="86" class="t-h">Original footprints</text><text x="32" y="106" class="t-s">shift + SAM (0.650 label)</text>
+<rect class="box k" x="250" y="60" width="180" height="70" rx="6"/><text x="262" y="86" class="t-h">Teacher, round 0</text><text x="262" y="106" class="t-s">ResNet34, 0.706 test IoU</text>
+<rect class="box o" x="480" y="60" width="200" height="70" rx="6"/><text x="492" y="86" class="t-h">Soft pseudo-labels</text><text x="492" y="106" class="t-m">p  or  0.8·p + 0.2·L</text>
+<rect class="box k" x="730" y="60" width="180" height="70" rx="6"/><text x="742" y="86" class="t-h">Student, round 1</text><text x="742" y="106" class="t-s">same net, soft BCE + Dice</text>
+<rect class="box g" x="960" y="60" width="120" height="70" rx="6"/><text x="972" y="86" class="t-h">Score on</text><text x="972" y="106" class="t-s">hand test half</text>
+<path class="arr k" d="M200,95H250" marker-end="url(#c1)"/><path class="arr k" d="M430,95H480" marker-end="url(#c1)"/><path class="arr k" d="M680,95H730" marker-end="url(#c1)"/><path class="arr k" d="M910,95H960" marker-end="url(#c1)"/>
+<path class="arr o" d="M110,60V30H580V60" marker-end="url(#c3)"/><text x="230" y="24" class="t-s">L is rebuilt from the original footprints every round (Girard 2019 [6]), never from the last round's output</text>
+<path class="arr o" d="M820,130V165H340V130" marker-end="url(#c3)"/><text x="400" y="185" class="t-s">if the student beats the teacher on calibration, it becomes the next teacher (round 2, 3, ...)</text>
+</svg></div>
+<figcaption>Figure 4. Round 2. 8-way TTA probabilities of the 0.706 model become soft training targets, alone or fused with the refined footprint label L. Soft targets keep the teacher's uncertainty instead of forcing 0/1 (Sirko et al. [3] found soft teacher labels beat hard ones).</figcaption>
+</figure>
+
+<details><summary>Stage 1 · Data in</summary><div>
+<ul>
+<li>16 Google satellite tiles of Jaipur, 26.6 cm per pixel (not the 10 cm first assumed), 175 km².</li>
+<li>Cut into 512 × 512 crops with stride 512. Crops that are all black (outside the imagery) are skipped. Train: 7,371 crops from 13 tiles. Validation: 1,701 crops from tiles 1-1, 2-2 and 4-3.</li>
+<li>Open Buildings v3 <a class="ref" href="#r3">[3]</a>: 523,283 polygons. Jaipur's true building share is 28.2% of pixels, against 7.7% in the AIRS training city: buildings here are also 23× smaller in pixels (median 913 px vs 21,084 px). That gap is why models from other cities fail.</li>
+<li><code>scripts/make_instance_labels.py</code> burns every polygon with its own ID, so touching buildings (78% of Jaipur buildings touch a neighbour) stay separable for the per-building steps.</li>
+</ul></div></details>
+
+<details><summary>Stage 2 · Labels, from footprint to roof</summary><div>
+<ul>
+<li><b>Rasterise, all confidences.</b> Open Buildings confidence is mostly a size filter: keeping only conf ≥ 0.75 drops 89% of small buildings and 7% of large ones. On hand labels, training on all polygons wins (0.632 vs 0.605).</li>
+<li><b>Global shift, 7 px south and 3 px west.</b> Measured as the median best-overlap offset between Open Buildings and the hand roofs; the calibration half alone gives the same 7 / −3, so the test half does not leak. Worth +0.038 test IoU (CI +0.031 to +0.045). Idea from Girard et al. <a class="ref" href="#r6">[6]</a>, in its simplest global form.</li>
+<li><b>Per-building alignment.</b> Each polygon is moved separately within ±14 px to the position that best overlaps the current model's TTA prediction (<code>cv2.matchTemplate</code>, ties go to the global shift; buildings under 150 px keep the global shift). The idea is from OMAF <a class="ref" href="#r14">[14]</a> and Align and Segment <a class="ref" href="#r15">[15]</a>, done offline.</li>
+<li><b>SAM refinement.</b> Each polygon's box, padded 10 px, prompts SAM ViT-H <a class="ref" href="#r9">[9]</a> (one mask, batches of 64). SAM's outline replaces the footprint only if it overlaps it at IoU ≥ 0.3 and its area is 0.5–2× the footprint's; otherwise the footprint stays. About 70% of buildings are accepted. Pad and threshold were picked on the calibration half.</li>
+<li><b>Teacher fusion (new, round 2).</b> Soft label = w · teacher probability + (1 − w) · refined label. Cut at 0.5, this means the footprint lowers the teacher's bar inside a building and raises it outside: at w = 0.7 a pixel inside a footprint counts as roof above p = 0.29, outside only above p = 0.71. Trained with the soft values directly (<code>--soft_masks</code>), as Sirko et al. <a class="ref" href="#r3">[3]</a> did with soft teacher labels.</li>
+</ul></div></details>
+
+<details><summary>Stage 3 · Training settings</summary><div>
+<div class="tbl"><table>
+<tr><th>Setting</th><th>Value</th><th>Source</th></tr>
+<tr><td>Input</td><td>RGB 512 × 512, ImageNet mean/std</td><td></td></tr>
+<tr><td>Loss</td><td>0.5 × BCE + 0.5 × Dice; edge variant multiplies BCE by 1 + 200 × Gaussian(σ 5.6 px) of the label boundary</td><td>Sirko 2021 <a class="ref" href="#r3">[3]</a> (σ 3 px at 50 cm → 5.6 px here)</td></tr>
+<tr><td>Optimiser</td><td>AdamW, lr 1e-4 decoder / 1e-5 encoder, weight decay 1e-4</td><td>Loshchilov &amp; Hutter <a class="ref" href="#r7">[7]</a></td></tr>
+<tr><td>Schedule</td><td>cosine to 1e-6, 40 epochs, early stop patience 15, AMP, seed 42</td><td></td></tr>
+<tr><td>Augmentation</td><td>flips, RandomRotate90, ShiftScaleRotate (±10% shift, ±20% scale), GaussNoise, ColorJitter</td><td></td></tr>
+<tr><td>Model selection</td><td>best IoU on validation tiles against <i>unshifted</i> Open Buildings: no hand label touches training</td><td></td></tr>
+</table></div></div></details>
+
+<details><summary>Stage 4 · Inference and the solar-panel detector</summary><div>
+<ul>
+<li>8-way dihedral test-time augmentation: the crop is rotated 0/90/180/270° with and without a flip, each prediction is mapped back and the 8 probabilities are averaged. Worth +0.010 (CI +0.007 to +0.013). Averaging different models or seeds adds nothing: they make the same mistakes, which points at the labels.</li>
+<li>Threshold 0.40, chosen on calibration. All models are under-confident on real roofs, so 0.3–0.4 beats the default 0.5.</li>
+<li>Existing rooftop PV: a separate U-Net trained on the French BDAPPV panel set plus about 15,000 no-panel crops and 3,955 Jaipur ground negatives. It finds 0.444 km² of panels (about 56–89 MWp), a lower bound because no Jaipur panel labels exist.</li>
+</ul></div></details>
+
+<details><summary>Stage 5 · Energy chain</summary><div>
+<p class="mono">P (GWp) = A_roof × k_usable × η × 1 kW/m²   with k_usable 0.60, η 0.20<br>E (TWh/yr) = P × PVOUT × derate   with PVOUT 1,630 kWh/kWp/yr (Global Solar Atlas, 5 points: 1,627–1,641), derate 0.95</p>
+<p>The roof area is divided by the model's measured over-prediction on the hand crops (1.21 on calibration, 1.07 on test) before it enters the formula. We never multiply PVOUT by a performance ratio: PVOUT already contains most system losses, and doing both under-estimates by 22.5% (diagnostic D15).</p></div></details>
+
+<details><summary>Evaluation protocol</summary><div>
+<ul>
+<li>152 hand-drawn roof crops from three annotators, split by map tile into calibration (76) and test (76) halves with a similar annotator mix.</li>
+<li>Pooled pixel IoU over all crops in a half. The label gate also ignores a 24 px border, where shifted labels are cut off.</li>
+<li>Paired bootstrap over crops, 2,000 resamples, for every difference against the baseline.</li>
+<li>Seed noise: 0.004 (three seeds of the shifted ResNet34) to 0.015 (older set). A single-seed gain below about 0.015 needs a second seed before we claim it.</li>
+</ul></div></details>
+</section>
+
+<section id="journey">
+<h2>How we got here: September to November</h2>
+<p>The project started as domain adaptation: take a rooftop model trained on AIRS (Christchurch, New Zealand) and adapt it to Jaipur without Jaipur labels. That failed every time. Open Buildings footprints, used directly as noisy labels, worked from the first try. The hand labels that arrived in November then reordered the September conclusions.</p>
+<figure class="fig"><div class="scroll"><svg id="journey-chart" viewBox="0 0 900 470" width="900" style="min-width:700px;max-width:none" role="img" aria-label="Hand-label IoU by method"></svg></div>
+<figcaption>Figure 5. IoU against hand-drawn roofs. Grey: domain adaptation from AIRS. Blue: weak supervision on Open Buildings. Top block: 136-crop set at threshold 0.5 (Nov 19 scoring). Bottom block: test half, threshold chosen on calibration. Open Buildings itself, drawn as a mask, scores 0.504: every model trained on it beats its own teacher.</figcaption>
+</figure>
+<div class="tbl"><table>
+<tr><th>When</th><th>What we learned</th><th>Evidence</th><th></th></tr>
+<tr><td>Sep 9</td><td>FDA and histogram matching make the AIRS model worse; AIRS pretraining is worth the same as ImageNet</td><td class="num">0.089 / 0.026 vs 0.142 · 0.6483 vs 0.6475</td><td><span class="pill rej">rejected</span></td></tr>
+<tr><td>Sep 9</td><td>Training on Open Buildings labels alone</td><td class="num">0.648 vs seed 0.142 (vs OB)</td><td><span class="pill kept">kept</span></td></tr>
+<tr><td>Sep 10</td><td>Self-training on Jaipur never beats its teacher; CBST ratio thresholds collapse</td><td class="num">R5, R5b</td><td><span class="pill rej">rejected</span></td></tr>
+<tr><td>Sep 10</td><td>Eroding labels 0.4 m stops buildings merging (pred/label 0.99 ± 0.08)</td><td class="num">merge 0.50 → 0.33</td><td><span class="pill std">superseded</span></td></tr>
+<tr><td>Sep 11</td><td>First energy figure: k_usable is 68% of the error bar, segmentation 2%</td><td class="num">4.59 GWp ±15.2%</td><td><span class="pill std">revised</span></td></tr>
+<tr><td>Oct 30</td><td>DUDA distillation and annotation-free arms A–R collapse</td><td class="num">0.04–0.27 (vs OB)</td><td><span class="pill rej">rejected</span></td></tr>
+<tr><td>Nov 19</td><td>Hand labels: the ranking flips. The eroded default is the worst Open Buildings model; all-confidence ResNet34 is best</td><td class="num">0.564 vs 0.632</td><td><span class="pill kept">kept</span></td></tr>
+<tr><td>Nov 20</td><td>Open Buildings sits 7 px north / 3 px east of the roofs: shifting the labels</td><td class="num">0.659 → 0.697 test</td><td><span class="pill kept">kept</span></td></tr>
+<tr><td>Nov 20</td><td>8-way TTA; ensembles add nothing; fine-tuning on 76 hand crops does not generalise</td><td class="num">0.706 · −0.021 / +0.026</td><td><span class="pill kept">TTA kept</span></td></tr>
+</table></div>
+<h3>Where the remaining error lives</h3>
+<figure class="fig"><div class="scroll"><svg id="budget-chart" viewBox="0 0 900 230" width="900" style="min-width:680px;max-width:none" role="img" aria-label="Error budget"></svg></div>
+<figcaption>Figure 6. Left: where the wrong pixels are (test half, ResNet34 + TTA). Right: IoU if we forgive a band of 1, 2 or 3 px around every hand-drawn roof edge. Even forgiving 80 cm only reaches 0.776, so the shapes themselves are off: footprint vs roof outline, merged neighbours, and annotator style (one annotator draws roofs 1.02× the footprint area, the others 1.24–1.37×).</figcaption>
+</figure>
+</section>
+
+<section id="overnight">
+<h2>Overnight experiments</h2>
+<p>The error budget says the labels, not the model, are the limit. So round 1 changed one thing at a time against the baseline (ResNet34 on shifted labels, seed 42, 40 epochs): two model-side changes and three label-side changes. All five trained in parallel on the DGX V100s. Big files (SAM weights, extra libraries, refined labels, checkpoints) went to host <code>/tmp</code> because the home quota had 2 GB left.</p>
+
+<h3>Step 1: the label gate (before any training)</h3>
+<p>Each candidate label set was scored directly against the hand roofs. This is cheap (minutes, no training) and tells us which label sets are worth a 2-hour training run.</p>
+<figure class="fig"><div class="scroll"><svg id="gate-chart" viewBox="0 0 900 330" width="900" style="min-width:680px;max-width:none" role="img" aria-label="Label gate"></svg></div>
+<figcaption id="gate-cap">Figure 7. IoU of each label set against the hand roofs (pooled, 24 px border ignored). Bars show the test half; the calibration value is printed beside each. Grey: position fixes only. Blue: SAM outlines. Ochre: labels that use the trained model (teacher). The model's own prediction is a better label than any refined footprint, and fusing it with the SAM-refined footprint (w = weight on the teacher, cut at 0.5) does not beat the teacher alone on calibration (0.688 vs 0.689). So round 2 trains on the teacher alone and on the w = 0.8 fusion.</figcaption>
+</figure>
+
+<h3>Step 2: round 1, five one-change runs</h3>
+<div class="tbl"><table id="r1-table">
+<tr><th>Run</th><th>What changed</th><th>Source</th><th>Test IoU</th><th>Gain of run + TTA over the plain model without TTA, 0.697 (95% CI). TTA alone gives +0.010, so beat +0.010 to beat the baseline.</th><th></th></tr>
+<tr><td>baseline</td><td>ResNet34 on shifted Open Buildings, + TTA</td><td>[1,2,4]</td><td class="num">0.706</td><td class="num">+0.010 (+0.007 to +0.013)</td><td><span class="pill std">reference</span></td></tr>
+<tr data-tag="edge"><td>edge</td><td>BCE weighted ×(1 + 200·Gaussian) at label edges</td><td>Sirko 2021 [3]</td><td class="num">0.695</td><td class="num">−0.001 (−0.007 to +0.005)</td><td><span class="pill rej">no gain</span></td></tr>
+<tr data-tag="dino"><td>dino</td><td>DINOv3 ConvNeXt-Tiny encoder</td><td>DINOv3 [10], AnS [15]</td><td class="num">0.685</td><td class="num">−0.011 (−0.019 to −0.005)</td><td><span class="pill rej">worse</span></td></tr>
+<tr data-tag="lab_align"><td>lab_align</td><td>per-building shifted labels</td><td>OMAF [14], AnS [15]</td><td class="num">0.698</td><td class="num">+0.001 (−0.004 to +0.007)</td><td><span class="pill rej">no gain</span></td></tr>
+<tr data-tag="lab_sam"><td>lab_sam</td><td>SAM-refined labels</td><td>SAM [9], SAMRS [22]</td><td class="num">0.705</td><td class="num">+0.009 (+0.002 to +0.015)</td><td><span class="pill rej">no gain over TTA baseline (seed 2: 0.704)</span></td></tr>
+<tr data-tag="lab_align_sam"><td>lab_align_sam</td><td>per-building shift, then SAM</td><td>[9,14,15]</td><td class="num">0.704</td><td class="num">+0.007 (−0.002 to +0.017)</td><td><span class="pill open">seed 2: 0.708; best on calib</span></td></tr>
+<tr data-tag="ens_lab"><td>ensemble</td><td>average of lab_align and lab_align_sam, + TTA (picked on calib out of 120 combinations)</td><td>standard practice</td><td class="num">0.710</td><td class="num">+0.014 (+0.008 to +0.020)</td><td><span class="pill kept">gain</span></td></tr>
+</table></div>
+<figure class="fig"><div class="scroll"><svg id="r-chart" viewBox="0 0 900 360" width="900" style="min-width:680px;max-width:none" role="img" aria-label="Round results"></svg></div>
+<figcaption>Figure 8. Test-half IoU with TTA at the calibration-chosen threshold; whiskers are the 95% paired-bootstrap interval of the gain over the baseline, drawn around each run's score.</figcaption>
+</figure>
+
+<h3>Step 3: round 2, teacher self-training</h3>
+<div id="r2-body">
+<p>The gate showed the trained model's own predictions (0.723 on test) are better labels than any refined footprint (best 0.650). Self-training on Jaipur failed in September, but those arms used <i>hard</i> labels from an <i>out-of-domain</i> AIRS teacher. Here the teacher is the in-domain 0.706 model and the labels stay soft, as in Sirko et al. <a class="ref" href="#r3">[3]</a>, and each round is rebuilt from the original footprints, as Girard et al. <a class="ref" href="#r6">[6]</a> recommend.</p>
+<div id="r2-status">
+<div class="tbl"><table>
+<tr><th>Run</th><th>Training labels</th><th class="num">Test IoU, 1 pass</th><th class="num">Test IoU, + TTA</th><th class="num">Gain of + TTA over 0.697 (95%)</th></tr>
+<tr><td>st_soft_pred</td><td>teacher probability (r34_c0_shift + TTA)</td><td class="num">0.703</td><td class="num">0.706</td><td class="num">+0.009 (+0.006 to +0.014)</td></tr>
+<tr><td>st_soft_fuse08</td><td>0.8 × teacher + 0.2 × shift+SAM footprint, soft</td><td class="num">0.706</td><td class="num">0.708</td><td class="num">+0.011 (+0.007 to +0.016)</td></tr>
+</table></div>
+<p><b>What it means.</b> The student learns the teacher's averaged-over-8-views answer and gives it back in <i>one</i> forward pass: 0.706 single-pass versus the teacher's 0.697, which makes it 8× cheaper to run for the full city. It does not beat the teacher with TTA by much (0.708 vs 0.706, within seed noise), so a third self-training round is not worth the GPU time. Fusing in the SAM footprint helps slightly (+0.002), which the gate predicted: on calibration, fusion w = 0.8 and the teacher alone were tied (0.688 vs 0.689).</p>
+<p><b>Second seeds (seed 43).</b> Shift+SAM labels: 0.705 and 0.706 single-pass for the two seeds, against 0.697 for the plain model, so a <b>+0.008 single-pass gain that reproduces</b>, and calibration agrees (0.677 and 0.673 vs 0.660). With TTA the two seeds give 0.704 and 0.708, the same as the baseline with TTA (0.706): the cleaner labels and TTA fix the same errors, so they do not stack. SAM-only labels did not reproduce (seed 43: 0.699 single-pass, 0.704 with TTA).</p>
+<p><b>Best combination.</b> Out of 510 single models and ensembles, the one with the best <i>calibration</i> score is the average of the shift+SAM model and the self-trained student, with TTA: <b>0.712 on test, +0.015 (+0.009 to +0.022)</b> over the plain model, +0.006 over the baseline with TTA. Every top-10 calibration configuration lands between 0.706 and 0.713 on test. The overnight runs found a ceiling near 0.71, not a jump. The headline reproduces: swapping in the seed-43 shift+SAM model gives 0.712 again (+0.015, +0.010 to +0.021).</p>
+</div>
+</div>
+</section>
+
+<section id="techniques">
+<h2>The modern techniques, in plain words</h2>
+<div class="cards">
+<div class="card"><h4>Weak supervision from open footprints</h4><p>Instead of hand-drawing thousands of roofs, train on polygons someone else's detector already drew. The labels are noisy (offset, footprint not roof, missing buildings), but there are half a million of them in the right city. Kaiser et al. <a class="ref" href="#r4">[4]</a> showed this works with OpenStreetMap; Open Buildings <a class="ref" href="#r3">[3]</a> gives Jaipur coverage.</p><p><span class="pill kept">the core of the result</span></p></div>
+<div class="card"><h4>Label offset correction</h4><p>Satellite images are not perfectly vertical, so a roof appears shifted from its footprint. Girard et al. <a class="ref" href="#r6">[6]</a> learn the shift; OMAF <a class="ref" href="#r14">[14]</a> (CVPR 2026) learns it per building. We use one global shift plus a per-building template match.</p><p><span class="pill kept">+0.038 IoU</span></p></div>
+<div class="card"><h4>Segment Anything (SAM)</h4><p>A foundation model that cuts out any object given a box or point. We give it each footprint's box and keep its outline when it agrees with the footprint. SAMRS <a class="ref" href="#r22">[22]</a> used the same box-to-mask trick to build datasets.</p><p><span class="pill open">labels 0.606 → 0.650, model +0.007</span></p></div>
+<div class="card"><h4>DINOv3 backbone</h4><p>Meta's 2025 self-supervised image encoder <a class="ref" href="#r10">[10]</a>, trained on 1.7 billion images without labels. Align and Segment <a class="ref" href="#r15">[15]</a> uses its ConvNeXt-Tiny version for exactly this problem (misaligned building labels).</p><p><span class="pill rej">−0.011, worse here</span></p></div>
+<div class="card"><h4>Edge-weighted loss</h4><p>Google's Open Buildings paper <a class="ref" href="#r3">[3]</a> weights pixels near building edges up to 200× in the loss, so the model learns to separate touching buildings. 93% of our error is at edges.</p><p><span class="pill rej">no gain (−0.001)</span></p></div>
+<div class="card"><h4>Soft-label self-training</h4><p>A trained model labels the training images again; a new model learns from those probabilities. Works when the teacher is better than the original labels, which our gate now measures directly (0.723 vs 0.650).</p><p><span class="pill kept">student = teacher+TTA in 1 pass</span></p></div>
+<div class="card"><h4>Test-time augmentation</h4><p>Predict on the crop and its 7 rotated/flipped copies, undo the transform, average. Free at training time, +0.010 here.</p><p><span class="pill kept">kept</span></p></div>
+<div class="card"><h4>Label-quality gate</h4><p>Before spending GPU hours, score each candidate label set against the held-out hand roofs. We found no prior paper that ranks label sources this way before training; overnight, the gate ranking and the trained ranking agreed only loosely (Spearman 0.77 single-pass, 0.54 with TTA, 6 label sets, not significant).</p><p><span class="pill open">weak evidence so far</span></p></div>
+</div>
+</section>
+
+<section id="sources">
+<h2>Which technique comes from which paper</h2>
+<p>Every citation below was checked against arXiv, Crossref or OpenAlex on 21 Nov (dblp blocks automated access and was checked by hand on 20 Nov). Full verification table: <code>docs/report/lit_review.md</code>.</p>
+<div class="tbl"><table>
+<tr><th>Pipeline part</th><th>What we use</th><th>Paper</th><th>How we differ</th></tr>
+<tr><td>Network</td><td>U-Net encoder-decoder with skips</td><td>Ronneberger et al., MICCAI 2015 <a class="ref" href="#r1">[1]</a></td><td>standard</td></tr>
+<tr><td>Encoder</td><td>ResNet34, ImageNet</td><td>He et al., CVPR 2016 <a class="ref" href="#r2">[2]</a></td><td>standard</td></tr>
+<tr><td>Encoder</td><td>MiT-B2 transformer</td><td>Xie et al., SegFormer, NeurIPS 2021 <a class="ref" href="#r8">[8]</a></td><td>ties ResNet34 (0.700 vs 0.697)</td></tr>
+<tr><td>Encoder</td><td>ConvNeXt-T DINOv3</td><td>Siméoni et al., 2025 <a class="ref" href="#r10">[10]</a></td><td>same choice as AnS <a class="ref" href="#r15">[15]</a></td></tr>
+<tr><td>Labels</td><td>Open Buildings polygons</td><td>Sirko et al., 2021 <a class="ref" href="#r3">[3]</a></td><td>all confidences, not ≥ 0.75</td></tr>
+<tr><td>Labels</td><td>training on map data as noisy labels</td><td>Mnih &amp; Hinton, ICML 2012 <a class="ref" href="#r5">[5]</a>; Kaiser et al., TGRS 2017 <a class="ref" href="#r4">[4]</a></td><td>Open Buildings instead of OSM; Indian city</td></tr>
+<tr><td>Labels</td><td>offset correction</td><td>Girard et al., IGARSS 2019 <a class="ref" href="#r6">[6]</a></td><td>one global shift, simpler than theirs</td></tr>
+<tr><td>Labels</td><td>per-object offsets</td><td>Xu et al., OMAF, CVPR 2026 <a class="ref" href="#r14">[14]</a>; Guthula et al., Align and Segment, 2026 <a class="ref" href="#r15">[15]</a></td><td>offline template match, no learned regressor</td></tr>
+<tr><td>Labels</td><td>box-prompted SAM masks</td><td>Kirillov et al., ICCV 2023 <a class="ref" href="#r9">[9]</a>; Wang et al., SAMRS, NeurIPS 2023 <a class="ref" href="#r22">[22]</a></td><td>acceptance test against the footprint; gated on hand roofs</td></tr>
+<tr><td>Loss</td><td>edge-weighted BCE</td><td>Sirko et al., 2021 <a class="ref" href="#r3">[3]</a></td><td>σ rescaled to 26.6 cm</td></tr>
+<tr><td>Training</td><td>AdamW</td><td>Loshchilov &amp; Hutter, ICLR 2019 <a class="ref" href="#r7">[7]</a></td><td>standard</td></tr>
+<tr><td>Self-training</td><td>soft teacher labels; rebuild from originals each round</td><td>Sirko 2021 <a class="ref" href="#r3">[3]</a>; Girard 2019 <a class="ref" href="#r6">[6]</a></td><td>fused with the refined footprint</td></tr>
+<tr><td>Baseline that failed</td><td>distilled UDA</td><td>Kang et al., DUDA, WACV 2026 <a class="ref" href="#r11">[11]</a></td><td>0.275 on hand labels</td></tr>
+<tr><td>Solar stage</td><td>BDAPPV panel detection reliability</td><td>Kasmi et al., EDS 2025 <a class="ref" href="#r12">[12]</a></td><td>retrained with negatives for Jaipur</td></tr>
+<tr><td>Ceiling</td><td>Inria aerial benchmark (~0.83 IoU, clean labels)</td><td>Maggiori et al., IGARSS 2017 <a class="ref" href="#r13">[13]</a></td><td>why 0.90 is not realistic here</td></tr>
+</table></div>
+</section>
+
+<section id="energy">
+<h2>The energy estimate</h2>
+<figure class="fig"><div class="scroll"><svg id="energy-chart" viewBox="0 0 900 250" width="900" style="min-width:680px;max-width:none" role="img" aria-label="Energy uncertainty budget"></svg></div>
+<figcaption>Figure 9. Left: the chain from roof area to annual energy, with today's numbers. Right: share of the ±15% uncertainty from each input (diagnostics D14–D16). Segmentation is 2%; the usable-roof fraction k_usable is 68%.</figcaption>
+</figure>
+<p>Better segmentation barely moves the energy error bar. The single most valuable next measurement for the energy number is <b>k_usable</b>, the fraction of a roof that can hold panels (water tanks, stairs, shade). It is assumed at 0.60; the one verified Indian source (Bhopal) gives 0.30, which would cut capacity to about 2.9–3.3 GWp.</p>
+</section>
+
+<section id="novelty">
+<h2>What is publishable, rated skeptically</h2>
+<div class="tbl"><table>
+<tr><th>Claim</th><th>Rating</th><th>Why, and what it still needs</th></tr>
+<tr><td>Open footprint labels beat seven UDA methods by a wide margin on the same hand-labelled test (0.70 vs 0.04–0.33)</td><td><span class="pill new">publishable, with fixes</span></td><td>Reviewers will call it unfair: Open Buildings is in-domain output of Google's detector. We already have two of the three missing controls: AIRS source-only on Jaipur (0.154 hand) and AIRS-initialised training on Open Buildings (same as ImageNet init, 0.6483 vs 0.6475). Still missing: a UDA method given Open Buildings labels as its source.</td></tr>
+<tr><td>A label-quality gate that ranks label sets against held-out roofs before training</td><td><span class="pill new">plausibly new</span></td><td>No precedent found, but overnight evidence is weak. Six label sets were trained. Gate (calib) vs trained model (calib): Spearman ρ = 0.77 single-pass, 0.54 with TTA; with n = 6 neither is significant (needs ρ ≥ 0.89). The clearest miss: the gate put the teacher's labels far above shift + SAM (0.689 vs 0.629), yet the shift + SAM model beat the self-trained student on calib and tied it on test. Label gains also shrink about 6× in training (+0.044 label IoU, about +0.008 model IoU). Needs 10+ label variants before it is a claim.</td></tr>
+<tr><td>Annotator style shifts roof IoU (area ratio 1.02 vs 1.24–1.37)</td><td><span class="pill new">plausibly new</span></td><td>Closest is the RID roof dataset's agreement study <a class="ref" href="#r34">[34]</a>. Needs the same 30–50 crops drawn by two or three annotators.</td></tr>
+<tr><td>Teacher-footprint fusion for self-training</td><td><span class="pill std">not enough</span></td><td>Overnight result: 0.708 vs 0.706 for the teacher with TTA, inside seed noise. Worth one line in framing B (the student matches teacher + TTA in a single pass, 8× cheaper inference), not a contribution by itself.</td></tr>
+<tr><td>Global 7 / 3 px offset</td><td><span class="pill std">incremental</span></td><td>The simplest case of Girard 2019 and OMAF, and it was measured against hand roofs, so it is not label-free.</td></tr>
+<tr><td>Per-building alignment</td><td><span class="pill std">not new</span></td><td>OMAF and Align and Segment do it better; our gain was 0.606 → 0.610. A useful negative result: after the global shift, position is no longer the bottleneck, shape is.</td></tr>
+<tr><td>City-scale GWp / TWh from open labels</td><td><span class="pill std">application</span></td><td>Google's Satellite Sunroof <a class="ref" href="#r29">[29]</a> covers the Global South; Singla &amp; Kalase <a class="ref" href="#r30">[30]</a> cover Indian cities with a DSM. Ours is open-label with a held-out roof test and propagated uncertainty.</td></tr>
+</table></div>
+<h3>Three paper framings</h3>
+<div class="cards">
+<div class="card"><h4>A · Open footprints vs domain adaptation</h4><p>"For Global South cities, open footprint products beat adapting Western benchmarks." Venues: CVPR EarthVision workshop, IGARSS, NeurIPS Climate Change AI workshop.</p><p>Needs: UDA-with-OB control; ideally a second city.</p></div>
+<div class="card"><h4>B · Which weak label should you train on?</h4><p>Label gate + SAM + per-building alignment + soft self-training, with the gate shown to predict downstream IoU. Venues: ISPRS Geospatial Week, IGARSS; extended to IEEE JSTARS.</p><p>Needs: more label variants so the gate test has enough points (6 is too few), and a double-annotated subset.</p></div>
+<div class="card"><h4>C · Jaipur rooftop PV with quantified uncertainty</h4><p>Open-label pipeline to GWp/TWh with an error budget. Venues: NeurIPS CCAI workshop, MDPI Remote Sensing, an energy journal.</p><p>Needs: measured k_usable; comparison with Google Solar API figures.</p></div>
+</div>
+<div class="callout"><b>Blocker for any submission:</b> the imagery is Google Maps tiles, whose terms forbid ML training, and the repository is public. Resolve the licence (or re-run on licensed imagery such as ISRO/NRSC or Maxar via a research agreement) before submitting anything.</div>
+</section>
+
+<section id="next">
+<h2>Next steps</h2>
+<div id="next-body">
+<ol>
+<li>Use the self-trained student <code>st_soft_fuse08</code> (single pass, 0.706) for the full-city run instead of the TTA teacher: same accuracy, 8× less inference. Its checkpoint is already copied to <code>experiments/2026-11-20-toward-higher-iou/ckpt_keep/</code> in the DGX home.</li>
+<li>For the label-gate claim, train 3–5 more label variants (SAM box pads, fusion weights) so the gate-vs-trained ranking can be tested as a correlation, not a top pick.</li>
+<li>Boundaries are 91% of the error: try a boundary-refinement head or a 2× upsampled input before any more label work.</li>
+<li>Measure k_usable on 100 roofs (it is 68% of the energy error).</li>
+<li>Have two annotators redraw the same 30–50 crops: turns the annotator-style finding into a result and tightens the test set.</li>
+<li>Run one UDA method with Open Buildings as its source labels (the missing control for framing A).</li>
+<li>Resolve the imagery licence.</li>
+</ol></div>
+</section>
+
+<section id="refs">
+<h2>References</h2>
+<ol class="refs">
+<li id="r1">Ronneberger, Fischer, Brox. U-Net: Convolutional Networks for Biomedical Image Segmentation. MICCAI 2015. <a href="https://doi.org/10.1007/978-3-319-24574-4_28">doi</a></li>
+<li id="r2">He, Zhang, Ren, Sun. Deep Residual Learning for Image Recognition. CVPR 2016. <a href="https://doi.org/10.1109/CVPR.2016.90">doi</a></li>
+<li id="r3">Sirko et al. Continental-Scale Building Detection from High Resolution Satellite Imagery. arXiv 2107.12283, 2021. <a href="https://arxiv.org/abs/2107.12283">arXiv</a></li>
+<li id="r4">Kaiser, Wegner, Lucchi, Jaggi, Hofmann, Schindler. Learning Aerial Image Segmentation From Online Maps. IEEE TGRS 55(11), 2017. <a href="https://doi.org/10.1109/TGRS.2017.2719738">doi</a></li>
+<li id="r5">Mnih, Hinton. Learning to Label Aerial Images from Noisy Data. ICML 2012. <a href="http://icml.cc/2012/papers/318.pdf">pdf</a></li>
+<li id="r6">Girard, Charpiat, Tarabalka. Noisy Supervision for Correcting Misaligned Cadaster Maps Without Perfect Ground Truth Data. IGARSS 2019. <a href="https://doi.org/10.1109/IGARSS.2019.8898071">doi</a></li>
+<li id="r7">Loshchilov, Hutter. Decoupled Weight Decay Regularization. ICLR 2019. <a href="https://arxiv.org/abs/1711.05101">arXiv</a></li>
+<li id="r8">Xie et al. SegFormer. NeurIPS 2021. <a href="https://arxiv.org/abs/2105.15203">arXiv</a></li>
+<li id="r9">Kirillov et al. Segment Anything. ICCV 2023. <a href="https://doi.org/10.1109/ICCV51070.2023.00371">doi</a></li>
+<li id="r10">Siméoni et al. DINOv3. arXiv 2508.10104, 2025. <a href="https://arxiv.org/abs/2508.10104">arXiv</a></li>
+<li id="r11">Kang et al. DUDA: Distilled Unsupervised Domain Adaptation for Lightweight Semantic Segmentation. WACV 2026. <a href="https://doi.org/10.1109/WACV61042.2026.00784">doi</a></li>
+<li id="r12">Kasmi, Dubus, Saint-Drenan, Blanc. Space-scale exploration of the poor reliability of deep learning models: rooftop PV. Environmental Data Science 4, e22, 2025. <a href="https://doi.org/10.1017/eds.2025.13">doi</a></li>
+<li id="r13">Maggiori, Tarabalka, Charpiat, Alliez. Can semantic labeling methods generalize to any city? The Inria aerial image labeling benchmark. IGARSS 2017. <a href="https://doi.org/10.1109/IGARSS.2017.8127684">doi</a></li>
+<li id="r14">Xu, Liu, Zeng, Wu, Qu, Zhang. Revisiting the Necessity of Full Accuracy: Weakly Supervised Object-Level Offset Correction for Misaligned Building Labels (OMAF). CVPR 2026. <a href="https://cvpr.thecvf.com/virtual/2026/poster/38531">poster page</a></li>
+<li id="r15">Guthula et al. Align and Segment: Unsupervised Learning for Building Segmentation From Misaligned Labels. arXiv 2607.10841, 2026. <a href="https://arxiv.org/abs/2607.10841">arXiv</a></li>
+<li id="r22">Wang et al. SAMRS: Scaling-up Remote Sensing Segmentation Dataset with Segment Anything Model. NeurIPS 2023 Datasets &amp; Benchmarks. <a href="https://arxiv.org/abs/2305.02034">arXiv</a></li>
+<li id="r29">Batchu et al. Satellite Sunroof. arXiv 2408.14400, 2024. <a href="https://arxiv.org/abs/2408.14400">arXiv</a></li>
+<li id="r30">Singla, Kalase. Solar potential analysis over Indian cities using high-resolution satellite imagery and DEM. arXiv 2411.04610, 2024. <a href="https://arxiv.org/abs/2411.04610">arXiv</a></li>
+<li id="r34">Krapf et al. RID: Roof Information Dataset. Remote Sensing 14(10), 2022. <a href="https://doi.org/10.3390/rs14102299">doi</a></li>
+</ol>
+<p style="font-size:13px;color:var(--muted)">Numbering follows <code>docs/report/lit_review.md</code>, which lists all 45 related papers, including the ones not cited here. Experiment details for every number: <code>docs/report/experiments_digest.md</code> and <code>experiments/*/README.md</code>.</p>
+</section>
+</main></div></div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+function el(p,tag,attrs,text){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;p.appendChild(e);return e}
+
+/* Horizontal bar chart. rows: {label, v, cls, lo, hi, note, group} */
+function hbars(svg,rows,o){
+  const W=+svg.getAttribute("viewBox").split(" ")[2], L=o.left||260, R=W-(o.right||70), T=o.top||30, rh=o.rh||26;
+  const x=v=>L+(v-o.min)/(o.max-o.min)*(R-L);
+  for(const t of o.ticks){el(svg,"line",{x1:x(t),x2:x(t),y1:T-8,y2:T+rows.length*rh+(o.gaps||0),class:"grid"});el(svg,"text",{x:x(t),y:T-12,"text-anchor":"middle",class:"t-s"},t.toFixed(o.dp??1))}
+  let y=T, last=null;
+  rows.forEach(r=>{
+    if(r.group&&r.group!==last){y+=last?14:0;el(svg,"text",{x:8,y:y+12,class:"t-lane"},r.group);y+=18;last=r.group}
+    el(svg,"text",{x:L-10,y:y+rh/2+4,"text-anchor":"end",class:r.bold?"t-h":"t-s"},r.label);
+    const w=Math.max(1,x(r.v)-L);el(svg,"rect",{x:L,y:y+4,width:w,height:rh-9,rx:3,class:"bar "+(r.cls||"")});
+    if(r.lo!=null){el(svg,"line",{x1:x(r.lo),x2:x(r.hi),y1:y+rh/2,y2:y+rh/2,class:"whisk"});el(svg,"line",{x1:x(r.lo),x2:x(r.lo),y1:y+rh/2-5,y2:y+rh/2+5,class:"whisk"});el(svg,"line",{x1:x(r.hi),x2:x(r.hi),y1:y+rh/2-5,y2:y+rh/2+5,class:"whisk"})}
+    el(svg,"text",{x:Math.max(x(r.v),r.hi!=null?x(r.hi):0)+6,y:y+rh/2+4,class:"t-m"},r.v.toFixed(3)+(r.note?"  "+r.note:""));
+    y+=rh;
+  });
+  svg.setAttribute("viewBox",`0 0 ${W} ${y+16}`);svg.setAttribute("height",y+16);
+}
+
+/* Fig 3: journey */
+hbars(document.getElementById("journey-chart"),[
+ {group:"136 HAND CROPS · THRESHOLD 0.5",label:"AIRS seed, no adaptation",v:.154,cls:"m"},
+ {group:"136 HAND CROPS · THRESHOLD 0.5",label:"DUDA distillation (WACV 2026)",v:.275,cls:"m"},
+ {group:"136 HAND CROPS · THRESHOLD 0.5",label:"best annotation-free arm (R)",v:.317,cls:"m"},
+ {group:"136 HAND CROPS · THRESHOLD 0.5",label:"Open Buildings polygons as-is",v:.504,cls:"o"},
+ {group:"136 HAND CROPS · THRESHOLD 0.5",label:"Sept default: MiT-B2, eroded",v:.564},
+ {group:"136 HAND CROPS · THRESHOLD 0.5",label:"ResNet34, all confidences",v:.632},
+ {group:"TEST HALF · THRESHOLD FROM CALIBRATION",label:"ResNet34, all conf, unshifted",v:.659},
+ {group:"TEST HALF · THRESHOLD FROM CALIBRATION",label:"+ labels shifted 7 S / 3 W",v:.697},
+ {group:"TEST HALF · THRESHOLD FROM CALIBRATION",label:"+ 8-way TTA (current best)",v:.706,bold:true},
+],{min:0,max:.8,ticks:[0,.2,.4,.6,.8],left:250});
+
+/* Fig 4: error budget (two panels drawn by hand) */
+(function(){const s=document.getElementById("budget-chart");
+ const parts=[["edges and partly covered roofs",93,"bar"],["inside missed buildings",4,"bar o"],["inside invented buildings",3,"bar b"]];
+ el(s,"text",{x:10,y:20,class:"t-lane"},"WHERE WRONG PIXELS ARE (TEST)");
+ let x=10;parts.forEach(p=>{const w=p[1]/100*400;el(s,"rect",{x,y:34,width:w,height:30,class:p[2]});x+=w});
+ parts.forEach((p,i)=>{el(s,"rect",{x:10,y:84+i*24,width:12,height:12,class:p[2]});el(s,"text",{x:30,y:94+i*24,class:"t-s"},p[1]+"%  "+p[0])});
+ el(s,"text",{x:490,y:20,class:"t-lane"},"IOU IF A BAND ROUND EDGES IS IGNORED");
+ const pts=[[0,.706],[1,.736],[2,.759],[3,.776]],X=v=>500+v*110,Y=v=>190-(v-.68)/(.12)*150;
+ [.70,.74,.78].forEach(t=>{el(s,"line",{x1:495,x2:850,y1:Y(t),y2:Y(t),class:"grid"});el(s,"text",{x:488,y:Y(t)+4,"text-anchor":"end",class:"t-s"},t.toFixed(2))});
+ el(s,"path",{d:"M"+pts.map(p=>X(p[0])+","+Y(p[1])).join("L"),fill:"none",stroke:"var(--cobalt)","stroke-width":2.2});
+ pts.forEach(p=>{el(s,"circle",{cx:X(p[0]),cy:Y(p[1]),r:4,fill:"var(--cobalt)"});el(s,"text",{x:X(p[0]),y:Y(p[1])-10,"text-anchor":"middle",class:"t-m"},p[1].toFixed(3));el(s,"text",{x:X(p[0]),y:212,"text-anchor":"middle",class:"t-s"},p[0]+" px")});
+})();
+
+/* Fig 5: label gate */
+const GATE=[
+ {label:"global shift (current labels)",v:.606,cls:"m"},
+ {label:"per-building shift",v:.610,cls:"m"},
+ {label:"SAM, box pad 10",v:.642},
+ {label:"per-building shift + SAM",v:.650},
+ {label:"fusion w = 0.6",v:.699,cls:"o"},
+ {label:"fusion w = 0.7",v:.710,cls:"o"},
+ {label:"fusion w = 0.8",v:.714,cls:"o"},
+ {label:"model's own TTA prediction",v:.723,cls:"o"},
+];
+const GATE_CAL={"global shift (current labels)":.589,"per-building shift":.598,"SAM, box pad 10":.615,"per-building shift + SAM":.629,"fusion w = 0.6":.678,"fusion w = 0.7":.686,"fusion w = 0.8":.688,"model's own TTA prediction":.689};
+GATE.forEach(r=>r.note="calib "+GATE_CAL[r.label].toFixed(3));
+function drawGate(){const s=document.getElementById("gate-chart");s.innerHTML="";hbars(s,GATE,{min:.5,max:.8,ticks:[.5,.6,.7,.8],left:270,dp:1})}
+drawGate();
+
+/* Fig 6: results with CIs; filled in as runs finish */
+const RES=[{label:"baseline ResNet34 + TTA",v:.706,lo:.703,hi:.709,cls:"m",bold:true},
+ {label:"edge-weighted BCE + TTA",v:.695,lo:.689,hi:.701},
+ {label:"DINOv3 ConvNeXt-T + TTA",v:.685,lo:.677,hi:.691,cls:"b"},
+ {label:"per-building shift labels + TTA",v:.698,lo:.693,hi:.704},
+ {label:"SAM labels + TTA",v:.705,lo:.699,hi:.712},
+ {label:"shift + SAM labels + TTA",v:.704,lo:.695,hi:.714},
+ {label:"ensemble shift, shift+SAM + TTA",v:.710,lo:.705,hi:.717,cls:"g"},
+ {label:"self-trained, teacher labels + TTA",v:.706,lo:.703,hi:.711,cls:"o"},
+ {label:"self-trained, fused labels + TTA",v:.708,lo:.704,hi:.713,cls:"o"},
+ {label:"best on calib: shift+SAM + student",v:.712,lo:.706,hi:.719,cls:"g",bold:true}];
+function drawRes(){const s=document.getElementById("r-chart");s.innerHTML="";hbars(s,RES,{min:.6,max:.78,ticks:[.6,.64,.68,.72,.76],left:270,dp:2})}
+drawRes();
+
+/* Fig 7: energy chain + uncertainty shares */
+(function(){const s=document.getElementById("energy-chart");
+ const steps=[["roof area (bias-corrected)","44–50 km²"],["× k_usable 0.60 × η 0.20","= 5.29–5.98 GWp"],["× PVOUT 1,630 × 0.95","= 8.2–9.3 TWh/yr"],["− existing PV 56–89 MWp","= 5.20–5.89 GWp"]];
+ el(s,"text",{x:10,y:20,class:"t-lane"},"ENERGY CHAIN");
+ steps.forEach((t,i)=>{el(s,"rect",{x:10,y:34+i*50,width:390,height:40,rx:5,class:"box"+(i===3?" g":"")});el(s,"text",{x:22,y:59+i*50,class:"t-s"},t[0]);el(s,"text",{x:388,y:59+i*50,"text-anchor":"end",class:"t-m"},t[1])});
+ el(s,"text",{x:470,y:20,class:"t-lane"},"SHARE OF THE ±15% ERROR BAR");
+ const sh=[["k_usable (assumed 0.60)",68.0,"bar o"],["PVOUT",14.2,"bar"],["panel efficiency η",10.9,"bar"],["derate",4.3,"bar m"],["segmentation",2.0,"bar g"],["erosion undo",0.6,"bar m"]];
+ sh.forEach((r,i)=>{const y=34+i*30;el(s,"text",{x:640,y:y+15,"text-anchor":"end",class:"t-s"},r[0]);el(s,"rect",{x:650,y:y+3,width:r[1]/70*190,height:18,rx:3,class:r[2]});el(s,"text",{x:656+r[1]/70*190,y:y+16,class:"t-m"},r[1]+"%")});
+})();
+
+/* Fig 3: label steps for one building */
+(function(){const s=document.getElementById("labsteps");
+ const roof="M48,62H128V102H108V140H48Z";              /* true roof, L-shaped */
+ const fp=(dx,dy)=>`M${56+dx},${70+dy}H${120+dx}V${132+dy}H${56+dx}Z`; /* footprint: smaller rectangle */
+ const P=[
+  ["1 · Open Buildings","offset ~1.9 m N/E|footprint is not the roof",p=>{el(p,"path",{d:fp(8,-16),class:"fp"})}],
+  ["2 · Global shift","7 px S, 3 px W|same for every building",p=>{el(p,"path",{d:fp(1,-3),class:"fp"})}],
+  ["3 · Per-building match","best overlap with the model|search window ±14 px",p=>{el(p,"rect",{x:34,y:48,width:110,height:106,fill:"none",stroke:"var(--muted)","stroke-dasharray":"3 3"});el(p,"path",{d:fp(-2,0),class:"fp"})}],
+  ["4 · SAM box prompt","padded box prompts SAM|outline follows the roof",p=>{el(p,"rect",{x:40,y:54,width:96,height:94,fill:"none",stroke:"var(--good)","stroke-dasharray":"5 3"});el(p,"path",{d:"M50,64H126V101H107V138H50Z",class:"sam"})}],
+  ["5 · Accept or keep","IoU ≥ 0.3, area 0.5–2×|otherwise keep footprint",p=>{el(p,"path",{d:"M50,64H126V101H107V138H50Z",class:"fp"});el(p,"text",{x:88,y:170,"text-anchor":"middle",class:"t-s",style:"fill:var(--good)"},"accepted (≈70% of buildings)")}],
+  ["6 · Teacher fusion","0.8·p + 0.2·L|values kept soft (0–1)",p=>{for(let i=0;i<6;i++)el(p,"path",{d:roof,fill:"var(--ochre)",opacity:.08,transform:`translate(${(i%3)-1},${(i>2?1:-1)}) scale(1)`});el(p,"path",{d:roof,class:"fp"});el(p,"text",{x:88,y:170,"text-anchor":"middle",class:"t-s"},"roof if p > 0.375 inside L,");el(p,"text",{x:88,y:184,"text-anchor":"middle",class:"t-s"},"p > 0.625 outside")}],
+ ];
+ P.forEach((d,i)=>{const g=el(s,"g",{transform:`translate(${10+i*182},10)`});
+  el(g,"rect",{x:0,y:30,width:172,height:160,rx:6,class:"gnd"});
+  el(g,"text",{x:0,y:14,class:"t-h",style:"font-size:12.5px"},d[0]);
+  const inner=el(g,"g",{transform:"translate(-2,6)"});
+  el(inner,"path",{d:roof,class:"roof"});d[2](inner);
+  d[1].split("|").forEach((t,j)=>el(g,"text",{x:0,y:208+j*15,class:"t-s"},t));
+  if(i<5)el(s,"path",{d:`M${10+i*182+174},${110}h6`,class:"arr"});
+ });
+ el(s,"rect",{x:10,y:248,width:12,height:12,class:"roof"});el(s,"text",{x:28,y:258,class:"t-s"},"true roof");
+ el(s,"rect",{x:110,y:248,width:12,height:12,class:"fp"});el(s,"text",{x:128,y:258,class:"t-s"},"training label");
+ el(s,"rect",{x:240,y:248,width:12,height:12,fill:"none",stroke:"var(--good)","stroke-width":2});el(s,"text",{x:258,y:258,class:"t-s"},"SAM outline");
+})();
+
+/* Fig 2: U-Net diagram, classic U: encoder steps down-right, decoder steps up-right */
+(function(){const g=document.getElementById("unet");
+ const enc=[["input image","3 × 512 × 512"],["stem: conv 7×7 /2 · BN · ReLU","64 × 256 × 256"],["maxpool /2 · layer1: 3 blocks","64 × 128 × 128"],["layer2: 4 blocks, /2","128 × 64 × 64"],["layer3: 6 blocks, /2","256 × 32 × 32"],["layer4: 3 blocks, /2","512 × 16 × 16"]];
+ const dec=[["D5 (no skip) → head conv 3×3","16 × 512² → 1 × 512²"],["D4 + skip(stem)","32 × 256 × 256"],["D3 + skip(layer1)","64 × 128 × 128"],["D2 + skip(layer2)","128 × 64 × 64"],["D1 + skip(layer3)","256 × 32 × 32"]];
+ const Y=l=>40+l*58, W=220, ex=l=>20+l*44, dx=l=>1080-W-l*44;
+ enc.forEach((e,l)=>{el(g,"rect",{x:ex(l),y:Y(l),width:W,height:42,rx:5,class:"box k"});el(g,"text",{x:ex(l)+10,y:Y(l)+17,class:"t-h",style:"font-size:12px"},e[0]);el(g,"text",{x:ex(l)+10,y:Y(l)+34,class:"t-m"},e[1]);
+   if(l<5)el(g,"path",{d:`M${ex(l)+30},${Y(l)+42}V${Y(l+1)}`,class:"arr","marker-end":"url(#b1)"})});
+ dec.forEach((d,l)=>{el(g,"rect",{x:dx(l),y:Y(l),width:W,height:42,rx:5,class:"box"+(l===0?" g":"")});el(g,"text",{x:dx(l)+10,y:Y(l)+17,class:"t-h",style:"font-size:12px"},d[0]);el(g,"text",{x:dx(l)+10,y:Y(l)+34,class:"t-m"},d[1]);
+   if(l<4)el(g,"path",{d:`M${dx(l+1)+W-30},${Y(l+1)}V${Y(l)+42}`,class:"arr","marker-end":"url(#b1)"})});
+ for(let l=1;l<=4;l++)el(g,"path",{d:`M${ex(l)+W},${Y(l)+21}H${dx(l)}`,class:"arr k","marker-end":"url(#b2)",style:"stroke-dasharray:6 4"});
+ el(g,"path",{d:`M${ex(5)+W},${Y(5)+21}H${dx(4)+W/2}V${Y(4)+42}`,class:"arr","marker-end":"url(#b1)"});
+ el(g,"text",{x:ex(5)+W+12,y:Y(5)+16,class:"t-s"},"bottleneck → upsample ×2");
+ el(g,"text",{x:520,y:Y(1)+16,"text-anchor":"middle",class:"t-s",style:"fill:var(--cobalt)"},"skip connections (concatenate)");
+ el(g,"text",{x:20,y:418,class:"t-s"},"encoder block (BasicBlock) = conv 3×3 → BN → ReLU → conv 3×3 → BN, + identity shortcut (1×1 conv when the stride is 2), → ReLU");
+ el(g,"text",{x:20,y:436,class:"t-s"},"decoder block = nearest upsample ×2 → concatenate skip → (conv 3×3 → BN → ReLU) × 2      output: sigmoid → roof if p > 0.40");
+})();
+</script>

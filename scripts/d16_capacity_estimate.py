@@ -119,7 +119,7 @@ def main(a):
         ("erosion un-do", eff_ratio, 0.010, "SELF-CHECKED — 1.0 when output is already un-eroded"),
         ("k_usable", a.k_usable, 0.075, "ASSUMED — 68% of variance (D14/D15)"),
         ("eta", a.eta, 0.010, "PLANNED — mono-PERC"),
-        ("PVOUT", a.pvout, 100.0, "SECONDARY — not citable, needs GSA map (D15)"),
+        ("PVOUT", a.pvout, 50.0, "Global Solar Atlas v2.2.68, 1627-1641 over Jaipur (2026-11-20)"),
         ("rooftop derate", a.rooftop_derate, 0.030, "ASSUMED (D15)"),
     ]
     rel = np.array([sd / mu for _, mu, sd, _ in terms])
@@ -159,7 +159,7 @@ def main(a):
                    "variance_share": round(float(share[i]), 4), "provenance": prov}
                   for i, (nm, mu, sd, prov) in enumerate(terms)],
         "caveats": [
-            "PVOUT is secondary-source and not citable (D15)",
+            "PVOUT from Global Solar Atlas (Solargis v2.2.68), 1627-1641 kWh/kWp over Jaipur",
             "train crops were seen during training; full-AOI total is partly in-sample",
             "areas are agreement with Open Buildings, which over-covers (D10)",
             "PVOUT x rooftop_derate, never PVOUT x PR (D15)",
@@ -178,7 +178,7 @@ if __name__ == "__main__":
                    help="eroded label area / un-eroded label area (0.20172/0.2306)")
     p.add_argument("--k_usable", type=float, default=0.60)
     p.add_argument("--eta", type=float, default=0.20)
-    p.add_argument("--pvout", type=float, default=1750.0)
+    p.add_argument("--pvout", type=float, default=1630.0)  # GSA, was an uncited 1750
     p.add_argument("--rooftop_derate", type=float, default=0.95)
     p.add_argument("--batch", type=int, default=16)
     p.add_argument("--out", default="diagnostics/d16_capacity.json")
