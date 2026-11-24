@@ -73,8 +73,23 @@ class SoftSet(Dataset):
         return torch.from_numpy(norm(o["image"])), torch.from_numpy(t)[None]
 
 
-def soft_loss(logits, target):
-    bce = F.binary_cross_entropy_with_logits(logits, target)
+def edge_band(target, px):
+    """1 on a px-wide band around the teacher's roof boundary (binary t>0.5), else 0. Shape B,1,H,W."""
+    b = (target > 0.5).float()
+    k = 2 * px + 1
+    dil = F.max_pool2d(b, k, 1, px)
+    ero = -F.max_pool2d(-b, k, 1, px)
+    return (dil - ero).clamp(0, 1)
+
+
+def soft_loss(logits, target, edge_w=0.0, edge_px=3):
+    """Soft BCE + soft Dice. edge_w > 0 up-weights BCE on the teacher-boundary band (edge-aware arm):
+    weight = 1 + edge_w inside the band, 1 elsewhere (mean normalised so the loss scale is unchanged)."""
+    if edge_w > 0:
+        w = 1 + edge_w * edge_band(target, edge_px)
+        bce = (F.binary_cross_entropy_with_logits(logits, target, reduction="none") * w).sum() / w.sum()
+    else:
+        bce = F.binary_cross_entropy_with_logits(logits, target)
     p = torch.sigmoid(logits)
     inter = (p * target).sum((1, 2, 3))
     dice = 1 - (2 * inter + 1) / (p.sum((1, 2, 3)) + target.sum((1, 2, 3)) + 1)
@@ -130,13 +145,14 @@ def main(a):
     tst = [i for i, r in enumerate(rows) if r["half"] == "test"]
 
     hist = []
+    best_calib = -1.0
     for ep in range(1, a.epochs + 1):
         model.train()
         tot = 0.0
         for x, t in dl:
             x, t = x.to(dev, non_blocking=True), t.to(dev, non_blocking=True)
             with torch.autocast("cuda", dtype=torch.float16):
-                loss = soft_loss(model(x).float(), t)
+                loss = soft_loss(model(x).float(), t, a.edge_w, a.edge_px)
             opt.zero_grad(set_to_none=True)
             scaler.scale(loss).backward()
             scaler.step(opt); scaler.update(); sched.step()
@@ -146,7 +162,13 @@ def main(a):
         hist.append(r)
         print(f"ep {ep} loss {r['train_loss']:.4f} calib {r['calib_iou']:.3f} test {r['test_iou']:.3f} "
               f"area {r['test_area_ratio']:.2f} thr {r['thr']:.2f}", flush=True)
-        torch.save({"model_state": model.state_dict(), "epoch": ep, "args": vars(a)}, a.ckpt)
+        blob = {"model_state": model.state_dict(), "epoch": ep, "args": vars(a)}
+        torch.save(blob, a.ckpt)                                   # LAST epoch (the reported one)
+        if r["calib_iou"] > best_calib:                            # best by CALIB half only, never test
+            best_calib = r["calib_iou"]
+            torch.save(blob, os.path.splitext(a.ckpt)[0] + "_bestcalib.pth")
+        if a.save_every and ep % a.save_every == 0:
+            torch.save(blob, os.path.splitext(a.ckpt)[0] + f"_ep{ep}.pth")
 
     final = {}
     for name, tta in (("last_plain", False), ("last_tta8", True)):
@@ -169,6 +191,9 @@ if __name__ == "__main__":
     p.add_argument("--bs", type=int, default=16)
     p.add_argument("--lr", type=float, default=1e-4)
     p.add_argument("--sharpen", type=float, default=1.0)
+    p.add_argument("--edge_w", type=float, default=0.0, help="extra BCE weight on the teacher-boundary band (0 = off)")
+    p.add_argument("--edge_px", type=int, default=3, help="half-width in px of the boundary band")
+    p.add_argument("--save_every", type=int, default=0, help="also keep a checkpoint every N epochs (0 = off)")
     p.add_argument("--workers", type=int, default=4)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--ckpt", required=True)
