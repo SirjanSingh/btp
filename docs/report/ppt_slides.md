@@ -342,3 +342,112 @@ Background used: last semester's deck ("BTP Even Semester 2026-2027", 22 Apr 202
 | DINOv3 encoder | 0.011 worse |
 
 **Speaker line:** "Better labels from the teacher mattered; bigger models, longer training and extra tricks did not move the score beyond noise."
+
+---
+
+## Slide: Results 1, Results vs baselines
+
+**Title:** Results vs Baselines
+
+**Same protocol (76 test crops, threshold from calib):**
+
+| Method | Test IoU (95% CI) |
+|---|---|
+| CrossEarth zero-shot, S2A + TTA | 0.664 |
+| CrossEarth zero-shot, A2S + TTA | 0.677 (0.650-0.704) |
+| Route 2: ResNet-34 student + TTA (3 seeds) | 0.706 ± 0.005 |
+| Route 1: self-trained CrossEarth, single pass | 0.711 (0.685-0.738) |
+| **Route 1: self-trained CrossEarth + TTA** | **0.717** (0.689-0.745) |
+
+- **+0.040** over CrossEarth zero-shot with TTA, **+0.064** single pass (0.647 to 0.711)
+- Route 1 and Route 2 are about equal: the gap is inside the ±0.03 CI, and 0.717 is one run
+- Student beats its own teacher by about 5 sd of seed noise (0.706 vs 0.677)
+- Older protocol (all 152 crops, fixed 0.5, marked separately): AIRS source 0.154, our run of DUDA 0.274
+- Scale only, different data: about **86% of Inria supervised SOTA** (0.831)
+
+**Speaker line:** "Self-training lifts the foundation model by 0.04 IoU with no Jaipur labels for training. The small student keeps almost all of it."
+
+---
+
+## Slide: Results 2, Qualitative examples
+
+**Title:** Qualitative Results
+
+- Four hand-labelled crops, chosen for variety, not for score
+- Panels: image, hand label, ours (self-trained CrossEarth + TTA)
+- Ours follows visible roof outlines; dense and cluttered crops stay hard (IoU 0.48 and 0.32 on two of them)
+- Two crops from the calib half, two from the test half
+- Remaining errors: roof edges and touching neighbours
+
+---
+
+## Slide: Results 3, Why below supervised SOTA
+
+**Title:** Why We Are Below Supervised SOTA (0.83 to 0.92)
+
+- **93% of wrong pixels are on roof edges.** Ignoring a 3 px (80 cm) band: **0.706 to 0.776**
+- **Tiny roofs:** median 913 px vs 21,084 px in AIRS (23x smaller)
+- **Crowded:** 78% of roofs touch a neighbour
+- **Off-nadir imagery:** roofs sit 1.6 to 2 m off their footprints
+- **Annotator style differs:** hand/footprint area ratio 1.02 vs 1.24 to 1.37
+- **No target labels:** fine-tuning on 76 hand crops added nothing reliable, so a few labels do not close the gap
+- **Context:** SpaceNet, same winning method: F1 0.885 in Las Vegas vs 0.544 in Khartoum
+
+**Speaker line:** "Almost all the error is at roof boundaries of roofs the model found. That is a label and resolution limit more than a model limit."
+
+---
+
+## Slide: Results 4, Jaipur energy estimate
+
+**Title:** Jaipur Rooftop Solar Potential
+
+*(numbers below come from an earlier run and will be replaced by the student rerun)*
+
+- Processed area: 168 km² of about 175 km²
+- Roof area is measured; usable share is **assumed 50%** (not measured), range 0.30 to 0.60
+
+| k_usable | Capacity (GWp) | Energy (TWh/yr) |
+|---|---|---|
+| 0.30 | ≈ 2.7-3.0 | ≈ 4.1-4.7 |
+| **0.50 (base)** | **≈ 4.4-5.0** | **≈ 6.8-7.8** |
+| 0.60 | 5.3-6.0 | 8.2-9.3 |
+
+- Range ends = predicted/hand area bias on calib and test halves
+- Existing rooftop PV (panel model) removed: less than 0.1 GWp
+- Usable share is the dominant uncertainty; segmentation is about 2% of the error
+- Technical potential, not an installation forecast
+
+---
+
+## Slide: Contributions and Conclusion
+
+**Contributions**
+- Hand-labelled roof test set for an Indian city (we found no public equivalent)
+- Self-trained CrossEarth with calibrated pseudo-labels: 0.677 to 0.717
+- Small student: 0.706 ± 0.005 over 3 seeds
+- No Jaipur labels used for training
+- Finding: **source choice mattered more than adaptation method**
+- Pixels to energy for Jaipur, with an error budget
+
+**Conclusion**
+
+| Problem | What we did | Result |
+|---|---|---|
+| Western roof model collapsed on Jaipur (0.154); UDA from it stayed under 0.32 | Foundation model plus calibrated self-training | **0.717**, no Jaipur labels used for training |
+| Roofs tiny, dense, unlabelled | Small student for city scale | 0.706 ± 0.005, 8x cheaper |
+| Remaining error | Mostly at roof edges | Better labels, not bigger models |
+
+- Energy: Jaipur technical potential at 50% usable roof (placeholder until rerun); usable share dominates the error
+
+---
+
+## Slide: Future plan
+
+**Title:** Making the Result Trustworthy
+
+1. **Measure the usable roof share** on real roofs (obstacle labelling on a sample): the biggest error term
+2. **Second seed for 0.717, and a second city** to show it generalises
+3. **Rerun on licensed imagery** (ISRO/NRSC or Maxar); the current tiles' licence is unresolved
+4. **Panel model on Jaipur** with Jaipur panel labels, to map existing PV properly
+5. **Double-annotate a subset** to measure annotator agreement
+6. **Release the test set** if the licence allows
