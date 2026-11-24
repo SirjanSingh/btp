@@ -3,10 +3,95 @@
 Draft content for the project presentation. Numbers come from `docs/report/sota_standouts.md`
 and the experiment READMEs. † = unverified (check against the paper PDF before final submission).
 
-Status: SOTA, Novelty, Where We Stand done. Still to write: Motivation, Problem Statement,
-Objective, Literature Review, Methodology, Experiments, Results, Conclusion, Future Plan, References.
+Status: Motivation, Problem Statement, Objective, SOTA, Novelty, Where We Stand done. Still to
+write: Literature Review, Methodology, Experiments, Results, Conclusion, Future Plan, References.
 
 Wording rule: say "no Jaipur labels used for training", not "zero labels".
+
+Background used: last semester's deck ("BTP Even Semester 2026-2027", 22 Apr 2026, Canva) and the repo.
+
+---
+
+## Slide: Motivation
+
+**Title:** Motivation: Why Estimate Rooftop Solar from Satellite Images?
+
+- **India is pushing rooftop solar, but planning is blind**
+  - Large national rooftop programmes (e.g. PM Surya Ghar, 2024, 1 crore homes target†)
+  - Planners have no city-wide map of *where* rooftop potential is highest
+- **Manual surveys don't scale**
+  - Assessing millions of roofs one by one is too slow and too costly
+- **The imagery already exists**
+  - High-resolution aerial/satellite images cover Indian cities
+  - But no open tool turns them into roof area, capacity (kWp) and energy (kWh/yr) for India
+- **Global models don't transfer to India**
+  - Existing models and datasets are Western (US, New Zealand, France)
+  - Indian roofs are small, flat, concrete, densely packed, with water tanks and clutter
+
+**Our journey (the chain):**
+
+| Stage | When | What | Result |
+|---|---|---|---|
+| 1. Literature | Sem 1 | DeepSolar (US, 1.47M installations), U-Net, AIRS, BDAPPV, US PV dataset | Two-stage idea: roofs, then panels |
+| 2. Rooftop model (M₁) | Sem 1 | U-Net + ResNet-34 on AIRS (Christchurch, 7.5 cm/px) | **0.9016 IoU** (210 tiles) > PSPNet 0.899; 0.8664 on full test |
+| 3. Panel model (M₂) | Sem 1 | U-Net + ResNet-34 on BDAPPV (France, Google + IGN) | **0.848 IoU**, F1 0.918 |
+| 4. Energy formula | Sem 1 | Roof area → capacity, P = A × η | Planned: India deployment |
+| 5. Move to India | Sem 2 | Ran M₁ on Jaipur (26.6 cm/px) | **Collapsed: 0.154 IoU** on real roofs |
+| 6. Fix the transfer | Sem 2 | Weak labels, domain adaptation, foundation models | **0.717 IoU**, no Jaipur labels used for training |
+| 7. Energy for Jaipur | Sem 2 | Roof area → GWp → TWh/yr | ≈ 5.3–6.0 GWp, 8.2–9.3 TWh/yr |
+
+**Speaker line:** "Last semester our models beat published baselines on Western data. When we moved to Jaipur, the rooftop model dropped from 0.90 to 0.15. Making it work for India became this semester's problem."
+
+---
+
+## Slide: Problem Statement
+
+**Title:** Problem Statement
+
+**One-line statement:**
+> Estimate rooftop solar potential (roof area, capacity, energy) for an Indian city from aerial imagery, **when no labelled Indian training data exists**.
+
+**Why it's hard: the domain gap from AIRS (NZ) to Jaipur (India)**
+
+| Factor | AIRS (source) | Jaipur (target) |
+|---|---|---|
+| Resolution | 7.5 cm/px | **26.6 cm/px** (3.55× coarser) |
+| Median building size | 21,084 px | **913 px** (23× smaller) |
+| Roof share of image | 7.7% | **28.2%** (3.7× denser) |
+| Buildings touching a neighbour | — | **78%** |
+| Imagery | Orthorectified aerial | Off-nadir Google tiles (roofs shifted from footprints) |
+| Labels | Full pixel masks | **None** |
+
+**What goes wrong:**
+- The AIRS model predicts only **5.7% roof** on Jaipur (true ≈ 28%) → **0.154 IoU**
+- Image-style fixes (FDA, histogram matching) make it **worse**
+- Classical domain adaptation (CBST, DUDA, 10 self-training variants) gets only **0.04–0.33**
+- Free footprint data (Google Open Buildings, 523k polygons) is shifted and footprint-shaped: **0.50 IoU** against real roofs
+- Hand-labelling a whole city is the expensive step we want to avoid
+
+**Speaker line:** "Last semester's plan was to hand-label Indian roofs and fine-tune. We asked a harder question: can we do it without labelling any training data?"
+
+---
+
+## Slide: Objective
+
+**Title:** Objectives
+
+1. **Rooftop segmentation for Jaipur without Jaipur training labels**
+   - Transfer from labelled foreign data using domain adaptation, weak labels and foundation models
+   - Target: close the gap from 0.154 IoU toward supervised SOTA (0.83 on Inria)
+2. **Honest evaluation on real Indian roofs**
+   - Build a hand-labelled Jaipur test set (152 crops, calib/test split by tile)
+   - Score every model and label source on it, instead of on footprint data
+3. **Find the method that actually works for Indian cities**
+   - Compare source-only, image translation, classical UDA, weak supervision (Open Buildings) and foundation-model self-training on the same test
+4. **A light, deployable model for city scale**
+   - Distil the large model into a small U-Net that runs over all 175 km² of Jaipur
+5. **From pixels to energy**
+   - Roof area → capacity (kWp) → energy (kWh/yr), using Global Solar Atlas PVOUT
+   - Report an error budget, and estimate existing rooftop PV with the panel model (M₂)
+
+**Speaker line:** "Our objective moved from 'segment roofs' to 'segment Indian roofs with no Indian training labels, prove it on real hand labels, and turn it into an energy number'."
 
 ---
 
