@@ -50,6 +50,12 @@ btp/
 │   ├── 07-risks-licensing-ethics.md# Risk register + imagery licensing
 │   └── 08-sources.md               # Every source cited
 │
+├── docs/report/                    # Write-ups of results
+│   ├── index.html                  # Full study report (the page shown in meetings)
+│   ├── sota_standouts.md           # Every number where we beat or come close to published work
+│   ├── lit_review.md               # Literature review with checked citations
+│   └── experiments_digest.md       # One line per experiment and what it found
+│
 ├── prep_bdappv.py                  # Prepare BDAPPV solar panel dataset (resize, split)
 ├── Dockerfile                      # Docker image (PyTorch 2.1.2, CUDA 11.8)
 ├── requirements.txt                # Python dependencies
