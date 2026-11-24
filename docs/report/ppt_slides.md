@@ -209,3 +209,136 @@ Background used: last semester's deck ("BTP Even Semester 2026-2027", 22 Apr 202
 - Imagery licence unresolved: tiles look Google-sourced, and Google's terms forbid ML training
 - Energy figure: this deck uses the November figure calibrated on hand labels (5.3–6.0 GWp);
   `sota_standouts.md` still quotes the September 4.59 GWp / 7.62 TWh/yr. Use one figure throughout
+
+---
+
+## Slide: Methodology 1, Pipeline overview
+
+**Title:** Method: From a Foundation Model to Jaipur Roofs
+
+1. **Teacher:** CrossEarth (released WHU-Building weights, A2S and S2A) runs on **8,920 unlabelled Jaipur tiles** with 8-way TTA
+2. **Pseudo-labels:** keep only confident pixels, with cut-offs set on the 76 calib crops
+3. **Two routes**
+   - Route 1: self-train CrossEarth's adapters + head on hard pseudo-labels, **0.717**
+   - Route 2: train a small ResNet-34 U-Net student on the teacher's soft maps, **0.706 ± 0.005**
+4. **Inference:** 8-way TTA, threshold chosen on the calib half
+5. **Pixels to energy:** roof area, capacity, yearly energy
+- Final deployed model: the Route 2 student (cheap, 3 seeds). Best single run: Route 1
+- No Jaipur hand or footprint labels are used for training in either route
+
+**Speaker line:** "A foundation model labels Jaipur for us, we keep only the labels it is sure about, and we train on those."
+
+---
+
+## Slide: Methodology 2, CrossEarth and the calibrated pseudo-labels
+
+**Title:** Teacher and Calibrated Pseudo-labels
+
+- **CrossEarth** (Gong et al., arXiv 2410.22629): remote-sensing domain-generalisation model
+  - DINOv2-L backbone: **frozen**
+  - Reins adapters + Mask2Former head: **trained**
+  - Released WHU-Building A2S and S2A weights; zero-shot 0.677 / 0.664 (TTA)
+- **Calibration trap:** the output "probabilities" only span **0.27 to 0.73** (background sits at 0.269), so standard cut-offs fail
+  - Our first cut-offs (0.25 / 0.55) ignored 81% of pixels, so we stopped that run
+- **Cut-offs set on calib crops only:**
+  - roof if p ≥ 0.50 (**82% precise**)
+  - background if p ≤ 0.30 (**98.6% precise**)
+  - ignored in between
+  - Result: 23% roof, 16% ignored
+- Teacher for Route 1: average of A2S and S2A, with 8-way TTA
+
+**Speaker line:** "The model's scores are squeezed into a narrow band, so we measured the cut-offs instead of guessing them."
+
+---
+
+## Slide: Methodology 3, Two routes
+
+**Title:** Route 1 and Route 2
+
+| | Route 1: self-train CrossEarth | Route 2: ResNet-34 student |
+|---|---|---|
+| Trains | Reins adapters + Mask2Former head | Whole U-Net (ResNet-34, AIRS-initialised) |
+| Labels | Hard pseudo-labels with ignore band | Teacher soft probabilities |
+| Loss | Mask2Former default | Soft BCE + soft Dice |
+| Setup | 6,000 iterations, batch 2, AdamW lr 2e-5; resize 0.75-1.5, 512 crop, flip, colour jitter | 6 epochs, last epoch reported, 3 seeds |
+| Cost | ~65 min on one V100; heavy at inference | Small and about 8x cheaper at inference |
+| Test IoU (TTA) | **0.717** (one run) | **0.706 ± 0.005** |
+
+- Neither route sees a Jaipur hand label or a footprint during training
+- Hand crops are excluded by name from the unlabelled tiles
+
+**Speaker line:** "Route 1 gives the best single number; Route 2 is the one we deploy, because it is small and stable across seeds."
+
+---
+
+## Slide: Methodology 4, Pixels to energy
+
+**Title:** From Roof Pixels to Energy
+
+- **Area:** A = pixel count × GSD², GSD = 0.266 m
+- **Capacity:** P = A × k_usable × η × 1 kW/m²
+  - η = 0.20 (assumed panel efficiency)
+  - **k_usable not measured** (obstacle mapping at 26.6 cm/px is unreliable on cluttered Indian roofs): we assume **0.50**, and show **0.30 to 0.60**
+- **Energy:** E = P × PVOUT × 0.95
+  - PVOUT = 1,627 to 1,641 kWh/kWp/yr (Global Solar Atlas, 5 points)
+  - Not PVOUT × PR: that counts losses twice (22.5% too low)
+- **Area bias fix:** scale by predicted/hand roof area ratio measured on the calib and test halves, which gives the range
+- Existing rooftop PV, found by the panel model, is subtracted
+
+**Speaker line:** "Roof area is measured. The usable share is the one thing we could not measure, so we state our assumption and show its range."
+
+---
+
+## Slide: Experiments 1, Test protocol
+
+**Title:** How We Test
+
+- **152 hand-drawn Jaipur crops** (512 x 512, 26.6 cm/px) from all 16 tiles, 3 annotators
+- **Split by tile:** 76 calib / 76 test, so no tile is in both
+- Calib half sets thresholds and cut-offs; test half only scores
+- Headline models never trained on these crops
+- Metric: IoU, **95% CI by crop bootstrap, about ±0.03**
+- Older baselines: all 152 crops, fixed 0.5 threshold, always marked separately
+- Why hand labels: before them, every score was against Open Buildings, which was also the training label, so it measured agreement, not accuracy
+- **Wording:** "no Jaipur labels used for training" (calib crops set the threshold)
+
+---
+
+## Slide: Experiments 2, What failed
+
+**Title:** What Failed
+
+| Route | Hand IoU | Note |
+|---|---|---|
+| AIRS source model, no adaptation | 0.154 | predicts 5.7% roof where ~28% is true |
+| Ten self-training arms from AIRS | 0.04 to 0.32 | best arm 0.317 |
+| DUDA (our run, WACV 2026) | 0.274 | small AIRS source |
+| FDA, histogram matching | worse than nothing | scored on a footprint proxy |
+| SAM-refined teacher | 0.599 to 0.687 vs 0.701 plain | worse in 12 of 12 settings |
+| **Open Buildings weak supervision** | 0.706 | works in Jaipur, **not portable** |
+
+- Open Buildings route: needs a footprint database, footprints match real roofs at only 0.50 IoU, the +0.038 shift was tuned on hand labels
+- Our own implementations from a small source, not the authors' numbers (protocol: all 152 crops, fixed 0.5)
+
+**Speaker line:** "Everything that adapts from a small Western model stays under 0.32. The footprint route scores well here, but it needs a footprint product and hand-tuned alignment, so it is not a general method."
+
+---
+
+## Slide: Experiments 3, What worked and what did not move
+
+**Title:** What Worked
+
+- **Route 1:** self-trained CrossEarth, **0.717** (+0.040 over zero-shot)
+- **Route 2:** student on soft maps, **0.706 ± 0.005** (beats its own teacher, 0.677)
+- **TTA:** +0.010
+
+| Tried | Result |
+|---|---|
+| Teacher ensemble A2S + S2A | no gain (students 0.69 to 0.71) |
+| Student trained 15 vs 6 epochs | 0.711 vs 0.706, inside noise |
+| Edge-weighted loss | no gain |
+| MiT-B2 / seed ensembles | no gain |
+| Fine-tune on 76 hand crops | no reliable gain (-0.021 / +0.026) |
+| DINOv3 encoder | 0.011 worse |
+
+**Speaker line:** "Better labels from the teacher mattered; bigger models, longer training and extra tricks did not move the score beyond noise."
